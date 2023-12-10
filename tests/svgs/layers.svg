@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   sodipodi:docname="layers.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.43719246"
+     inkscape:cx="396.85039"
+     inkscape:cy="561.53759"
+     inkscape:window-width="1340"
+     inkscape:window-height="1041"
+     inkscape:window-x="576"
+     inkscape:window-y="18"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <rect
+       x="62.954131"
+       y="345.89926"
+       width="479.41597"
+       height="266.26934"
+       id="rect4" />
+  </defs>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Bottom layer" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Middle layer">
+    <g
+       inkscape:groupmode="layer"
+       id="layer5"
+       inkscape:label="Middle layer, bottom sublayer" />
+    <g
+       inkscape:groupmode="layer"
+       id="layer4"
+       inkscape:label="Middle layer, top sublayer" />
+  </g>
+  <g
+     inkscape:label="Top layer"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g2"
+       transform="translate(-28.032798,-3.2644433)">
+      <rect
+         style="fill:#a40000;stroke:none;stroke-width:0.3;stroke-linecap:round;stroke-linejoin:round"
+         id="rect1"
+         width="28.502016"
+         height="28.502016"
+         x="52.107941"
+         y="45.677441" />
+      <circle
+         style="fill:#204a87;stroke:none;stroke-width:0.3;stroke-linecap:round;stroke-linejoin:round"
+         id="path1"
+         cx="88.565216"
+         cy="33.767727"
+         r="11.926649" />
+      <path
+         sodipodi:type="star"
+         style="fill:#4e9a06;stroke:none;stroke-width:0.3;stroke-linecap:round;stroke-linejoin:round"
+         id="path2"
+         inkscape:flatsided="true"
+         sodipodi:sides="3"
+         sodipodi:cx="108.01245"
+         sodipodi:cy="68.8106"
+         sodipodi:r1="19.416237"
+         sodipodi:r2="9.7081184"
+         sodipodi:arg1="0.78539816"
+         sodipodi:arg2="1.8325957"
+         inkscape:rounded="0"
+         inkscape:randomized="0"
+         d="M 121.7418,82.539953 89.257807,73.835892 113.03774,50.055956 Z"
+         inkscape:transform-center-x="2.5126472"
+         inkscape:transform-center-y="-2.5126467"
+         transform="translate(-4.857944,-4.0615936)" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:13.6916px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.855725"
+       x="26.269133"
+       y="110.3346"
+       id="text2"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.855725"
+         x="26.269133"
+         y="110.3346"
+         id="tspan3" /></text>
+    <text
+       xml:space="preserve"
+       transform="scale(0.26458333)"
+       id="text4"
+       style="font-size:26.6667px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect4)"><tspan
+         x="62.955078"
+         y="368.6718"
+         id="tspan1">A test file with several (nested) layers, </tspan><tspan
+         x="62.955078"
+         y="402.00517"
+         id="tspan2">along with a simple group (also a &lt;g&gt;, </tspan><tspan
+         x="62.955078"
+         y="435.33855"
+         id="tspan4">but without the special Inkscape layer </tspan><tspan
+         x="62.955078"
+         y="468.67192"
+         id="tspan5">attribute).</tspan></text>
+  </g>
+</svg>
