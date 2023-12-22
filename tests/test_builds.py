@@ -11,33 +11,34 @@ from slidie.builds import (
     Start,
     End,
     Range,
-    UnprocessedStep,
-    AutoFreeStep,
-    NameFreeStep,
-    NameFreeStepAtom,
-    BoundsFreeStep,
+    InputStep,
+    Stage1Step,
+    Stage2Step,
+    Stage2Atom,
+    Stage3Step,
     LayerNameParseError,
-    parse_step,
-    parse_builds_in_layer_name,
-    parse_identifiers_in_layer_name,
-    resolve_step_autos,
+    parse_build_specification_step,
+    parse_build_specification,
+    parse_tags,
+    resolve_step_auto,
     get_first_numeric_step,
     resolve_autos,
-    iter_referenced_identifiers,
+    iter_referenced_tags,
     IdentifierNotFoundError,
     CyclicDependencyError,
-    compute_name_resolution_order,
-    resolve_suffix,
-    resolve_step_names,
-    resolve_names,
-    resolve_step_bounds,
+    compute_tag_resolution_order,
+    resolve_tag_suffix,
+    resolve_step_tag,
+    resolve_tags,
+    resolve_step_bound,
     resolve_bounds,
     resolve_ranges,
-    normalise_steps,
+    normalise_specs,
+    evaluate_build_steps,
 )
 
 
-class TestParseStep:
+class TestParseBuildSpecificationStep:
     
     @pytest.mark.parametrize(
         "spec, exp",
@@ -54,13 +55,13 @@ class TestParseStep:
             ("", Start()),
         ],
     )
-    def test_valid(self, spec: str, exp: UnprocessedStep) -> None:
-        assert parse_step(spec, Start()) == exp
+    def test_valid(self, spec: str, exp: InputStep) -> None:
+        assert parse_build_specification_step(spec, Start()) == exp
     
     @pytest.mark.parametrize(
         "spec",
         [
-            # No empty spec specified in call to parse_step
+            # No empty spec specified in call to parse_build_specification_step
             "",
             # Invalid name
             "@",
@@ -78,7 +79,7 @@ class TestParseStep:
     )
     def test_invalid(self, spec: str) -> None:
         with pytest.raises(LayerNameParseError):
-            parse_step(spec)
+            parse_build_specification_step(spec)
 
 
 @pytest.mark.parametrize(
@@ -103,8 +104,8 @@ class TestParseStep:
         ("foo <1> <2,3>", [1, 2, 3]),
     ],
 )
-def test_parse_builds_in_layer_name(layer_name: str, exp: list[UnprocessedStep]) -> None:
-    assert parse_builds_in_layer_name(layer_name) == exp
+def test_parse_build_specification(layer_name: str, exp: list[InputStep]) -> None:
+    assert parse_build_specification(layer_name) == exp
 
 
 @pytest.mark.parametrize(
@@ -127,8 +128,8 @@ def test_parse_builds_in_layer_name(layer_name: str, exp: list[UnprocessedStep])
         ("foo @bar@baz", {"bar", "baz"}),
     ],
 )
-def test_parse_identifiers_in_layer_name(layer_name: str, exp: set[str]) -> None:
-    assert parse_identifiers_in_layer_name(layer_name) == exp
+def test_parse_tags(layer_name: str, exp: set[str]) -> None:
+    assert parse_tags(layer_name) == exp
 
 
 @pytest.mark.parametrize(
@@ -149,11 +150,11 @@ def test_parse_identifiers_in_layer_name(layer_name: str, exp: set[str]) -> None
         (Range(123, "foo"), Range(123, "foo")),
     ],
 )
-def test_resolve_step_autos(
-    step: UnprocessedStep,
-    exp: AutoFreeStep,
+def test_resolve_step_auto(
+    step: InputStep,
+    exp: Stage1Step,
 ) -> None:
-    assert resolve_step_autos(step, 100) == exp
+    assert resolve_step_auto(step, 100) == exp
 
 
 @pytest.mark.parametrize(
@@ -177,7 +178,7 @@ def test_resolve_step_autos(
         ([Range("foo", "bar")], None),
     ],
 )
-def test_get_first_numeric_step(step: list[AutoFreeStep], exp: int | None) -> None:
+def test_get_first_numeric_step(step: list[Stage1Step], exp: int | None) -> None:
     assert get_first_numeric_step(step) == exp
 
 
@@ -244,8 +245,8 @@ def test_get_first_numeric_step(step: list[AutoFreeStep], exp: int | None) -> No
     ],
 )
 def test_resolve_autos(layer_steps: list[str], exp: list[str]) -> None:
-    assert resolve_autos([parse_builds_in_layer_name(spec) for spec in layer_steps]) == [
-        cast(list[AutoFreeStep], parse_builds_in_layer_name(spec))
+    assert resolve_autos([parse_build_specification(spec) for spec in layer_steps]) == [
+        cast(list[Stage1Step], parse_build_specification(spec))
         for spec in exp
     ]
 
@@ -266,22 +267,22 @@ def test_resolve_autos(layer_steps: list[str], exp: list[str]) -> None:
         ("<@foo-@bar>", ["foo", "bar"]),
     ],
 )
-def test_iter_referenced_identifiers(spec: str, exp: list[str]) -> None:
+def test_iter_referenced_tags(spec: str, exp: list[str]) -> None:
     assert list(
-        iter_referenced_identifiers(
-            cast(list[AutoFreeStep], parse_builds_in_layer_name(spec))
+        iter_referenced_tags(
+            cast(list[Stage1Step], parse_build_specification(spec))
         )
     ) == exp
 
 
-class TestComputeNameResolutionOrder:
+class TestComputeTagResolutionOrder:
 
     def test_empty(self) -> None:
-        assert compute_name_resolution_order([]) == []
+        assert compute_tag_resolution_order([]) == []
 
     def test_missing_dependency(self) -> None:
         with pytest.raises(IdentifierNotFoundError) as exc_info:
-            assert compute_name_resolution_order([
+            assert compute_tag_resolution_order([
                 (set(), {"foo"}),
                 ({"bar"}, set()),
             ])
@@ -291,7 +292,7 @@ class TestComputeNameResolutionOrder:
 
     def test_cyclic_dependency_self(self) -> None:
         with pytest.raises(CyclicDependencyError) as exc_info:
-            assert compute_name_resolution_order([
+            assert compute_tag_resolution_order([
                 ({"foo"}, {"foo"}),
             ])
         
@@ -299,7 +300,7 @@ class TestComputeNameResolutionOrder:
 
     def test_cyclic_dependency_self_and_other(self) -> None:
         with pytest.raises(CyclicDependencyError) as exc_info:
-            assert compute_name_resolution_order([
+            assert compute_tag_resolution_order([
                 ({"foo"}, {"foo", "bar"}),
                 ({"bar"}, set()),
             ])
@@ -311,7 +312,7 @@ class TestComputeNameResolutionOrder:
 
     def test_cyclic_dependency_multiple_steps(self) -> None:
         with pytest.raises(CyclicDependencyError) as exc_info:
-            assert compute_name_resolution_order([
+            assert compute_tag_resolution_order([
                 ({"l0"}, {"l1"}),
                 ({"l1"}, {"l2"}),
                 ({"l2"}, {"l3"}),
@@ -322,7 +323,7 @@ class TestComputeNameResolutionOrder:
 
     def test_cyclic_dependency_multiple_steps_but_not_all(self) -> None:
         with pytest.raises(CyclicDependencyError) as exc_info:
-            assert compute_name_resolution_order([
+            assert compute_tag_resolution_order([
                 ({"l0"}, {"l1"}),
                 ({"l1"}, {"l2"}),
                 ({"l2"}, {"l3"}),
@@ -357,18 +358,18 @@ class TestComputeNameResolutionOrder:
     )
     def test_orderings(self, layer_names: list[str]) -> None:
         layer_identifiers = [
-            parse_identifiers_in_layer_name(n) for n in layer_names
+            parse_tags(n) for n in layer_names
         ]
         layer_dependency_names = [
             set(
-                iter_referenced_identifiers(
-                    cast(list[AutoFreeStep], parse_builds_in_layer_name(n))
+                iter_referenced_tags(
+                    cast(list[Stage1Step], parse_build_specification(n))
                 )
             )
             for n in layer_names
         ]
         
-        ordering = compute_name_resolution_order(
+        ordering = compute_tag_resolution_order(
             list(zip(layer_identifiers, layer_dependency_names))
         )
         
@@ -420,11 +421,11 @@ class TestComputeNameResolutionOrder:
         ([Start()], "after", Start()),
     ],
 )
-def test_resolve_suffix(
-    spec: list[NameFreeStep],
-    suffix: str, exp: NameFreeStepAtom | None,
+def test_resolve_tag_suffix(
+    spec: list[Stage2Step],
+    suffix: str, exp: Stage2Atom | None,
 ) -> None:
-    assert resolve_suffix(spec, suffix) == exp
+    assert resolve_tag_suffix(spec, suffix) == exp
 
 
 @pytest.mark.parametrize(
@@ -455,15 +456,15 @@ def test_resolve_suffix(
         (Range(0, "empty"), []),
     ],
 )
-def test_resolve_step_names(step: AutoFreeStep, exp: list[NameFreeStep]) -> None:
-    resolved_names: dict[str, list[NameFreeStep]] = {
+def test_resolve_step_tag(step: Stage1Step, exp: list[Stage2Step]) -> None:
+    resolved_names: dict[str, list[Stage2Step]] = {
         "empty": [],
         "one_two_three": [1, 2, 3],
         "just_start": [Start()],
         "just_end": [End()],
         "start_two_end": [Start(), 2, End()],
     }
-    assert resolve_step_names(step, resolved_names) == exp
+    assert resolve_step_tag(step, resolved_names) == exp
 
 
 @pytest.mark.parametrize(
@@ -480,19 +481,19 @@ def test_resolve_step_names(step: AutoFreeStep, exp: list[NameFreeStep]) -> None
         (["<@foo, 2>", "<@bar, 3>", "@foo @bar <1>"], ["<1, 2>", "<1, 3>", "<1>"]),
     ],
 )
-def test_resolve_names(layers: list[str], exp: list[str]) -> None:
-    layer_identifiers = [parse_identifiers_in_layer_name(layer) for layer in layers]
+def test_resolve_tags(layers: list[str], exp: list[str]) -> None:
+    layer_identifiers = [parse_tags(layer) for layer in layers]
     layer_steps = [
-        cast(list[AutoFreeStep], parse_builds_in_layer_name(layer))
+        cast(list[Stage1Step], parse_build_specification(layer))
         for layer in layers
     ]
     
     exp_steps = [
-        cast(list[NameFreeStep], parse_builds_in_layer_name(layer))
+        cast(list[Stage2Step], parse_build_specification(layer))
         for layer in exp
     ]
     
-    assert resolve_names(layer_identifiers, layer_steps) == exp_steps
+    assert resolve_tags(layer_identifiers, layer_steps) == exp_steps
 
 
 @pytest.mark.parametrize(
@@ -511,8 +512,8 @@ def test_resolve_names(layers: list[str], exp: list[str]) -> None:
         (Range(999, End()), Range(999, 2)),
     ],
 )
-def test_resolve_step_bounds(step: NameFreeStep, exp: BoundsFreeStep) -> None:
-    assert resolve_step_bounds(step, 1, 2) == exp
+def test_resolve_step_bound(step: Stage2Step, exp: Stage3Step) -> None:
+    assert resolve_step_bound(step, 1, 2) == exp
 
 
 @pytest.mark.parametrize(
@@ -537,11 +538,11 @@ def test_resolve_step_bounds(step: NameFreeStep, exp: BoundsFreeStep) -> None:
 )
 def test_resolve_bounds(layers: list[str], exp: list[str]) -> None:
     layer_steps = [
-        cast(list[NameFreeStep], parse_builds_in_layer_name(layer))
+        cast(list[Stage2Step], parse_build_specification(layer))
         for layer in layers
     ]
     exp_steps = [
-        cast(list[BoundsFreeStep], parse_builds_in_layer_name(layer))
+        cast(list[Stage3Step], parse_build_specification(layer))
         for layer in exp
     ]
     
@@ -567,11 +568,11 @@ def test_resolve_bounds(layers: list[str], exp: list[str]) -> None:
 )
 def test_resolve_ranges(layers: list[str], exp: list[str]) -> None:
     layer_steps = [
-        cast(list[BoundsFreeStep], parse_builds_in_layer_name(layer))
+        cast(list[Stage3Step], parse_build_specification(layer))
         for layer in layers
     ]
     exp_steps = [
-        cast(list[NumericStep], parse_builds_in_layer_name(layer))
+        cast(list[NumericStep], parse_build_specification(layer))
         for layer in exp
     ]
     
@@ -590,14 +591,55 @@ def test_resolve_ranges(layers: list[str], exp: list[str]) -> None:
         (["<1, 3, 2, 3>"], ["<1, 2, 3>"]),
     ],
 )
-def test_normalise_steps(layers: list[str], exp: list[str]) -> None:
+def test_normalise_specs(layers: list[str], exp: list[str]) -> None:
     layer_steps = [
-        cast(list[NumericStep], parse_builds_in_layer_name(layer))
+        cast(list[NumericStep], parse_build_specification(layer))
         for layer in layers
     ]
     exp_steps = [
-        cast(list[NumericStep], parse_builds_in_layer_name(layer))
+        cast(list[NumericStep], parse_build_specification(layer))
         for layer in exp
     ]
     
-    assert normalise_steps(layer_steps) == exp_steps
+    assert normalise_specs(layer_steps) == exp_steps
+
+
+class TestEvaluateBuildSteps:
+    
+    def test_integration(self) -> None:
+        assert evaluate_build_steps(
+            [
+                "A <2> @foo",
+                "B <+>",
+                "C <@foo>",
+                "D",
+            ]
+        ) == [
+            [2],
+            [3],
+            [2],
+            [0, 1, 2, 3],
+        ]
+    
+    def test_identifier_not_found_layer_names(self) -> None:
+        with pytest.raises(IdentifierNotFoundError) as exc_info:
+            evaluate_build_steps(["Who knows what <@foo> is?"])
+        
+        assert exc_info.value.layer_name == "Who knows what <@foo> is?"
+    
+    def test_cyclic_dependency_error(self) -> None:
+        with pytest.raises(CyclicDependencyError) as exc_info:
+            evaluate_build_steps(
+                [
+                    "A <@b> @a",
+                    "B <@c> @b",
+                    "C <@a> @c",
+                ]
+            )
+        
+        assert exc_info.value.layer_names == [
+            "A <@b> @a",
+            "B <@c> @b",
+            "C <@a> @c",
+            "A <@b> @a",
+        ]

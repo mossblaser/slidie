@@ -1,152 +1,245 @@
 """
-Support for slide builds. That is, the process of revealing/hiding components
-on a slide step-by-step to illustrate some point.
+Parsing and evaluation of slide build specifications. That is, the
+specifications which control how elements of the slide are revealed (or hidden)
+step by step to illustrate some point over time.
 
-Syntax
+The :py:func:`evaluate_build_steps` function in this module takes a list of
+layer names and returns selected step numbers during which each slide is
+visible.
+
+
+Basic syntax
+============
+
+Builds are controlled using special annotations added to Inkscape layer names
+with a beamer-inspired syntax.
+
+Build *specifications* are given in angle brackets (`<` and `>`) anywhere
+within the layer name and consist of a comma separated list of *steps* during
+which that layer is visible.
+
+For example if you have a slide with four layers named like so:
+
+* A
+* B <1>
+* C <2>
+* D <1, 2>
+
+This describes a slide which builds in three steps (numbered 0, 1 and 2):
+
+* In step 0 (the initial state of the slide), only layer A is visible.
+* In step 1 (after the first click), layers A, B and D are visible.
+* In step 2 (after the second click), layers A, C and D are visible.
+
+
+Ranges
 ======
 
-Builds are controlled by the presence of specifications in angle brackets (`<`
-and `>`) included in layer names. The syntax is inspired by Beamer.
+You can also specify ranges of steps, for example, given the following layers:
 
-The top level syntax is described informally by the following grammar::
+* A <1>
+* B <2>
+* C <3>
+* D <0-2>
 
-    build ::= '<' range_list '>'
-    range_list ::= range | range ',' range_list?
-    range ::= step | step '-' | '-' step | step '-' step
-    step ::= number | '+' | '.' | '@' name
-    number ::= /[0-9]+/
-    name ::= identifier | identifier '.' qualifier
-    qualifier ::= 'before' | 'start' | 'end' | 'after'
+This slide will build in four steps like so:
 
+* In step 0 (the initial state of the slide), only layer D is visible.
+* In step 1 (after the first click), layers A, D are visible.
+* In step 2 (after the second click), layers B and D are visible.
+* In step 3 (after the third click), only layers C is visible.
 
-Simple numerical specifications
--------------------------------
-
-Some examples of simple numbered specifications are:
-
-* `<1>` -- Show in step 1 only
-* `<3->` -- Show from step 3 onward (inclusive)
-* `<-3>` -- Show up until step 3 (inclusive)
-* `<3-5>` -- Show on steps 3 until 5 (inclusive)
-* `<1,4-6>` -- Show on step 1 and then steps 4 to 6 (inclusive)
-
-The numbers given should be considered to be more like sorting keys than
-indices into generated slides. Slides are only generated for numbers explicitly
-used in a specification.
-
-For example given a series of layers named like so:
-
-    * Always visible on entering the slide
-    * Becomes visible after first click <3->
-    * Becomes visible after second click <6->
-
-This slide would be displayed in three steps even though the numbers chosen
-leave gaps. This choice allows BASIC line numbering style number choices which
-allow for easier renumbering as desired.
+If the start or end of a range is omitted, this defines a range from the first
+step or to last step respectively. For example `<2->` means from the second
+click onward.
 
 
-Automatic numerical specifications (`+` and `.`)
-------------------------------------------------
+Automatic step numbering
+========================
 
-The `+` specification is substituted with 1 + last-used-number. That is,
-searching upward through the layers (in the order they're shown in Inkscape's
-GUI), find the next numbered (or automatically numbered) specification and add
-one to that layer's first listed (automatic/numeric) step.
+For the common case where consecutive layers are revealed in consecutive steps
+the `+` shorthand means the step after the first step in the previous layer
+with a specification. For example:
 
-For example, given layers like so:
+* A
+* B <+>
+* C <+>
 
-    * Always visible on entering the slide
-    * Becomes visible after first click <+->
-    * Becomes visible after second click <+->
+Here, layer A is always visible whilst layers B C appear (then disappear) after
+the first and second clicks respectively.
 
-This allows for more convenient specification of simple orderings which is
-easily edited by moving layers around in Inkscape.
+A '+' can be used as part of a range specification. In addition the `.`
+shorthand works like `+` but without incrementing the step number. Used
+together this allows you to something like follows:
 
-As a special case, if no numbered slides are found, the first '+' will be
-numbered as '1'.
+* Title
+* First bullet <+->
+* First bullet highlight <.>
+* Second bullet <+->
+* Second bullet highlight <.>
+* Third bullet <+->
+* Third bullet highlight <.>
 
-The '.' specification is similar except it does not increment the last used
-number. For example:
-
-    * Always visible on entering the slide
-    * Becomes visible after first click <+->
-    * Becomes visible after first click too <.->
-    * Becomes visible after second click <+->
-    * Becomes visible after second click as well <.->
-
-This can be useful when several layers are revealed at the same moment in time.
+This slide has four steps with (for example) a bullet being reveled after each
+click. The most recently shown bullet might be highlighted in some way in the
+'highlight' layers.
 
 
-Named specifications
---------------------
+Tags
+====
 
-Because layers are used for, you know, layering things, it is often useful to
-have groups of layers appear/disappear in sync. Since these layers are not
-likely to be adjacent, the '.' primitive is not useful so we introduce the
-notion of named layers.
+For advanced (or fiddly) usecases, it is possible to add one or more tags to a
+layer by including `@tag_name_here` to their name. These tags may be referenced
+in build specifications to make layers appear in sync with eachother.
 
-A layer is named by including an '@'-prefixed identifier outside of the layer's
-build specification.
+A typical use of this feature is for cases where graphics are split between
+foreground and background layers and need to be built in sync. For example,
+consider the following layers:
 
-In the most simple case, a specification of `<@name>` indicates that a layer
-should be visible at the same points in time as the named layer. For example:
+* Foreground
+  * Foreground A <+-> @a
+  * Foreground B <+-> @b
+  * Foreground C <+-> @c
+* Background
+  * Background A <@a>
+  * Background B <@b>
+  * Background C <@c>
 
-    * Visible at various points in time <2,4-7,10> @foo
-    * Visible iff the 'foo' layer is visible <@foo>
+This slide builds in four steps with foreground layers A, B and C being
+revealed after each click. The corresponding background layers are revealed in
+sync with their foreground counterparts.
 
-When used at the start of a range, the name resolves to the first moment the
-referenced layer is visible. When used at the end of a range, the name resolves
-to the last point at which it was visible. For example:
 
-    * Visible at various points in time <2,4-7,10> @foo
-    * Visible from 2 onward <@foo->
-    * Visible until (and including) 10 <-@foo>
-    * Visible between 2 and 10 inclusive, even if 'foo' isnt <@foo-@foo>
+Tag suffixes
+------------
 
-You can also be explicit by adding `.before`, `.start`, `.end` and `.after`
-suffixes like so:
+By default, when you use a tag in a build specification, all of the steps of
+layers with that tag are effectively copied into your specification.
 
-    * Visible at various points in time <2,4-7,10> @foo
-    * Visible at step 1 <@foo.before>
-    * Visible at step 2 <@foo.start>
-    * Visible at step 10 <@foo.end>
-    * Visible at step 11 <@foo.after>
+By adding a `.start`, `.end`, `.before`, or `.after` suffix, you can instead
+reference the first or last steps layers with that tag are visible. For
+example, given the following layers:
 
-Named step specifications are processed *after* all automatic and numeric steps
-are resolved. This means that '+' and '.' will not act relative to any step
-defined by name.
+* Foo <1, 2, 3> @foo
+* A <@foo.before>
+* B <@foo.start>
+* C <@foo.start>
+* D <@foo.after>
+
+This defines a slide with five build steps:
+
+* In step 0, just layer A is visible
+* In step 1, layers Foo and B are visible
+* In step 2, just layer Foo is visible
+* In step 3, layers Foo and C are visible
+* In step 4, just layer D is visible
+
+
+Tags in ranges
+--------------
+
+When a tag is used in a range specification without a suffix, the `.start` and
+`.end` suffixes are implied for the start end end of the range. That is,
+`<@foo-@bar>` is treated as `<@foo.start-@bar.end>`.
+
+
+Sharing tags
+------------
+
+Many layers may be labelled with the same tag. In this case, referencing that
+tag refers to the union of all steps those layers are visible. For example,
+given the layers:
+
+* A <1> @foo
+* B <2> @foo
+* C <@foo>
+
+Layer 'C' will be visible after both the first and second clicks.
+
+
+Limitations of tags
+-------------------
+
+There are two major limitations to the use of tags in build specifications:
+
+Firstly, circular dependencies between layers via tags are not permitted.
+
+Secondly, automatic step numbering (i.e. `+` and `.`) ignores tag references
+when computing the number to use. For example given the layers:
+
+* A <1> @foo
+* B <@foo, 2>
+* C <.>
+
+Here the `.` layer C resolves to 2 and not 1 because 2 is the first non-tag
+step in the layer B's build specification.
 """
 
-from typing import cast, TypeVar, Generic, Literal, NamedTuple, Iterator, Any
-from collections.abc import Sequence
+# At a high level, build specifications are parsed and then resolved from their
+# initial, more abstract form (containing things like ranges, '+' and '@tag'
+# references) into a concrete list of step numbers.
+#
+# Before getting started, lets define a few extra terms:
+#
+# * A *spec* (build specification) consists of a list of steps
+# * A *step* may be one of the following:
+#   * A *numeric* value
+#   * An *auto* (automatically numbered) value, i.e. '+' or '.'.
+#   * A *tag* (a reference to a tag with no suffix added)
+#   * A *tag-and-suffix* (a reference to a tag with some suffix)
+#   * A *bound* referencing either the very first or very last step
+#   * A *range* which references all of the steps between a start and end,
+#     inclusively.
+# * An *atom* is any kind of step except a range (whose start and end steps are
+#   always defined by an atom).
+#
+# The spec resolution process is performed in a series of distinct (numbered)
+# stages:
+#
+# 1. First, automatic step numbers (i.e. '+' and '.') are resolved
+# 2. Next references to tags (e.g. '@foo' or '@foo.start') are resolved
+# 3. Then the bounds (i.e. first/last step number) are resolved
+# 4. Finally, ranges are expanded into concrete lists of step numbers
 
-from dataclasses import dataclass, Field
+
+from typing import cast, overload, TypeVar, Generic, Iterator, Any, Sequence
+
+from dataclasses import dataclass
 from collections import defaultdict
 from functools import total_ordering
 
 import re
 
 
-T = TypeVar("T")
+################################################################################
+# Atomic step type definitions
+################################################################################
 
-# NB: For some reason MyPy fails to typecheck this when we use the equivalent
-# NamedTuple...
-@dataclass(frozen=True)
-class Range(Generic[T]):
-    start: T
-    end: T
 
-class Plus(NamedTuple):
+NumericStep = int
+
+
+@dataclass
+class Plus:
+    """Representation of a '+' automatic numbering step."""
     pass
 
-class Dot(NamedTuple):
+
+@dataclass
+class Dot:
+    """Representation of a '.' automatic numbering step."""
     pass
 
-# NB: Implemented as mixins to ensure that total_ordering creates all six
-# comparisons since it would otherwise be prevented from doing so on a
-# NamedTuple since they are already defined!
+
+AutoStep = Plus | Dot
+
+
+@dataclass
 @total_ordering
-class StartOrderingMixin:
+class Start:
+    """
+    Representation of the 'first step' bound reference. Sorts before any int value.
+    """
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, type(self)):
@@ -160,8 +253,12 @@ class StartOrderingMixin:
         else:
             return True
     
+@dataclass
 @total_ordering
-class EndOrderingMixin:
+class End:
+    """
+    Representation of the 'last step' bound reference. Sorts after any int value.
+    """
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, type(self)):
@@ -175,107 +272,153 @@ class EndOrderingMixin:
         else:
             return True
 
-class Start(StartOrderingMixin, NamedTuple("Start", [])):
-    pass
 
-class End(EndOrderingMixin, NamedTuple("End", [])):
-    pass
-
-BoundsStep = Start | End
-NumericStep = int
-AutoStep = Plus | Dot
-NamedStep = str | tuple[str, str]
+BoundStep = Start | End
 
 
-# The type of specs as parsed from a layer name
-UnprocessedStepAtom = BoundsStep | NumericStep | AutoStep | NamedStep
-UnprocessedStep = UnprocessedStepAtom | Range[UnprocessedStepAtom]
+TagStep = str | tuple[str, str]
+"""
+Representation of a tag step.
 
-# The type of specs after automatic numbers (+ and .) are resolved
-AutoFreeStepAtom = BoundsStep | NumericStep | NamedStep
-AutoFreeStep = AutoFreeStepAtom | Range[AutoFreeStepAtom]
+For tag references without a suffix, the bare string is used (with the leading
+'@' stripped off). 
 
-# The type of specs after both automatic numbers and names are resolved
-NameFreeStepAtom = BoundsStep | NumericStep
-NameFreeStep = NameFreeStepAtom | Range[NameFreeStepAtom]
+For tag references with a suffix, a tuple of strings (tag, suffix).
+"""
 
-# The type of specs after automatic numbers, names and Start/End bounds have
-# been resolved
-BoundsFreeStepAtom = NumericStep
-BoundsFreeStep = BoundsFreeStepAtom | Range[BoundsFreeStepAtom]
+
+################################################################################
+# Aggregate atom and step types
+################################################################################
+
+
+InputAtom = BoundStep | NumericStep | AutoStep | TagStep
+Stage1Atom = BoundStep | NumericStep | TagStep
+Stage2Atom = BoundStep | NumericStep
+Stage3Atom = NumericStep
+Stage4Atom = NumericStep  # Included for completenes...
+
+
+T = TypeVar("T", bound=InputAtom)
+
+
+@dataclass(frozen=True)
+class Range(Generic[T]):
+    """Represents a continuous range of steps between start and end, inclusive."""
+    start: T
+    end: T
+
+
+InputStep = InputAtom | Range[InputAtom]
+Stage1Step = Stage1Atom | Range[Stage1Atom]
+Stage2Step = Stage2Atom | Range[Stage2Atom]
+Stage3Step = Stage3Atom | Range[Stage3Atom]
+Stage4Step = Stage4Atom  # Included for completeness
+
+
+################################################################################
+# Layer name parsing routines
+################################################################################
 
 
 class LayerNameParseError(ValueError):
+    """Thrown when an annotation in a layer name is not parsable."""
+    pass
+
+class UnexpectedTagSuffixError(LayerNameParseError):
+    """Thrown when an unrecognised tag suffix is used."""
+    pass
+
+class InvalidStepError(LayerNameParseError):
+    """Thrown when a step in a build specification is not valid."""
     pass
 
 
-def parse_step(
-    step_spec: str,
-    empty_value: BoundsStep | None = None,
-) -> UnprocessedStepAtom:
+def parse_build_specification_step(step_str: str, empty_value: BoundStep | None = None) -> InputAtom:
     """
-    Parse a single step (e.g. '123', '+', '.', '@foo'). If empty_value is
-    given, parses and empty string as the given BoundsStep.
+    Parse a single step (e.g. '123', '+', '.', '@foo').
+    
+    If empty_value is not None, an empty string is parsed as that value.
     """
-    step_spec = step_spec.strip()
-    if re.fullmatch(r"@[^\s]+", step_spec):
-        name, dot, suffix = step_spec[1:].partition(".")
+    step_str = step_str.strip()
+    if re.fullmatch(r"@[^\s]+", step_str):
+        name, dot, suffix = step_str[1:].partition(".")
         if dot:
             if suffix not in ("before", "start", "end", "after"):
-                raise LayerNameParseError(f"Unexpected suffix: {step_spec!r}")
+                raise UnexpectedTagSuffixError(step_str)
             return (name, suffix)
         else:
             return name
-    elif step_spec == "+":
+    elif step_str == "+":
         return Plus()
-    elif step_spec == ".":
+    elif step_str == ".":
         return Dot()
-    elif step_spec == "" and empty_value is not None:
+    elif step_str == "" and empty_value is not None:
         return empty_value
-    elif re.fullmatch(r"[0-9]+", step_spec):
-        return int(step_spec)
+    elif re.fullmatch(r"[0-9]+", step_str):
+        return int(step_str)
     else:
-        raise LayerNameParseError(f"Invalid step: {step_spec!r}")
+        raise InvalidStepError(step_str)
 
 
-def parse_builds_in_layer_name(layer_name: str) -> list[UnprocessedStep]:
+def parse_build_specification(layer_name: str) -> list[InputStep]:
     """
-    Parse the build steps/ranges specified in a layer name.
-    """
-    steps_and_ranges: list[UnprocessedStep] = []
+    Parse the build specifications within a layer name.
     
-    contains_step_list = False
+    If none are present, treats it as if `<->` was specified (i.e. layer is
+    always visible).
+    
+    If more than one is given, the steps within them will be concatenated.
+    """
+    build_specification: list[InputStep] = []
+    
+    contains_build_specification = False
     for match in re.findall(r"<[^>]*>", layer_name):
-        contains_step_list = True
+        contains_build_specification = True
         
-        if match[1:-1].strip():
-            for step_or_range in match[1:-1].split(","):
-                if '-' in step_or_range:
-                    before, _, after = step_or_range.partition("-")
-                    steps_and_ranges.append(
-                        Range(parse_step(before, Start()), parse_step(after, End()))
+        if steps_str := match[1:-1].strip():
+            for step_or_range_str in steps_str.split(","):
+                if '-' in step_or_range_str:
+                    start_str, _, end_str = step_or_range_str.partition("-")
+                    build_specification.append(
+                        Range(
+                            parse_build_specification_step(start_str, Start()),
+                            parse_build_specification_step(end_str, End()),
+                        )
                     )
                 else:
-                    steps_and_ranges.append(parse_step(step_or_range))
+                    build_specification.append(
+                        parse_build_specification_step(step_or_range_str)
+                    )
     
-    if not contains_step_list:
-        steps_and_ranges = [Range(Start(), End())]
+    if not contains_build_specification:
+        build_specification = [Range(Start(), End())]
     
-    return steps_and_ranges
+    return build_specification
 
 
-def parse_identifiers_in_layer_name(layer_name: str) -> set[str]:
+def parse_tags(layer_name: str) -> set[str]:
     """
-    Find any/all layer names specified inside a layer's name.
+    Parse tags within a layer name.
     """
-    layer_name_without_builds = re.sub(r"<[^>]+>", "", layer_name)
-    return set(re.findall(r"@([^\s<>.@]+)(?=\s|@|$)", layer_name_without_builds))
+    # Remove build specifications from layer name since these may contain
+    # references to tags which would confuse matters!
+    layer_name = re.sub(r"<[^>]+>", "", layer_name)
+    
+    return set(re.findall(r"@([^\s<>.@]+)(?=\s|@|$)", layer_name))
 
 
-def resolve_step_autos(
-    step: UnprocessedStep,
-    last_number: int,
-) -> AutoFreeStep:
+################################################################################
+# Stage 1: Resolving automatically numbered steps (autos)
+################################################################################
+
+
+@overload
+def resolve_step_auto(step: InputAtom, last_number: int) -> Stage1Atom: ...
+@overload
+def resolve_step_auto(step: InputStep, last_number: int) -> Stage1Step: ...
+
+def resolve_step_auto(step: InputStep, last_number: int) -> Stage1Step:
     """
     Resolve automatic numbering steps (i.e. Plus() and Dot()) into numeric
     steps.
@@ -287,17 +430,17 @@ def resolve_step_autos(
             return last_number
         case Range(start, end):
             return Range(
-                cast(AutoFreeStepAtom, resolve_step_autos(start, last_number)),
-                cast(AutoFreeStepAtom, resolve_step_autos(end, last_number)),
+                resolve_step_auto(start, last_number),
+                resolve_step_auto(end, last_number),
             )
         case _:
             return step
 
 
-def get_first_numeric_step(steps: Sequence[AutoFreeStep]) -> int | None:
+def get_first_numeric_step(steps: list[Stage1Step]) -> int | None:
     """
-    Get the first numbered step to appear in the provided list of steps.
-    Returns None if no numbered steps exist.
+    Get the first (in terms of position, not value) numbered step to appear in
+    the provided list of steps.  Returns None if no numbered steps exist.
     """
     for step in steps:
         match step:
@@ -313,30 +456,37 @@ def get_first_numeric_step(steps: Sequence[AutoFreeStep]) -> int | None:
     return None
 
 
-def resolve_autos(
-    layer_steps: Sequence[Sequence[UnprocessedStep]]
-) -> list[list[AutoFreeStep]]:
+def resolve_autos(layer_specs: list[list[InputStep]]) -> list[list[Stage1Step]]:
     """
-    Resolves '+' and '.' components of layer numberings into concrete numeric
-    steps.
+    Given a list of parsed layer build specifications (one for each layer in
+    the order presented in the Inkscape GUI) resolves '+' and '.' components
+    into concrete numeric steps.
     """
-    out: list[list[AutoFreeStep]] = []
+    out: list[list[Stage1Step]] = []
     
+    # The step number of the last layer which had one.
     last_number = 0
-    for steps in layer_steps:
-        new_steps = [resolve_step_autos(step, last_number) for step in steps]
-        out.append(new_steps)
+    
+    for spec in layer_specs:
+        new_spec = [resolve_step_auto(step, last_number) for step in spec]
+        out.append(new_spec)
         
-        new_steps_number = get_first_numeric_step(new_steps)
-        if new_steps_number is not None:
-            last_number = new_steps_number
+        new_number = get_first_numeric_step(new_spec)
+        if new_number is not None:
+            last_number = new_number
     
     return out
 
 
-def iter_referenced_identifiers(steps: Sequence[AutoFreeStep]) -> Iterator[str]:
+################################################################################
+# Stage 2: Resolving tag references
+################################################################################
+
+
+def iter_referenced_tags(steps: list[Stage1Step]) -> Iterator[str]:
     """
-    Enumerate the named identifiers used in a build specification.
+    Enumerate the names of any tags used within a build specification. (Tag
+    suffixes are not reported).
     """
     for step in steps:
         match step:
@@ -345,7 +495,7 @@ def iter_referenced_identifiers(steps: Sequence[AutoFreeStep]) -> Iterator[str]:
             case (str(identifier), _):
                 yield identifier
             case Range(start, end):
-                yield from iter_referenced_identifiers([start, end])
+                yield from iter_referenced_tags([start, end])
             case _:
                 pass  # Other types are not names
 
@@ -357,6 +507,9 @@ class IdentifierNotFoundError(ValueError):
     """
     identifier: str
     layer_index: int
+    
+    # May be populated later
+    layer_name: str | None = None
 
 
 @dataclass
@@ -365,74 +518,85 @@ class CyclicDependencyError(ValueError):
     Thrown when a a series of names form a cyclic dependency
     """
     layer_indices: list[int]
+    
+    # May be populated later
+    layer_names: list[str] | None = None
 
 
-def compute_name_resolution_order(
-    layer_names_and_dependencies: list[tuple[set[str], set[str]]],
+def compute_tag_resolution_order(
+    layer_tags_and_dependencies: list[tuple[set[str], set[str]]],
 ) -> list[int]:
     """
-    Return an ordering of layers to process such that each layer is processed
-    before any other layer which depends on it.
+    Return an ordering of layers to process which ensures that each layer is
+    processed before any other layer which depends on it.
     
-    `layer_names_and_dependencies` is a list of (identifiers, dependencies) pairs. A permuted
-    sequence of indices into this list is returned.
+    Takes a list of (tags, dependencies) tuples which give, for each layer, the
+    tags given to that layer and the tags of layers that layer depends on.
+    
+    Returns a list of layer indices in an order which ensures dependencies are
+    processed before their dependants.
     """
-    # Map names to indices
-    name_to_indices: dict[str, set[int]] = defaultdict(set)
-    for i, (names, _deps) in enumerate(layer_names_and_dependencies):
-        for name in names:
-            name_to_indices[name].add(i)
+    # Map tags to indices
+    tag_to_indices: dict[str, set[int]] = defaultdict(set)
+    for i, (tags, _deps) in enumerate(layer_tags_and_dependencies):
+        for tag in tags:
+            tag_to_indices[tag].add(i)
     
-    # Create an index-based dependency graph (checking all dependencies are
-    # defined)
+    # Create an index-based dependency graph (checking all dependencies exist
+    # as we go)
     index_to_deps: dict[int, set[int]] = defaultdict(set)
-    for i, (names, deps) in enumerate(layer_names_and_dependencies):
+    for i, (_tags, deps) in enumerate(layer_tags_and_dependencies):
         for dep in deps:
-            if dep not in name_to_indices:
+            if dep not in tag_to_indices:
                 raise IdentifierNotFoundError(dep, i)
-            index_to_deps[i].update(name_to_indices[dep])
+            index_to_deps[i].update(tag_to_indices[dep])
     
+    # The output ordering
     ordering: list[int] = []
+    
+    # We use a simple depth-first traversal through the dependency graph to
+    # find our ordering.
     
     def resolve(index: int, visited_indices: list[int]) -> None:
         # If already resolved, do nothing
         if index in ordering:
             return
         
-        # Detect dependency cycles
+        # Check for dependency cycles
         if index in visited_indices:
             loop_indices = visited_indices[visited_indices.index(index):]
             raise CyclicDependencyError(loop_indices + [index])
         
-        # Process all dependencies
+        # Process all dependencies first
         for dep_index in index_to_deps[index]:
             resolve(dep_index, visited_indices + [index])
         
         # Now process this item
         ordering.append(index)
     
-    for i in range(len(layer_names_and_dependencies)):
+    for i in range(len(layer_tags_and_dependencies)):
         resolve(i, [])
     
     return ordering
 
 
-def resolve_suffix(
-    named_spec: Sequence[NameFreeStep],
+def resolve_tag_suffix(
+    referenced_spec: list[Stage2Step],
     suffix: str,
-) -> NameFreeStepAtom | None:
+) -> Stage2Atom | None:
     """
-    Given a spec which has been referenced by name, and the suffix used with
-    that reference, return the singular step it resolves to (or None if the
-    named_spec is empty).
+    Given the build specification referenced by a tag, resolve this into the
+    atom implied by the tag reference's suffix.
+    
+    As a special case, returns None when the referenced spec is empty.
     """
-    if len(named_spec) == 0:
+    if len(referenced_spec) == 0:
         return None
     
-    # Flatten the spec (including range elements)
+    # Flatten the spec into individual atoms
     flat_spec = [
         atom
-        for step in named_spec
+        for step in referenced_spec
         for atom in ([step.start, step.end] if isinstance(step, Range) else [step])
     ]
     
@@ -453,97 +617,137 @@ def resolve_suffix(
             case start_or_end:
                 return start_or_end
     else:
+        # Should be unreachable: The parser should have already rejected all
+        # other (invalid) suffixes.
         raise NotImplementedError(suffix)
 
-
-def resolve_step_names(
-    step: AutoFreeStep,
-    resolved_names: dict[str, list[NameFreeStep]],
+@overload
+def resolve_step_tag(
+    step: Stage1Atom,
+    resolved_tags: dict[str, list[Stage2Step]],
     _default_suffix: str | None = None,
-) -> list[NameFreeStep]:
+) -> Sequence[Stage2Atom]:
+    ...
+
+@overload
+def resolve_step_tag(
+    step: Stage1Step,
+    resolved_tags: dict[str, list[Stage2Step]],
+    _default_suffix: str | None = None,
+) -> Sequence[Stage2Step]:
+    ...
+
+def resolve_step_tag(
+    step: Stage1Step,
+    resolved_tags: dict[str, list[Stage2Step]],
+    _default_suffix: str | None = None,
+) -> Sequence[Stage2Step]:
     """
-    Resolve any names in a step. Note that names may resolve into more than one
-    step.
+    Resolve any tags in a step. Note that tags may resolve into more than one
+    step so a list of steps is returned.
     """
+    # The _default_suffix argument is used internally and specifies the suffix
+    # to add to any tag references which don't already have one. This is used
+    # to recursively resolve the start/end components of a range step in which
+    # `.start` and `.end` are implied if not given.
+    
     if _default_suffix is not None and isinstance(step, str):
         step = (step, _default_suffix)
     
     match step:
         case str():
-            return resolved_names[step]
-        case (str(name), str(suffix)):
-            new_step = resolve_suffix(resolved_names[name], suffix)
+            return resolved_tags[step]
+        case (str(tag), str(suffix)):
+            new_step = resolve_tag_suffix(resolved_tags[tag], suffix)
             if new_step is not None:
                 return [new_step]
             else:
                 return []
         case Range(start, end):
             # Resolve
-            new_start = resolve_step_names(start, resolved_names, "start")
-            new_end = resolve_step_names(end, resolved_names, "end")
+            new_start = resolve_step_tag(start, resolved_tags, "start")
+            new_end = resolve_step_tag(end, resolved_tags, "end")
             
             if new_start and new_end:
                 assert len(new_start) == 1
                 assert len(new_end) == 1
-                return [
-                    Range(
-                        cast(NameFreeStepAtom, new_start[0]),
-                        cast(NameFreeStepAtom, new_end[0]),
-                    )
-                ]
+                return [Range(new_start[0], new_end[0])]
             else:
                 return []
         case _:
-            return [cast(NameFreeStep, step)]
+            return [cast(Stage2Step, step)]
 
 
-def resolve_names(
-    layer_identifers: list[set[str]],
-    layer_steps: list[list[AutoFreeStep]],
-) -> list[list[NameFreeStep]]:
+def resolve_tags(
+    layer_tags: list[set[str]],
+    layer_specs: list[list[Stage1Step]],
+) -> list[list[Stage2Step]]:
     """
-    Resolve all identifiers in layer build specifications.
+    Resolve all tag references in a set of layer build specifications.
+    
+    Parameters
+    ==========
+    layer_tags : [{tag, ...}, ...]
+        For each layer, the tags associated with it.
+    layer_specs : [{spec, ...}, ...]
+        The build specs of each layer (in the same order as layer_tags).
     """
-    # Work out the order in which to resolve names in specs which ensures we've
-    # already expanded any names in a spec before it is used by a later spec.
+    # Work out the order in which to resolve tags in specs which ensures we've
+    # already expanded any tags in a spec before it is used by a later spec.
     layer_dependencies = [
-        set(iter_referenced_identifiers(steps))
-        for steps in layer_steps
+        set(iter_referenced_tags(spec))
+        for spec in layer_specs
     ]
-    resolution_order = compute_name_resolution_order(
-        list(zip(layer_identifers, layer_dependencies))
+    resolution_order = compute_tag_resolution_order(
+        list(zip(layer_tags, layer_dependencies))
     )
     
     # Lookup {layer_index: resolved_steps, ...}
-    resolved_layers_by_index: dict[int, list[NameFreeStep]] = {}
+    resolved_specs: dict[int, list[Stage2Step]] = {}
     
-    # Lookup from name to the combined set of steps for all layers which have
-    # that name
-    resolved_layers_by_name: dict[str, list[NameFreeStep]] = defaultdict(list)
+    # Lookup from tag to the combined set of steps of all layers which have
+    # that tag. (Remember: multiple layers can share the same tag!)
+    resolved_tags: dict[str, list[Stage2Step]] = defaultdict(list)
     
-    # Resolve names
     for index in resolution_order:
-        new_steps = [
+        new_spec = [
             new_step
-            for step in layer_steps[index]
-            for new_step in resolve_step_names(step, resolved_layers_by_name)
+            for step in layer_specs[index]
+            for new_step in resolve_step_tag(step, resolved_tags)
         ]
-        resolved_layers_by_index[index] = new_steps
-        for name in layer_identifers[index]:
-            resolved_layers_by_name[name].extend(new_steps)
+        resolved_specs[index] = new_spec
+        for name in layer_tags[index]:
+            resolved_tags[name].extend(new_spec)
     
     # Return back in order
-    return [
-        resolved_layers_by_index[index]
-        for index in range(len(layer_identifers))
-    ]
+    return [resolved_specs[index] for index in range(len(layer_tags))]
 
 
-def resolve_step_bounds(
-    step: NameFreeStep,
+################################################################################
+# Stage 3: Resolving bounds
+################################################################################
+
+@overload
+def resolve_step_bound(
+    step: Stage2Atom,
     resolved_start: NumericStep,
     resolved_end: NumericStep,
-) -> BoundsFreeStep:
+) -> Stage3Atom:
+    ...
+
+@overload
+def resolve_step_bound(
+    step: Stage2Step,
+    resolved_start: NumericStep,
+    resolved_end: NumericStep,
+) -> Stage3Step:
+    ...
+
+def resolve_step_bound(
+    step: Stage2Step,
+    resolved_start: NumericStep,
+    resolved_end: NumericStep,
+) -> Stage3Step:
     """
     Resolve Start/End into resolved_start and resolved_end respectively.
     """
@@ -554,63 +758,84 @@ def resolve_step_bounds(
             return resolved_end
         case Range(start, end):
             return Range(
-                cast(
-                    BoundsFreeStepAtom,
-                    resolve_step_bounds(start, resolved_start, resolved_end),
-                ),
-                cast(
-                    BoundsFreeStepAtom,
-                    resolve_step_bounds(end, resolved_start, resolved_end),
-                ),
+                resolve_step_bound(start, resolved_start, resolved_end),
+                resolve_step_bound(end, resolved_start, resolved_end),
             )
         case _:
             return step
 
 
-def resolve_bounds(
-    layer_steps: Sequence[Sequence[NameFreeStep]]
-) -> list[list[BoundsFreeStep]]:
-    """
-    Resolve all Start/End instances into concrete integer values.
-    """
+def resolve_bounds(layer_specs: list[list[Stage2Step]]) -> list[list[Stage3Step]]:
+    """Resolve all Start/End instances into concrete integer values."""
     # Find the true start/end indices
-    all_numeric_atoms = [
+    all_numeric_atoms = [0] + [
         atom
-        for spec in layer_steps
+        for spec in layer_specs
         for step in spec
         for atom in ([step.start, step.end] if isinstance(step, Range) else [step])
         if not isinstance(atom, (Start, End))
-    ] + [0]
+    ]
     start = min(all_numeric_atoms)
     end = max(all_numeric_atoms)
     
     # Resolve Start/End accordingly
     return [
-        [resolve_step_bounds(step, start, end) for step in spec]
-        for spec in layer_steps
+        [resolve_step_bound(step, start, end) for step in spec]
+        for spec in layer_specs
     ]
 
 
-def resolve_ranges(
-    layer_steps: Sequence[Sequence[BoundsFreeStep]]
-) -> list[list[NumericStep]]:
-    """
-    Resolve all ranges into individual steps.
-    """
+################################################################################
+# Stage 4: Resolve ranges
+################################################################################
+
+
+def resolve_ranges(layer_specs: list[list[Stage3Step]]) -> list[list[Stage4Step]]:
+    """Resolve all ranges into individual steps."""
     return [
         [
             atom
             for step in spec
             for atom in (range(step.start, step.end + 1) if isinstance(step, Range) else [step])
         ]
-        for spec in layer_steps
+        for spec in layer_specs
     ]
 
 
-def normalise_steps(
-    layer_steps: Sequence[Sequence[NumericStep]]
+################################################################################
+# Top-level interface
+################################################################################
+
+
+def normalise_specs(
+    layer_specs: list[list[NumericStep]]
 ) -> list[list[NumericStep]]:
     """
     Remove sort and remove duplicate steps.
     """
-    return [sorted(set(spec)) for spec in layer_steps]
+    return [sorted(set(spec)) for spec in layer_specs]
+
+
+def evaluate_build_steps(layer_names: list[str]) -> list[list[int]]:
+    """
+    Given a list of layer names, returns the step indices at which each layer
+    is visible.
+    """
+    # Parse layer names
+    layer_specs = [parse_build_specification(name) for name in layer_names]
+    layer_tags = [parse_tags(name) for name in layer_names]
+    
+    try:
+        # Resolve into plain numeric steps
+        s1_layer_specs = resolve_autos(layer_specs)
+        s2_layer_specs = resolve_tags(layer_tags, s1_layer_specs)
+        s3_layer_specs = resolve_bounds(s2_layer_specs)
+        s4_layer_specs = resolve_ranges(s3_layer_specs)
+    except IdentifierNotFoundError as exc:
+        exc.layer_name = layer_names[exc.layer_index]
+        raise
+    except CyclicDependencyError as exc:
+        exc.layer_names = [layer_names[i] for i in exc.layer_indices]
+        raise
+    
+    return normalise_specs(s4_layer_specs)
