@@ -222,12 +222,14 @@ NumericStep = int
 @dataclass
 class Plus:
     """Representation of a '+' automatic numbering step."""
+
     pass
 
 
 @dataclass
 class Dot:
     """Representation of a '.' automatic numbering step."""
+
     pass
 
 
@@ -246,13 +248,14 @@ class Start:
             return True
         else:
             return False
-    
+
     def __lt__(self, other: Any) -> bool:
         if isinstance(other, Start):
             return False
         else:
             return True
-    
+
+
 @dataclass
 @total_ordering
 class End:
@@ -265,7 +268,7 @@ class End:
             return True
         else:
             return False
-    
+
     def __gt__(self, other: Any) -> bool:
         if isinstance(other, End):
             return False
@@ -305,6 +308,7 @@ T = TypeVar("T", bound=InputAtom)
 @dataclass(frozen=True)
 class Range(Generic[T]):
     """Represents a continuous range of steps between start and end, inclusive."""
+
     start: T
     end: T
 
@@ -323,21 +327,28 @@ Stage4Step = Stage4Atom  # Included for completeness
 
 class LayerNameParseError(ValueError):
     """Thrown when an annotation in a layer name is not parsable."""
+
     pass
+
 
 class UnexpectedTagSuffixError(LayerNameParseError):
     """Thrown when an unrecognised tag suffix is used."""
+
     pass
+
 
 class InvalidStepError(LayerNameParseError):
     """Thrown when a step in a build specification is not valid."""
+
     pass
 
 
-def parse_build_specification_step(step_str: str, empty_value: BoundStep | None = None) -> InputAtom:
+def parse_build_specification_step(
+    step_str: str, empty_value: BoundStep | None = None
+) -> InputAtom:
     """
     Parse a single step (e.g. '123', '+', '.', '@foo').
-    
+
     If empty_value is not None, an empty string is parsed as that value.
     """
     step_str = step_str.strip()
@@ -364,21 +375,21 @@ def parse_build_specification_step(step_str: str, empty_value: BoundStep | None 
 def parse_build_specification(layer_name: str) -> list[InputStep]:
     """
     Parse the build specifications within a layer name.
-    
+
     If none are present, treats it as if `<->` was specified (i.e. layer is
     always visible).
-    
+
     If more than one is given, the steps within them will be concatenated.
     """
     build_specification: list[InputStep] = []
-    
+
     contains_build_specification = False
     for match in re.findall(r"<[^>]*>", layer_name):
         contains_build_specification = True
-        
+
         if steps_str := match[1:-1].strip():
             for step_or_range_str in steps_str.split(","):
-                if '-' in step_or_range_str:
+                if "-" in step_or_range_str:
                     start_str, _, end_str = step_or_range_str.partition("-")
                     build_specification.append(
                         Range(
@@ -390,10 +401,10 @@ def parse_build_specification(layer_name: str) -> list[InputStep]:
                     build_specification.append(
                         parse_build_specification_step(step_or_range_str)
                     )
-    
+
     if not contains_build_specification:
         build_specification = [Range(Start(), End())]
-    
+
     return build_specification
 
 
@@ -404,7 +415,7 @@ def parse_tags(layer_name: str) -> set[str]:
     # Remove build specifications from layer name since these may contain
     # references to tags which would confuse matters!
     layer_name = re.sub(r"<[^>]+>", "", layer_name)
-    
+
     return set(re.findall(r"@([^\s<>.@]+)(?=\s|@|$)", layer_name))
 
 
@@ -414,9 +425,14 @@ def parse_tags(layer_name: str) -> set[str]:
 
 
 @overload
-def resolve_step_auto(step: InputAtom, last_number: int) -> Stage1Atom: ...
+def resolve_step_auto(step: InputAtom, last_number: int) -> Stage1Atom:
+    ...
+
+
 @overload
-def resolve_step_auto(step: InputStep, last_number: int) -> Stage1Step: ...
+def resolve_step_auto(step: InputStep, last_number: int) -> Stage1Step:
+    ...
+
 
 def resolve_step_auto(step: InputStep, last_number: int) -> Stage1Step:
     """
@@ -452,7 +468,7 @@ def get_first_numeric_step(steps: list[Stage1Step]) -> int | None:
                 return end
             case _:
                 pass  # Ignore all other types
-    
+
     return None
 
 
@@ -463,18 +479,18 @@ def resolve_autos(layer_specs: list[list[InputStep]]) -> list[list[Stage1Step]]:
     into concrete numeric steps.
     """
     out: list[list[Stage1Step]] = []
-    
+
     # The step number of the last layer which had one.
     last_number = 0
-    
+
     for spec in layer_specs:
         new_spec = [resolve_step_auto(step, last_number) for step in spec]
         out.append(new_spec)
-        
+
         new_number = get_first_numeric_step(new_spec)
         if new_number is not None:
             last_number = new_number
-    
+
     return out
 
 
@@ -505,9 +521,10 @@ class IdentifierNotFoundError(ValueError):
     """
     Thrown when a name is used in a step which doesn't correspond to any layer.
     """
+
     identifier: str
     layer_index: int
-    
+
     # May be populated later
     layer_name: str | None = None
 
@@ -517,8 +534,9 @@ class CyclicDependencyError(ValueError):
     """
     Thrown when a a series of names form a cyclic dependency
     """
+
     layer_indices: list[int]
-    
+
     # May be populated later
     layer_names: list[str] | None = None
 
@@ -529,10 +547,10 @@ def compute_tag_resolution_order(
     """
     Return an ordering of layers to process which ensures that each layer is
     processed before any other layer which depends on it.
-    
+
     Takes a list of (tags, dependencies) tuples which give, for each layer, the
     tags given to that layer and the tags of layers that layer depends on.
-    
+
     Returns a list of layer indices in an order which ensures dependencies are
     processed before their dependants.
     """
@@ -541,7 +559,7 @@ def compute_tag_resolution_order(
     for i, (tags, _deps) in enumerate(layer_tags_and_dependencies):
         for tag in tags:
             tag_to_indices[tag].add(i)
-    
+
     # Create an index-based dependency graph (checking all dependencies exist
     # as we go)
     index_to_deps: dict[int, set[int]] = defaultdict(set)
@@ -550,33 +568,33 @@ def compute_tag_resolution_order(
             if dep not in tag_to_indices:
                 raise IdentifierNotFoundError(dep, i)
             index_to_deps[i].update(tag_to_indices[dep])
-    
+
     # The output ordering
     ordering: list[int] = []
-    
+
     # We use a simple depth-first traversal through the dependency graph to
     # find our ordering.
-    
+
     def resolve(index: int, visited_indices: list[int]) -> None:
         # If already resolved, do nothing
         if index in ordering:
             return
-        
+
         # Check for dependency cycles
         if index in visited_indices:
-            loop_indices = visited_indices[visited_indices.index(index):]
+            loop_indices = visited_indices[visited_indices.index(index) :]
             raise CyclicDependencyError(loop_indices + [index])
-        
+
         # Process all dependencies first
         for dep_index in index_to_deps[index]:
             resolve(dep_index, visited_indices + [index])
-        
+
         # Now process this item
         ordering.append(index)
-    
+
     for i in range(len(layer_tags_and_dependencies)):
         resolve(i, [])
-    
+
     return ordering
 
 
@@ -587,19 +605,19 @@ def resolve_tag_suffix(
     """
     Given the build specification referenced by a tag, resolve this into the
     atom implied by the tag reference's suffix.
-    
+
     As a special case, returns None when the referenced spec is empty.
     """
     if len(referenced_spec) == 0:
         return None
-    
+
     # Flatten the spec into individual atoms
     flat_spec = [
         atom
         for step in referenced_spec
         for atom in ([step.start, step.end] if isinstance(step, Range) else [step])
     ]
-    
+
     if suffix == "start":
         return min(flat_spec)
     elif suffix == "end":
@@ -621,6 +639,7 @@ def resolve_tag_suffix(
         # other (invalid) suffixes.
         raise NotImplementedError(suffix)
 
+
 @overload
 def resolve_step_tag(
     step: Stage1Atom,
@@ -629,6 +648,7 @@ def resolve_step_tag(
 ) -> Sequence[Stage2Atom]:
     ...
 
+
 @overload
 def resolve_step_tag(
     step: Stage1Step,
@@ -636,6 +656,7 @@ def resolve_step_tag(
     _default_suffix: str | None = None,
 ) -> Sequence[Stage2Step]:
     ...
+
 
 def resolve_step_tag(
     step: Stage1Step,
@@ -650,10 +671,10 @@ def resolve_step_tag(
     # to add to any tag references which don't already have one. This is used
     # to recursively resolve the start/end components of a range step in which
     # `.start` and `.end` are implied if not given.
-    
+
     if _default_suffix is not None and isinstance(step, str):
         step = (step, _default_suffix)
-    
+
     match step:
         case str():
             return resolved_tags[step]
@@ -667,7 +688,7 @@ def resolve_step_tag(
             # Resolve
             new_start = resolve_step_tag(start, resolved_tags, "start")
             new_end = resolve_step_tag(end, resolved_tags, "end")
-            
+
             if new_start and new_end:
                 assert len(new_start) == 1
                 assert len(new_end) == 1
@@ -684,7 +705,7 @@ def resolve_tags(
 ) -> list[list[Stage2Step]]:
     """
     Resolve all tag references in a set of layer build specifications.
-    
+
     Parameters
     ==========
     layer_tags : [{tag, ...}, ...]
@@ -694,21 +715,18 @@ def resolve_tags(
     """
     # Work out the order in which to resolve tags in specs which ensures we've
     # already expanded any tags in a spec before it is used by a later spec.
-    layer_dependencies = [
-        set(iter_referenced_tags(spec))
-        for spec in layer_specs
-    ]
+    layer_dependencies = [set(iter_referenced_tags(spec)) for spec in layer_specs]
     resolution_order = compute_tag_resolution_order(
         list(zip(layer_tags, layer_dependencies))
     )
-    
+
     # Lookup {layer_index: resolved_steps, ...}
     resolved_specs: dict[int, list[Stage2Step]] = {}
-    
+
     # Lookup from tag to the combined set of steps of all layers which have
     # that tag. (Remember: multiple layers can share the same tag!)
     resolved_tags: dict[str, list[Stage2Step]] = defaultdict(list)
-    
+
     for index in resolution_order:
         new_spec = [
             new_step
@@ -718,7 +736,7 @@ def resolve_tags(
         resolved_specs[index] = new_spec
         for name in layer_tags[index]:
             resolved_tags[name].extend(new_spec)
-    
+
     # Return back in order
     return [resolved_specs[index] for index in range(len(layer_tags))]
 
@@ -726,6 +744,7 @@ def resolve_tags(
 ################################################################################
 # Stage 3: Resolving bounds
 ################################################################################
+
 
 @overload
 def resolve_step_bound(
@@ -735,6 +754,7 @@ def resolve_step_bound(
 ) -> Stage3Atom:
     ...
 
+
 @overload
 def resolve_step_bound(
     step: Stage2Step,
@@ -742,6 +762,7 @@ def resolve_step_bound(
     resolved_end: NumericStep,
 ) -> Stage3Step:
     ...
+
 
 def resolve_step_bound(
     step: Stage2Step,
@@ -777,11 +798,10 @@ def resolve_bounds(layer_specs: list[list[Stage2Step]]) -> list[list[Stage3Step]
     ]
     start = min(all_numeric_atoms)
     end = max(all_numeric_atoms)
-    
+
     # Resolve Start/End accordingly
     return [
-        [resolve_step_bound(step, start, end) for step in spec]
-        for spec in layer_specs
+        [resolve_step_bound(step, start, end) for step in spec] for spec in layer_specs
     ]
 
 
@@ -796,7 +816,9 @@ def resolve_ranges(layer_specs: list[list[Stage3Step]]) -> list[list[Stage4Step]
         [
             atom
             for step in spec
-            for atom in (range(step.start, step.end + 1) if isinstance(step, Range) else [step])
+            for atom in (
+                range(step.start, step.end + 1) if isinstance(step, Range) else [step]
+            )
         ]
         for spec in layer_specs
     ]
@@ -807,9 +829,7 @@ def resolve_ranges(layer_specs: list[list[Stage3Step]]) -> list[list[Stage4Step]
 ################################################################################
 
 
-def normalise_specs(
-    layer_specs: list[list[NumericStep]]
-) -> list[list[NumericStep]]:
+def normalise_specs(layer_specs: list[list[NumericStep]]) -> list[list[NumericStep]]:
     """
     Remove sort and remove duplicate steps.
     """
@@ -824,7 +844,7 @@ def evaluate_build_steps(layer_names: list[str]) -> list[list[int]]:
     # Parse layer names
     layer_specs = [parse_build_specification(name) for name in layer_names]
     layer_tags = [parse_tags(name) for name in layer_names]
-    
+
     try:
         # Resolve into plain numeric steps
         s1_layer_specs = resolve_autos(layer_specs)
@@ -837,5 +857,5 @@ def evaluate_build_steps(layer_names: list[str]) -> list[list[int]]:
     except CyclicDependencyError as exc:
         exc.layer_names = [layer_names[i] for i in exc.layer_indices]
         raise
-    
+
     return normalise_specs(s4_layer_specs)

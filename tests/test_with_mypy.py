@@ -1,6 +1,7 @@
 from pathlib import Path
 from subprocess import run
 
+
 def test_with_mypy() -> None:
     run(
         [

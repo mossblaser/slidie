@@ -39,7 +39,6 @@ from slidie.builds import (
 
 
 class TestParseBuildSpecificationStep:
-    
     @pytest.mark.parametrize(
         "spec, exp",
         [
@@ -57,7 +56,7 @@ class TestParseBuildSpecificationStep:
     )
     def test_valid(self, spec: str, exp: InputStep) -> None:
         assert parse_build_specification_step(spec, Start()) == exp
-    
+
     @pytest.mark.parametrize(
         "spec",
         [
@@ -246,8 +245,7 @@ def test_get_first_numeric_step(step: list[Stage1Step], exp: int | None) -> None
 )
 def test_resolve_autos(layer_steps: list[str], exp: list[str]) -> None:
     assert resolve_autos([parse_build_specification(spec) for spec in layer_steps]) == [
-        cast(list[Stage1Step], parse_build_specification(spec))
-        for spec in exp
+        cast(list[Stage1Step], parse_build_specification(spec)) for spec in exp
     ]
 
 
@@ -268,70 +266,82 @@ def test_resolve_autos(layer_steps: list[str], exp: list[str]) -> None:
     ],
 )
 def test_iter_referenced_tags(spec: str, exp: list[str]) -> None:
-    assert list(
-        iter_referenced_tags(
-            cast(list[Stage1Step], parse_build_specification(spec))
+    assert (
+        list(
+            iter_referenced_tags(
+                cast(list[Stage1Step], parse_build_specification(spec))
+            )
         )
-    ) == exp
+        == exp
+    )
 
 
 class TestComputeTagResolutionOrder:
-
     def test_empty(self) -> None:
         assert compute_tag_resolution_order([]) == []
 
     def test_missing_dependency(self) -> None:
         with pytest.raises(IdentifierNotFoundError) as exc_info:
-            assert compute_tag_resolution_order([
-                (set(), {"foo"}),
-                ({"bar"}, set()),
-            ])
-        
+            assert compute_tag_resolution_order(
+                [
+                    (set(), {"foo"}),
+                    ({"bar"}, set()),
+                ]
+            )
+
         assert exc_info.value.identifier == "foo"
         assert exc_info.value.layer_index == 0
 
     def test_cyclic_dependency_self(self) -> None:
         with pytest.raises(CyclicDependencyError) as exc_info:
-            assert compute_tag_resolution_order([
-                ({"foo"}, {"foo"}),
-            ])
-        
+            assert compute_tag_resolution_order(
+                [
+                    ({"foo"}, {"foo"}),
+                ]
+            )
+
         assert exc_info.value.layer_indices == [0, 0]
 
     def test_cyclic_dependency_self_and_other(self) -> None:
         with pytest.raises(CyclicDependencyError) as exc_info:
-            assert compute_tag_resolution_order([
-                ({"foo"}, {"foo", "bar"}),
-                ({"bar"}, set()),
-            ])
-        
-        assert (
-            exc_info.value.layer_indices == [0, 0] or
-            exc_info.value.layer_indices == [0, 1, 0]
-        )
+            assert compute_tag_resolution_order(
+                [
+                    ({"foo"}, {"foo", "bar"}),
+                    ({"bar"}, set()),
+                ]
+            )
+
+        assert exc_info.value.layer_indices == [
+            0,
+            0,
+        ] or exc_info.value.layer_indices == [0, 1, 0]
 
     def test_cyclic_dependency_multiple_steps(self) -> None:
         with pytest.raises(CyclicDependencyError) as exc_info:
-            assert compute_tag_resolution_order([
-                ({"l0"}, {"l1"}),
-                ({"l1"}, {"l2"}),
-                ({"l2"}, {"l3"}),
-                ({"l3"}, {"l0"}),
-            ])
-        
+            assert compute_tag_resolution_order(
+                [
+                    ({"l0"}, {"l1"}),
+                    ({"l1"}, {"l2"}),
+                    ({"l2"}, {"l3"}),
+                    ({"l3"}, {"l0"}),
+                ]
+            )
+
         assert exc_info.value.layer_indices == [0, 1, 2, 3, 0]
 
     def test_cyclic_dependency_multiple_steps_but_not_all(self) -> None:
         with pytest.raises(CyclicDependencyError) as exc_info:
-            assert compute_tag_resolution_order([
-                ({"l0"}, {"l1"}),
-                ({"l1"}, {"l2"}),
-                ({"l2"}, {"l3"}),
-                ({"l3"}, {"l1"}),
-            ])
-        
+            assert compute_tag_resolution_order(
+                [
+                    ({"l0"}, {"l1"}),
+                    ({"l1"}, {"l2"}),
+                    ({"l2"}, {"l3"}),
+                    ({"l3"}, {"l1"}),
+                ]
+            )
+
         assert exc_info.value.layer_indices == [1, 2, 3, 1]
-    
+
     @pytest.mark.parametrize(
         "layer_names",
         # NB: We try all permutations of layer orderings to ensure the
@@ -357,9 +367,7 @@ class TestComputeTagResolutionOrder:
         ),
     )
     def test_orderings(self, layer_names: list[str]) -> None:
-        layer_identifiers = [
-            parse_tags(n) for n in layer_names
-        ]
+        layer_identifiers = [parse_tags(n) for n in layer_names]
         layer_dependency_names = [
             set(
                 iter_referenced_tags(
@@ -368,15 +376,15 @@ class TestComputeTagResolutionOrder:
             )
             for n in layer_names
         ]
-        
+
         ordering = compute_tag_resolution_order(
             list(zip(layer_identifiers, layer_dependency_names))
         )
-        
+
         # Check all layers appear in the ordering exactly once
         assert set(ordering) == set(range(len(layer_names)))
         assert len(ordering) == len(layer_names)
-        
+
         # Check dependencies are always processed before dependents
         name_to_index = {
             name: index
@@ -387,6 +395,7 @@ class TestComputeTagResolutionOrder:
             for dep_name in layer_dependency_names[index]:
                 dep_index = name_to_index[dep_name]
                 assert ordering.index(dep_index) < ordering.index(index)
+
 
 @pytest.mark.parametrize(
     "spec, suffix, exp",
@@ -423,7 +432,8 @@ class TestComputeTagResolutionOrder:
 )
 def test_resolve_tag_suffix(
     spec: list[Stage2Step],
-    suffix: str, exp: Stage2Atom | None,
+    suffix: str,
+    exp: Stage2Atom | None,
 ) -> None:
     assert resolve_tag_suffix(spec, suffix) == exp
 
@@ -484,15 +494,13 @@ def test_resolve_step_tag(step: Stage1Step, exp: list[Stage2Step]) -> None:
 def test_resolve_tags(layers: list[str], exp: list[str]) -> None:
     layer_identifiers = [parse_tags(layer) for layer in layers]
     layer_steps = [
-        cast(list[Stage1Step], parse_build_specification(layer))
-        for layer in layers
+        cast(list[Stage1Step], parse_build_specification(layer)) for layer in layers
     ]
-    
+
     exp_steps = [
-        cast(list[Stage2Step], parse_build_specification(layer))
-        for layer in exp
+        cast(list[Stage2Step], parse_build_specification(layer)) for layer in exp
     ]
-    
+
     assert resolve_tags(layer_identifiers, layer_steps) == exp_steps
 
 
@@ -527,7 +535,7 @@ def test_resolve_step_bound(step: Stage2Step, exp: Stage3Step) -> None:
         (["", "<99>"], ["<0-99>", "<99>"]),
         (["", "<-99>"], ["<0-99>", "<0-99>"]),
         (["", "<99->"], ["<0-99>", "<99-99>"]),
-        # Pull start/end appart 
+        # Pull start/end appart
         (["<11>", "<99>", "<->"], ["<11>", "<99>", "<0-99>"]),
         (["<11-99>", "<->"], ["<11-99>", "<0-99>"]),
         # Should be taking min/max not first/last
@@ -538,14 +546,12 @@ def test_resolve_step_bound(step: Stage2Step, exp: Stage3Step) -> None:
 )
 def test_resolve_bounds(layers: list[str], exp: list[str]) -> None:
     layer_steps = [
-        cast(list[Stage2Step], parse_build_specification(layer))
-        for layer in layers
+        cast(list[Stage2Step], parse_build_specification(layer)) for layer in layers
     ]
     exp_steps = [
-        cast(list[Stage3Step], parse_build_specification(layer))
-        for layer in exp
+        cast(list[Stage3Step], parse_build_specification(layer)) for layer in exp
     ]
-    
+
     assert resolve_bounds(layer_steps) == exp_steps
 
 
@@ -568,14 +574,12 @@ def test_resolve_bounds(layers: list[str], exp: list[str]) -> None:
 )
 def test_resolve_ranges(layers: list[str], exp: list[str]) -> None:
     layer_steps = [
-        cast(list[Stage3Step], parse_build_specification(layer))
-        for layer in layers
+        cast(list[Stage3Step], parse_build_specification(layer)) for layer in layers
     ]
     exp_steps = [
-        cast(list[NumericStep], parse_build_specification(layer))
-        for layer in exp
+        cast(list[NumericStep], parse_build_specification(layer)) for layer in exp
     ]
-    
+
     assert resolve_ranges(layer_steps) == exp_steps
 
 
@@ -593,19 +597,16 @@ def test_resolve_ranges(layers: list[str], exp: list[str]) -> None:
 )
 def test_normalise_specs(layers: list[str], exp: list[str]) -> None:
     layer_steps = [
-        cast(list[NumericStep], parse_build_specification(layer))
-        for layer in layers
+        cast(list[NumericStep], parse_build_specification(layer)) for layer in layers
     ]
     exp_steps = [
-        cast(list[NumericStep], parse_build_specification(layer))
-        for layer in exp
+        cast(list[NumericStep], parse_build_specification(layer)) for layer in exp
     ]
-    
+
     assert normalise_specs(layer_steps) == exp_steps
 
 
 class TestEvaluateBuildSteps:
-    
     def test_integration(self) -> None:
         assert evaluate_build_steps(
             [
@@ -620,13 +621,13 @@ class TestEvaluateBuildSteps:
             [2],
             [0, 1, 2, 3],
         ]
-    
+
     def test_identifier_not_found_layer_names(self) -> None:
         with pytest.raises(IdentifierNotFoundError) as exc_info:
             evaluate_build_steps(["Who knows what <@foo> is?"])
-        
+
         assert exc_info.value.layer_name == "Who knows what <@foo> is?"
-    
+
     def test_cyclic_dependency_error(self) -> None:
         with pytest.raises(CyclicDependencyError) as exc_info:
             evaluate_build_steps(
@@ -636,7 +637,7 @@ class TestEvaluateBuildSteps:
                     "C <@a> @c",
                 ]
             )
-        
+
         assert exc_info.value.layer_names == [
             "A <@b> @a",
             "B <@c> @b",

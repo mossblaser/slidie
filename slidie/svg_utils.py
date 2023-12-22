@@ -22,7 +22,7 @@ namespaces = {
 class InkscapeLayer(NamedTuple):
     element: ET.Element
     children: list["InkscapeLayer"]
-    
+
     def __repr__(self) -> str:
         if self.children:
             return f"<InkscapeLayer {get_inkscape_layer_name(self.element)!r} {self.children!r}>"
@@ -37,12 +37,13 @@ def enumerate_inkscape_layers(root: ET.Element) -> list[InkscapeLayer]:
     """
     layers: list[InkscapeLayer] = []
     to_visit: list[tuple[list[InkscapeLayer], ET.Element]] = [(layers, root)]
-    
+
     while to_visit:
         parent, element = to_visit.pop(0)
         if (
-            element.tag == f"{{{SVG_NAMESPACE}}}g" and
-            element.attrib.get(f"{{{INKSCAPE_NAMESPACE}}}groupmode", None) == "layer"
+            element.tag == f"{{{SVG_NAMESPACE}}}g"
+            and element.attrib.get(f"{{{INKSCAPE_NAMESPACE}}}groupmode", None)
+            == "layer"
         ):
             layer = InkscapeLayer(element, [])
             parent.insert(0, layer)
