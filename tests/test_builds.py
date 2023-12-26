@@ -85,9 +85,9 @@ class TestParseBuildSpecificationStep:
     "layer_name, exp",
     [
         # No specs = full range
-        ("", [Range(Start(), End())]),
-        ("foo", [Range(Start(), End())]),
-        ("foo <", [Range(Start(), End())]),
+        ("", None),
+        ("foo", None),
+        ("foo <", None),
         # Explicitly empty range
         ("foo <>", []),
         ("foo < >", []),
@@ -103,7 +103,9 @@ class TestParseBuildSpecificationStep:
         ("foo <1> <2,3>", [1, 2, 3]),
     ],
 )
-def test_parse_build_specification(layer_name: str, exp: list[InputStep]) -> None:
+def test_parse_build_specification(
+    layer_name: str, exp: list[InputStep] | None
+) -> None:
     assert parse_build_specification(layer_name) == exp
 
 
@@ -211,7 +213,7 @@ def test_get_first_numeric_step(step: list[Stage1Step], exp: int | None) -> None
         (
             [
                 "<+>",
-                "",
+                "<->",
                 "<.>",
                 "<+>",
                 "<@foo>",
@@ -219,7 +221,7 @@ def test_get_first_numeric_step(step: list[Stage1Step], exp: int | None) -> None
             ],
             [
                 "<1>",
-                "",
+                "<->",
                 "<1>",
                 "<2>",
                 "<@foo>",
@@ -244,16 +246,16 @@ def test_get_first_numeric_step(step: list[Stage1Step], exp: int | None) -> None
     ],
 )
 def test_resolve_autos(layer_steps: list[str], exp: list[str]) -> None:
-    assert resolve_autos([parse_build_specification(spec) for spec in layer_steps]) == [
-        cast(list[Stage1Step], parse_build_specification(spec)) for spec in exp
-    ]
+    assert resolve_autos(
+        [cast(list[InputStep], parse_build_specification(spec)) for spec in layer_steps]
+    ) == [cast(list[Stage1Step], parse_build_specification(spec)) for spec in exp]
 
 
 @pytest.mark.parametrize(
     "spec, exp",
     [
         # Empty case
-        ("", []),
+        ("<>", []),
         # No named values
         ("<.-+, 123>", []),
         # Some names
@@ -350,18 +352,19 @@ class TestComputeTagResolutionOrder:
             layers
             for case in [
                 # No dependencies
-                ["", ""],
+                ["<>", "<>"],
+                ["<->", "<->"],
                 ["<+>", "<+>"],
                 # Singular dependency
-                ["<@foo>", "@foo"],
+                ["<@foo>", "@foo <->"],
                 # Chain
-                ["<@foo>", "@foo <@bar>", "@bar"],
+                ["<@foo>", "@foo <@bar>", "@bar <->"],
                 # Tree
-                ["<@foo, @bar>", "@foo", "@bar"],
+                ["<@foo, @bar>", "@foo <->", "@bar <->"],
                 # Diamond
-                ["<@foo, @bar>", "@foo <@baz>", "@bar <@baz>", "@baz"],
+                ["<@foo, @bar>", "@foo <@baz>", "@bar <@baz>", "@baz <->"],
                 # Multiple aliases referenced
-                ["<@foo, @bar>", "@foo @bar"],
+                ["<@foo, @bar>", "@foo @bar <->"],
             ]
             for layers in permutations(case)
         ),
@@ -529,12 +532,13 @@ def test_resolve_step_bound(step: Stage2Step, exp: Stage3Step) -> None:
     [
         # Empty
         ([], []),
+        (["<>"], ["<>"]),
         # No steps listed, should resolve to 0
-        ([""], ["<0-0>"]),
+        (["<->"], ["<0-0>"]),
         # Single number listed should resolve as start/end, even if in a range
-        (["", "<99>"], ["<0-99>", "<99>"]),
-        (["", "<-99>"], ["<0-99>", "<0-99>"]),
-        (["", "<99->"], ["<0-99>", "<99-99>"]),
+        (["<->", "<99>"], ["<0-99>", "<99>"]),
+        (["<->", "<-99>"], ["<0-99>", "<0-99>"]),
+        (["<->", "<99->"], ["<0-99>", "<99-99>"]),
         # Pull start/end appart
         (["<11>", "<99>", "<->"], ["<11>", "<99>", "<0-99>"]),
         (["<11-99>", "<->"], ["<11-99>", "<0-99>"]),
@@ -613,12 +617,18 @@ class TestEvaluateBuildSteps:
                 "A <2> @foo",
                 "B <+>",
                 "C <@foo>",
-                "D",
+                "D <->",
+                # Test handling of absent specs
+                "E @bar",
+                # Test reference to absent spec = always visible
+                "F <@bar>",
             ]
         ) == [
             [2],
             [3],
             [2],
+            [0, 1, 2, 3],
+            None,
             [0, 1, 2, 3],
         ]
 

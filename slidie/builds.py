@@ -372,14 +372,14 @@ def parse_build_specification_step(
         raise InvalidStepError(step_str)
 
 
-def parse_build_specification(layer_name: str) -> list[InputStep]:
+def parse_build_specification(layer_name: str) -> list[InputStep] | None:
     """
     Parse the build specifications within a layer name.
 
-    If none are present, treats it as if `<->` was specified (i.e. layer is
-    always visible).
+    If one ore more is given, the steps within them will be concatenated into a
+    single list and returned.
 
-    If more than one is given, the steps within them will be concatenated.
+    If none are present, returns None.
     """
     build_specification: list[InputStep] = []
 
@@ -402,10 +402,10 @@ def parse_build_specification(layer_name: str) -> list[InputStep]:
                         parse_build_specification_step(step_or_range_str)
                     )
 
-    if not contains_build_specification:
-        build_specification = [Range(Start(), End())]
-
-    return build_specification
+    if contains_build_specification:
+        return build_specification
+    else:
+        return None
 
 
 def parse_tags(layer_name: str) -> set[str]:
@@ -836,21 +836,33 @@ def normalise_specs(layer_specs: list[list[NumericStep]]) -> list[list[NumericSt
     return [sorted(set(spec)) for spec in layer_specs]
 
 
-def evaluate_build_steps(layer_names: list[str]) -> list[list[int]]:
+def evaluate_build_steps(layer_names: list[str]) -> list[list[int] | None]:
     """
     Given a list of layer names, returns the step indices at which each layer
     is visible.
+
+    For layers which don't specify a build system, returns None. (Tag
+    references to layers without a build spec are treated as being always
+    visible).
     """
-    # Parse layer names
-    layer_specs = [parse_build_specification(name) for name in layer_names]
+    # Parse specs and tags from layer names.
+    input_layer_specs = [parse_build_specification(name) for name in layer_names]
     layer_tags = [parse_tags(name) for name in layer_names]
 
+    # Resolve into plain numeric steps
     try:
-        # Resolve into plain numeric steps
-        s1_layer_specs = resolve_autos(layer_specs)
+        # Internally we treat layers without a any build specs as having the spec
+        # '<->' (i.e. always visible).
+        s1_layer_specs = resolve_autos(
+            [
+                spec if spec is not None else [Range(Start(), End())]
+                for spec in input_layer_specs
+            ]
+        )
         s2_layer_specs = resolve_tags(layer_tags, s1_layer_specs)
         s3_layer_specs = resolve_bounds(s2_layer_specs)
         s4_layer_specs = resolve_ranges(s3_layer_specs)
+        layer_specs = normalise_specs(s4_layer_specs)
     except IdentifierNotFoundError as exc:
         exc.layer_name = layer_names[exc.layer_index]
         raise
@@ -858,4 +870,9 @@ def evaluate_build_steps(layer_names: list[str]) -> list[list[int]]:
         exc.layer_names = [layer_names[i] for i in exc.layer_indices]
         raise
 
-    return normalise_specs(s4_layer_specs)
+    # Remove specs from layers without a build spec. This prevents these layers
+    # being bogusly forced to be visible/invisible by the build process.
+    return [
+        spec if input_spec is not None else None
+        for input_spec, spec in zip(input_layer_specs, layer_specs)
+    ]
