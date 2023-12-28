@@ -53,22 +53,19 @@ def test_get_inkscape_page_colour(test_file: str) -> None:
 
 
 class TestGetViewBox:
-
     def test_has_view_box(self) -> None:
         assert get_view_box(get_svg("view_box.svg")) == ViewBox(1, 2, 3, 4)
-    
+
     def test_no_view_box(self) -> None:
         assert get_view_box(get_svg("no_view_box.svg")) is None
 
 
 class TestGetInkscapePages:
-    
     def test_pages(self) -> None:
         assert get_inkscape_pages(get_svg("multiple_pages.svg")) == [
             ViewBox(10, 20, 30, 40),
             ViewBox(50, 20, 50, 60),
         ]
-    
+
     def test_old_inkscape_file(self) -> None:
         assert get_inkscape_pages(get_svg("old_inkscape_file.svg")) == []
-

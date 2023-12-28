@@ -94,7 +94,7 @@ def get_view_box(svg: ET.Element) -> ViewBox | None:
 def get_inkscape_pages(svg: ET.Element) -> list[ViewBox]:
     """
     Get the extents of pages in an Inkscape (1.2+) multi-page SVG.
-    
+
     For older Inkscape SVGs (without multiple pages) or non-Inkscape SVGs,
     returns an empty list.
     """
@@ -104,7 +104,7 @@ def get_inkscape_pages(svg: ET.Element) -> list[ViewBox]:
         y = view_box.y
     else:
         x = y = 0
-    
+
     return [
         ViewBox(
             float(page_elem.get("x", 0)) + x,
@@ -122,14 +122,14 @@ def fill_inkscape_page_background(svg: ET.Element) -> None:
     """
     Given an Inkscape SVG, add a <rect> behind every page which explicitly
     draws the Inkscape 'page' colour (100% opaquely).
-    
+
     Does nothing for non-Inkscape SVGs.
     """
     if page_colour := get_inkscape_page_colour(svg):
         pages = get_inkscape_pages(svg)
         if view_box := get_view_box(svg):
             pages.append(view_box)
-        
+
         for page in set(pages):
             rect = ET.Element(f"{{{SVG_NAMESPACE}}}rect")
             rect.set("x", str(page.x))
@@ -137,5 +137,5 @@ def fill_inkscape_page_background(svg: ET.Element) -> None:
             rect.set("width", str(page.width))
             rect.set("height", str(page.height))
             rect.set("style", f"fill:{page_colour}")
-            
+
             svg.insert(0, rect)
