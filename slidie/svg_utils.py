@@ -6,6 +6,10 @@ from typing import NamedTuple, Iterator
 
 from xml.etree import ElementTree as ET
 
+import json
+
+from slidie.builds import evaluate_build_steps
+
 
 # Relevant XML namespace URIs used by SVGs
 SVG_NAMESPACE = "http://www.w3.org/2000/svg"
@@ -77,6 +81,27 @@ def get_inkscape_layer_name(layer: ET.Element) -> str:
     name = layer.attrib.get(f"{{{INKSCAPE_NAMESPACE}}}label")
     assert name is not None
     return name
+
+
+def annotate_build_steps(svg: ET.Element) -> tuple[int, int]:
+    """
+    Evaluate the build steps defined on layers in an Inkscape SVG and add a
+    slidie:steps attribute to them giving the visible step numbers as a JSON
+    array.
+
+    Modifies 'svg' in-place and returns the first and last step indices in use.
+    """
+    layers = list(iter_layers(enumerate_inkscape_layers(svg)))
+
+    layer_steps = evaluate_build_steps(list(map(get_inkscape_layer_name, layers)))
+
+    for layer, steps in zip(layers, layer_steps):
+        if steps is not None:
+            layer.set(f"{{{SLIDIE_NAMESPACE}}}steps", json.dumps(steps))
+
+    first = min([0] + [s for steps in layer_steps if steps is not None for s in steps])
+    last = max([0] + [s for steps in layer_steps if steps is not None for s in steps])
+    return first, last
 
 
 def get_inkscape_page_colour(svg: ET.Element) -> str | None:
