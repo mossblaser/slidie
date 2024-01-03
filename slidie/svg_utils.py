@@ -83,13 +83,13 @@ def get_inkscape_layer_name(layer: ET.Element) -> str:
     return name
 
 
-def annotate_build_steps(svg: ET.Element) -> tuple[int, int]:
+def annotate_build_steps(svg: ET.Element) -> None:
     """
     Evaluate the build steps defined on layers in an Inkscape SVG and add a
     slidie:steps attribute to them giving the visible step numbers as a JSON
     array.
 
-    Modifies 'svg' in-place and returns the first and last step indices in use.
+    Modifies 'svg' in-place.
     """
     layers = list(iter_layers(enumerate_inkscape_layers(svg)))
 
@@ -99,9 +99,6 @@ def annotate_build_steps(svg: ET.Element) -> tuple[int, int]:
         if steps is not None:
             layer.set(f"{{{SLIDIE_NAMESPACE}}}steps", json.dumps(steps))
 
-    first = min([0] + [s for steps in layer_steps if steps is not None for s in steps])
-    last = max([0] + [s for steps in layer_steps if steps is not None for s in steps])
-    return first, last
 
 
 def get_inkscape_page_colour(svg: ET.Element) -> str | None:
