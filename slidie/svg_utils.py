@@ -2,7 +2,7 @@
 Utilities for probing and interacting with (primarily) Inkscape-derrived SVGs.
 """
 
-from typing import NamedTuple
+from typing import NamedTuple, Iterator
 
 from xml.etree import ElementTree as ET
 
@@ -56,6 +56,18 @@ def enumerate_inkscape_layers(root: ET.Element) -> list[InkscapeLayer]:
                 to_visit.append((parent, child))
 
     return layers
+
+
+def flatten_layers(layers: list[InkscapeLayer]) -> Iterator[ET.Element]:
+    """
+    Given a hierarchy of layers (e.g. produced by
+    :py:func:`enumerate_inkscape_layers`), iterate over the layers in a
+    flattened fashion in the order they are displayed in the Inkscape GUI.
+    """
+    for layer in layers:
+        yield layer.element
+        for child in layer.children:
+            yield from flatten_layers([child])
 
 
 def get_inkscape_layer_name(layer: ET.Element) -> str:
