@@ -12,12 +12,14 @@ SVG_NAMESPACE = "http://www.w3.org/2000/svg"
 INKSCAPE_NAMESPACE = "http://www.inkscape.org/namespaces/inkscape"
 SODIPODI_NAMESPACE = "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
 XLINK_NAMESPACE = "http://www.w3.org/1999/xlink"
+SLIDIE_NAMESPACE = "http://xmlns.jhnet.co.uk/slidie/1.0"
 
 namespaces = {
     "svg": SVG_NAMESPACE,
     "inkscape": INKSCAPE_NAMESPACE,
     "sodipodi": SODIPODI_NAMESPACE,
     "xlink": XLINK_NAMESPACE,
+    "slidie": SLIDIE_NAMESPACE,
 }
 
 
