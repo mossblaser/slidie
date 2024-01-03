@@ -60,7 +60,7 @@ def enumerate_inkscape_layers(root: ET.Element) -> list[InkscapeLayer]:
     return layers
 
 
-def flatten_layers(layers: list[InkscapeLayer]) -> Iterator[ET.Element]:
+def iter_layers(layers: list[InkscapeLayer]) -> Iterator[ET.Element]:
     """
     Given a hierarchy of layers (e.g. produced by
     :py:func:`enumerate_inkscape_layers`), iterate over the layers in a
@@ -69,7 +69,7 @@ def flatten_layers(layers: list[InkscapeLayer]) -> Iterator[ET.Element]:
     for layer in layers:
         yield layer.element
         for child in layer.children:
-            yield from flatten_layers([child])
+            yield from iter_layers([child])
 
 
 def get_inkscape_layer_name(layer: ET.Element) -> str:

@@ -4,7 +4,7 @@ from svgs import get_svg
 
 from slidie.svg_utils import (
     enumerate_inkscape_layers,
-    flatten_layers,
+    iter_layers,
     get_inkscape_layer_name,
     get_inkscape_page_colour,
     ViewBox,
@@ -42,11 +42,11 @@ def test_enumerate_inkscape_layers() -> None:
     assert len(layers[1].children[1].children) == 0
 
 
-def test_flatten_layers() -> None:
+def test_iter_layers() -> None:
     root = get_svg("layers.svg")
     layers = enumerate_inkscape_layers(root)
 
-    assert list(map(get_inkscape_layer_name, flatten_layers(layers))) == [
+    assert list(map(get_inkscape_layer_name, iter_layers(layers))) == [
         "Top layer",
         "Middle layer",
         "Middle layer, top sublayer",
