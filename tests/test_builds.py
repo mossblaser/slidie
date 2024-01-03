@@ -3,6 +3,15 @@ import pytest
 from typing import cast
 
 from itertools import permutations
+import json
+
+from svgs import get_svg
+
+from slidie.svg_utils import (
+    SLIDIE_NAMESPACE,
+    enumerate_inkscape_layers,
+    iter_layers,
+)
 
 from slidie.builds import (
     NumericStep,
@@ -35,6 +44,7 @@ from slidie.builds import (
     resolve_ranges,
     normalise_specs,
     evaluate_build_steps,
+    annotate_build_steps,
 )
 
 
@@ -654,3 +664,32 @@ class TestEvaluateBuildSteps:
             "C <@a> @c",
             "A <@b> @a",
         ]
+
+
+class TestAnnotateBuildSteps:
+    def test_no_layers(self) -> None:
+        svg = get_svg("no_layers.svg")
+        first, last = annotate_build_steps(svg)
+        assert first == 0
+        assert last == 0
+
+    def test_no_builds(self) -> None:
+        svg = get_svg("empty.svg")
+        first, last = annotate_build_steps(svg)
+        assert first == 0
+        assert last == 0
+
+    def test_annotations(self) -> None:
+        svg = get_svg("simple_build.svg")
+        assert annotate_build_steps(svg) == (0, 3)
+
+        always, first, second, third = iter_layers(enumerate_inkscape_layers(svg))
+
+        assert always.get(f"{{{SLIDIE_NAMESPACE}}}steps") is None
+        assert json.loads(first.get(f"{{{SLIDIE_NAMESPACE}}}steps", "null")) == [
+            1,
+            2,
+            3,
+        ]
+        assert json.loads(second.get(f"{{{SLIDIE_NAMESPACE}}}steps", "null")) == [2, 3]
+        assert json.loads(third.get(f"{{{SLIDIE_NAMESPACE}}}steps", "null")) == [3]

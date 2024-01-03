@@ -7,6 +7,10 @@ The :py:func:`evaluate_build_steps` function in this module takes a list of
 layer names and returns selected step numbers during which each slide is
 visible.
 
+Alternatively, the :py:func:`annotate_build_steps` function takes an Inkscape
+SVG and adds JSON-encoded slidie:steps attributes to all layers with a build
+spec in their names.
+
 
 Basic syntax
 ============
@@ -207,8 +211,17 @@ from typing import cast, overload, TypeVar, Generic, Iterator, Any, Sequence
 from dataclasses import dataclass
 from collections import defaultdict
 from functools import total_ordering
+from xml.etree import ElementTree as ET
 
 import re
+import json
+
+from slidie.svg_utils import (
+    SLIDIE_NAMESPACE,
+    enumerate_inkscape_layers,
+    iter_layers,
+    get_inkscape_layer_name,
+)
 
 
 ################################################################################
@@ -876,3 +889,24 @@ def evaluate_build_steps(layer_names: list[str]) -> list[list[int] | None]:
         spec if input_spec is not None else None
         for input_spec, spec in zip(input_layer_specs, layer_specs)
     ]
+
+
+def annotate_build_steps(svg: ET.Element) -> tuple[int, int]:
+    """
+    Evaluate the build steps defined on layers in an Inkscape SVG and add a
+    slidie:steps attribute to them giving the visible step numbers as a JSON
+    array.
+
+    Modifies 'svg' in-place and returns the first and last step indices in use.
+    """
+    layers = list(iter_layers(enumerate_inkscape_layers(svg)))
+
+    layer_steps = evaluate_build_steps(list(map(get_inkscape_layer_name, layers)))
+
+    for layer, steps in zip(layers, layer_steps):
+        if steps is not None:
+            layer.set(f"{{{SLIDIE_NAMESPACE}}}steps", json.dumps(steps))
+
+    first = min([0] + [s for steps in layer_steps if steps is not None for s in steps])
+    last = max([0] + [s for steps in layer_steps if steps is not None for s in steps])
+    return first, last
