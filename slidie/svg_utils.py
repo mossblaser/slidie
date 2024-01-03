@@ -100,6 +100,16 @@ def annotate_build_steps(svg: ET.Element) -> None:
             layer.set(f"{{{SLIDIE_NAMESPACE}}}steps", json.dumps(steps))
 
 
+def find_build_elements(svg: ET.Element) -> dict[ET.Element, list[int]]:
+    """
+    Find all elements with build steps defined and return a dictionary from
+    SVG element to build steps.
+    """
+    return {
+        elem: json.loads(elem.attrib[f"{{{SLIDIE_NAMESPACE}}}steps"])
+        for elem in svg.findall(f".//{{{SVG_NAMESPACE}}}*[@{{{SLIDIE_NAMESPACE}}}steps]")
+    }
+
 
 def get_inkscape_page_colour(svg: ET.Element) -> str | None:
     """

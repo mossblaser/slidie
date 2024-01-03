@@ -10,6 +10,7 @@ from slidie.svg_utils import (
     iter_layers,
     get_inkscape_layer_name,
     annotate_build_steps,
+    find_build_elements,
     get_inkscape_page_colour,
     ViewBox,
     get_view_box,
@@ -75,6 +76,21 @@ def test_annotate_build_steps() -> None:
     ]
     assert json.loads(second.get(f"{{{SLIDIE_NAMESPACE}}}steps", "null")) == [2, 3]
     assert json.loads(third.get(f"{{{SLIDIE_NAMESPACE}}}steps", "null")) == [3]
+
+def test_find_build_elements() -> None:
+    svg = get_svg("simple_build.svg")
+    annotate_build_steps(svg)
+    elems = find_build_elements(svg)
+    elems_by_name = {
+        get_inkscape_layer_name(elem): steps
+        for elem, steps in elems.items()
+    }
+    
+    assert elems_by_name == {
+        "First <+->": [1, 2, 3],
+        "Second <+->": [2, 3],
+        "Third <+->": [3],
+    }
 
 
 @pytest.mark.parametrize(
