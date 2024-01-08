@@ -11,6 +11,7 @@ from slidie.svg_utils import (
     get_inkscape_layer_name,
     annotate_build_steps,
     find_build_elements,
+    get_build_step_range,
     get_inkscape_page_colour,
     ViewBox,
     get_view_box,
@@ -77,6 +78,7 @@ def test_annotate_build_steps() -> None:
     assert json.loads(second.get(f"{{{SLIDIE_NAMESPACE}}}steps", "null")) == [2, 3]
     assert json.loads(third.get(f"{{{SLIDIE_NAMESPACE}}}steps", "null")) == [3]
 
+
 def test_find_build_elements() -> None:
     svg = get_svg("simple_build.svg")
     annotate_build_steps(svg)
@@ -91,6 +93,20 @@ def test_find_build_elements() -> None:
         "Second <+->": [2, 3],
         "Third <+->": [3],
     }
+
+
+@pytest.mark.parametrize(
+    "filename, exp",
+    [
+        ("empty.svg", range(1)),
+        ("no_layers.svg", range(1)),
+        ("simple_build.svg", range(4)),
+    ],
+)
+def test_get_build_step_range(filename: str, exp: range) -> None:
+    svg = get_svg(filename)
+    annotate_build_steps(svg)
+    assert get_build_step_range(svg) == exp
 
 
 @pytest.mark.parametrize(

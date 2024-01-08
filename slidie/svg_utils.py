@@ -116,6 +116,18 @@ def find_build_elements(svg: ET.Element) -> dict[ET.Element, list[int]]:
     }
 
 
+def get_build_step_range(svg: ET.Element) -> range:
+    """
+    Get a range covering all of the build step numbers for a given slide (as
+    annotated in slidie:steps attributes).
+    """
+    # NB: We include the starting [0] firstly to handle the case where no
+    # builds are used and secondly to constrain the step indices to include zero
+    # (which is always present).
+    steps_and_zero = sum(find_build_elements(svg).values(), start=[0])
+    return range(min(steps_and_zero), max(steps_and_zero) + 1)
+
+
 def get_inkscape_page_colour(svg: ET.Element) -> str | None:
     """
     Get the Inkscape page colour specified in an SVG, or None for a
