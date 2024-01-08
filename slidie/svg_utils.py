@@ -112,7 +112,9 @@ def find_build_elements(svg: ET.Element) -> dict[ET.Element, list[int]]:
     """
     return {
         elem: json.loads(elem.attrib[f"{{{SLIDIE_NAMESPACE}}}steps"])
-        for elem in svg.findall(f".//{{{SVG_NAMESPACE}}}*[@{{{SLIDIE_NAMESPACE}}}steps]")
+        for elem in svg.findall(
+            f".//{{{SVG_NAMESPACE}}}*[@{{{SLIDIE_NAMESPACE}}}steps]"
+        )
     }
 
 
@@ -202,3 +204,31 @@ def fill_inkscape_page_background(svg: ET.Element) -> None:
             rect.set("style", f"fill:{page_colour}")
 
             svg.insert(0, rect)
+
+
+def clip_to_inkscape_pages(svg: ET.Element) -> None:
+    """
+    Given an Inkscape SVG, clip the image to only include content within a
+    page.
+
+    Warning: This will result in an SVG with a <style> tag which is not
+    well supported by Inkscape. Specifically the clip-path will be impossible
+    to remove within Inkscape and a warning will be emitted when loading the
+    file.
+    """
+    pages = get_inkscape_pages(svg)
+    if view_box := get_view_box(svg):
+        pages.append(view_box)
+
+    defs = ET.SubElement(svg, f"{{{SVG_NAMESPACE}}}defs")
+    clip_path = ET.SubElement(defs, f"{{{SVG_NAMESPACE}}}clipPath")
+    clip_path.attrib["id"] = "slidie-clip-to-inkscpae-pages-clip-path"
+    for page in set(pages):
+        rect = ET.SubElement(clip_path, f"{{{SVG_NAMESPACE}}}rect")
+        rect.set("x", str(page.x))
+        rect.set("y", str(page.y))
+        rect.set("width", str(page.width))
+        rect.set("height", str(page.height))
+
+    style = ET.SubElement(svg, f"{{{SVG_NAMESPACE}}}style")
+    style.text = "svg > * { clip-path: url(#slidie-clip-to-inkscpae-pages-clip-path); }"

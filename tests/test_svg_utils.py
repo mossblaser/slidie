@@ -16,7 +16,6 @@ from slidie.svg_utils import (
     ViewBox,
     get_view_box,
     get_inkscape_pages,
-    fill_inkscape_page_background,
 )
 
 
@@ -63,10 +62,10 @@ def test_iter_layers() -> None:
 
 def test_annotate_build_steps() -> None:
     svg = get_svg("simple_build.svg")
-    
+
     # Get references to these elements first to verify we're editing in place
     always, first, second, third = iter_layers(enumerate_inkscape_layers(svg))
-    
+
     annotate_build_steps(svg)
 
     assert always.get(f"{{{SLIDIE_NAMESPACE}}}steps") is None
@@ -84,10 +83,9 @@ def test_find_build_elements() -> None:
     annotate_build_steps(svg)
     elems = find_build_elements(svg)
     elems_by_name = {
-        get_inkscape_layer_name(elem): steps
-        for elem, steps in elems.items()
+        get_inkscape_layer_name(elem): steps for elem, steps in elems.items()
     }
-    
+
     assert elems_by_name == {
         "First <+->": [1, 2, 3],
         "Second <+->": [2, 3],
