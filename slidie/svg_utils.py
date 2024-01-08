@@ -26,6 +26,11 @@ namespaces = {
     "slidie": SLIDIE_NAMESPACE,
 }
 
+ET.register_namespace("", SVG_NAMESPACE)
+for name, uri in namespaces.items():
+    if uri != SVG_NAMESPACE:
+        ET.register_namespace(name, uri)
+
 
 class InkscapeLayer(NamedTuple):
     element: ET.Element
