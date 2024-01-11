@@ -7,12 +7,6 @@ import json
 
 from svgs import get_svg
 
-from slidie.svg_utils import (
-    SLIDIE_NAMESPACE,
-    enumerate_inkscape_layers,
-    iter_layers,
-)
-
 from slidie.builds import (
     NumericStep,
     Plus,
