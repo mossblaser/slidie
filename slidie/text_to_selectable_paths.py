@@ -10,7 +10,7 @@ from copy import deepcopy
 from xml.etree import ElementTree as ET
 from itertools import chain
 
-from slidie.svg_utils import SVG_NAMESPACE
+from slidie.xml_namespaces import SVG_NAMESPACE
 from slidie.inkscape import Inkscape
 
 

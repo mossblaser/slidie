@@ -10,26 +10,12 @@ import json
 
 from slidie.builds import evaluate_build_steps
 
-
-# Relevant XML namespace URIs used by SVGs
-SVG_NAMESPACE = "http://www.w3.org/2000/svg"
-INKSCAPE_NAMESPACE = "http://www.inkscape.org/namespaces/inkscape"
-SODIPODI_NAMESPACE = "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-XLINK_NAMESPACE = "http://www.w3.org/1999/xlink"
-SLIDIE_NAMESPACE = "http://xmlns.jhnet.co.uk/slidie/1.0"
-
-namespaces = {
-    "svg": SVG_NAMESPACE,
-    "inkscape": INKSCAPE_NAMESPACE,
-    "sodipodi": SODIPODI_NAMESPACE,
-    "xlink": XLINK_NAMESPACE,
-    "slidie": SLIDIE_NAMESPACE,
-}
-
-ET.register_namespace("", SVG_NAMESPACE)
-for name, uri in namespaces.items():
-    if uri != SVG_NAMESPACE:
-        ET.register_namespace(name, uri)
+from slidie.xml_namespaces import (
+    SVG_NAMESPACE,
+    INKSCAPE_NAMESPACE,
+    SODIPODI_NAMESPACE,
+    SLIDIE_NAMESPACE,
+)
 
 
 class InkscapeLayer(NamedTuple):

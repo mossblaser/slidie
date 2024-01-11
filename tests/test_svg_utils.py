@@ -4,8 +4,9 @@ from svgs import get_svg
 
 import json
 
+from slidie.xml_namespaces import SLIDIE_NAMESPACE
+
 from slidie.svg_utils import (
-    SLIDIE_NAMESPACE,
     enumerate_inkscape_layers,
     iter_layers,
     get_inkscape_layer_name,

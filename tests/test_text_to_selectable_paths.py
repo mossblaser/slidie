@@ -1,7 +1,7 @@
 from svgs import get_svg
 
 from slidie.inkscape import Inkscape
-from slidie.svg_utils import SVG_NAMESPACE
+from slidie.xml_namespaces import SVG_NAMESPACE
 from slidie.text_to_selectable_paths import text_to_selectable_paths
 
 

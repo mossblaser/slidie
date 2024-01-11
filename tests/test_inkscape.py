@@ -5,7 +5,7 @@ from xml.etree import ElementTree as ET
 
 from svgs import get_svg_filename
 
-from slidie.svg_utils import SVG_NAMESPACE
+from slidie.xml_namespaces import SVG_NAMESPACE
 from slidie.inkscape import Inkscape, InkscapeError, FileOpenError
 
 
