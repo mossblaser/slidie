@@ -1,0 +1,19 @@
+body {
+  background-color: #000000;
+  margin: 0;
+  padding: 0;
+}
+
+/* Hide SVGs until javascript has moved them into the shadow DOM. */
+#slides > svg {
+  display: none;
+}
+
+#slides > .slide-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  
+  /* Slides are hidden until explicitly displayed. */
+  display: none;
+}

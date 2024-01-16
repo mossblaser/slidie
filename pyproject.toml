@@ -6,3 +6,6 @@ build-backend = "setuptools.build_meta"
 name = "slidie"
 version = "0.0.1"
 dependencies = []
+
+[project.scripts]
+slidie = "slidie.scripts.slidie_cmd:main"
