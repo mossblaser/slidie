@@ -32,7 +32,10 @@ def text_to_selectable_paths(input_svg: ET.Element, inkscape: Inkscape) -> ET.El
             ET.ElementTree(input_svg).write(f)
 
         inkscape.file_open(input_file)
-        inkscape.export(output_file, text_to_path=True)
+        try:
+            inkscape.export(output_file, text_to_path=True)
+        finally:
+            inkscape.file_close()
 
         output_svg = ET.parse(output_file).getroot()
 
