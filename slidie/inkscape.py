@@ -104,10 +104,22 @@ class Inkscape:
         self,
         filename: Path,
         text_to_path: bool = False,
+        width: int | None = None,
+        height: int | None = None,
     ) -> None:
         if text_to_path:
             if out := self._run_cmd("export-text-to-path"):
                 InkscapeError(out)
+        
+        if width is not None:
+            if out := self._run_cmd(f"export-width: {width}"):
+                InkscapeError(out)
+        if height is not None:
+            if out := self._run_cmd(f"export-height: {height}"):
+                InkscapeError(out)
+        
+        if out := self._run_cmd(f"export-area-page"):
+            InkscapeError(out)
 
         # NB: Resolving to absolute path to avoid having to special-case
         # filenames which start with a space... (Filenames with newlines in?
@@ -116,4 +128,20 @@ class Inkscape:
             InkscapeError(out)
 
         if out := self._run_cmd("export-do"):
+            InkscapeError(out)
+    
+    def select_clear(self) -> None:
+        if out := self._run_cmd(f"select-clear"):
+            InkscapeError(out)
+    
+    def select_by_id(self, id: str) -> None:
+        if out := self._run_cmd(f"select-by-id: {id}"):
+            InkscapeError(out)
+    
+    def selection_hide(self) -> None:
+        if out := self._run_cmd(f"selection-hide"):
+            InkscapeError(out)
+    
+    def selection_unhide(self) -> None:
+        if out := self._run_cmd(f"selection-unhide"):
             InkscapeError(out)

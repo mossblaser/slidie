@@ -1,3 +1,5 @@
 pytest
 mypy
 black
+pillow
+numpy
