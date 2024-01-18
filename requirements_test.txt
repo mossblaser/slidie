@@ -2,4 +2,5 @@ pytest
 mypy
 black
 pillow
+types-pillow
 numpy
