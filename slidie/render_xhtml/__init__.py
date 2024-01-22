@@ -16,6 +16,7 @@ from uuid import uuid4
 from slidie.xml_namespaces import XHTML_NAMESPACE
 from slidie.inkscape import Inkscape
 from slidie.text_to_selectable_paths import text_to_selectable_paths
+from slidie.embed_thumbnails import embed_thumbnails
 from slidie.svg_utils import (
     annotate_build_steps,
     fill_inkscape_page_background,
@@ -94,17 +95,24 @@ def render_slide(
     # screen readers and copy-paste purposes.
     svg = text_to_selectable_paths(svg, inkscape)
 
-    # We probably want the background displayed in Inkscape since otherwise
-    # you'll just get a transparent background onto the black background of the
-    # presentation viewer.
+    # We (probably) want the background displayed in Inkscape to back the SVG
+    # since otherwise you'll just get a transparent background onto the black
+    # background of the presentation viewer.
     fill_inkscape_page_background(svg)
 
     # The Javascript presentation runner will use these annotations to step
     # through builds
     annotate_build_steps(svg)
 
-    # We probably want to clip the SVG to just the viewbox (i.e. to behave like
-    # an ordinary bounded image when scaled to fill the screen)
+    # Embed thumbnail renders of each build step (for use in slide listing)
+    #
+    # NB: Called *before* clip_to_inkscape_pages because that will add a
+    # <style> tag which Inkscape will warn about but which has no effect on
+    # what we're about to do.
+    embed_thumbnails(svg, inkscape)
+
+    # Clip the SVG to just the viewbox (i.e. to behave like an ordinary bounded
+    # image when scaled to fill the screen)
     clip_to_inkscape_pages(svg)
 
     return svg
