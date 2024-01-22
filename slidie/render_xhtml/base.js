@@ -424,7 +424,9 @@ function loadThumbnails(slides) {
       const elem = thumbnailTemplate.content.cloneNode(true).firstElementChild;
       slideThumbnailsElem.appendChild(elem)
       
-      // Add link
+      // Add link and tooltip
+      const sourceFilename = slides[slideNum].getAttributeNS(ns("slidie"), "source");
+      elem.title = `${sourceFilename}\nstep number ${step}`;
       elem.href = toUrlHash(slideNum, stepNum);
       
       // Set image
@@ -488,6 +490,13 @@ function loadThumbnails(slides) {
   
   // Keyboard navigation
   window.addEventListener("keydown", evt => {
+    // No keyboard shortcuts have modifiers (we'll ignore shift for now!) --
+    // prevent handling of these cases to ensure (e.g.) browser history
+    // shortcuts work as usual.
+    if (evt.altKey || evt.ctrlKey || evt.metaKey) {
+      return;
+    }
+    
     switch (evt.key) {
       // Left/Down or Right/Up: Move a step at a time
       case "ArrowUp":

@@ -13,7 +13,7 @@ from xml.etree import ElementTree as ET
 
 from uuid import uuid4
 
-from slidie.xml_namespaces import XHTML_NAMESPACE
+from slidie.xml_namespaces import XHTML_NAMESPACE, SLIDIE_NAMESPACE
 from slidie.inkscape import Inkscape
 from slidie.text_to_selectable_paths import text_to_selectable_paths
 from slidie.embed_thumbnails import embed_thumbnails
@@ -129,6 +129,7 @@ def render_xhtml(source_directory: Path, output: Path) -> None:
     with Inkscape() as inkscape:
         for filename in slide_filenames:
             svg = ET.parse(filename).getroot()
+            svg.attrib[f"{{{SLIDIE_NAMESPACE}}}source"] = str(filename)
             svg = render_slide(svg, inkscape)
             slide_container.append(svg)
 
