@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <rect
+       x="123.46982"
+       y="183.3896"
+       width="251.97642"
+       height="268.11912"
+       id="rect1" />
+  </defs>
+  <g
+     id="layer1">
+    <text
+       xml:space="preserve"
+       transform="scale(0.26458333)"
+       id="text1"
+       style="font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect1);display:inline"><tspan
+         x="123.4707"
+         y="197.05267"
+         id="tspan1">zero&#10;</tspan><tspan
+         x="123.4707"
+         y="217.05267"
+         id="tspan6"> one&#10;</tspan><tspan
+         x="123.4707"
+         y="237.05267"
+         id="tspan7">  two&#10;</tspan><tspan
+         x="123.4707"
+         y="257.05267"
+         id="tspan8">   three</tspan></text>
+  </g>
+</svg>

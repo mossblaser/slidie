@@ -4,7 +4,7 @@ from svgs import get_svg
 
 import json
 
-from slidie.xml_namespaces import SLIDIE_NAMESPACE
+from slidie.xml_namespaces import SLIDIE_NAMESPACE, SVG_NAMESPACE
 
 from slidie.svg_utils import (
     enumerate_inkscape_layers,
@@ -17,6 +17,7 @@ from slidie.svg_utils import (
     ViewBox,
     get_view_box,
     get_inkscape_pages,
+    extract_multiline_text,
 )
 
 
@@ -136,3 +137,47 @@ class TestGetInkscapePages:
 
     def test_old_inkscape_file(self) -> None:
         assert get_inkscape_pages(get_svg("old_inkscape_file.svg")) == []
+
+
+@pytest.mark.parametrize(
+    "svg, exp",
+    [
+        # Simple one-line cases
+        ("oneline_text_inkscape_unbounded.svg", "one two three"),
+        ("oneline_text_inkscape_bounded.svg", "one two three"),
+        # Simple Inkscape multi-line cases
+        ("multiline_text_inkscape_unbounded.svg", "zero\n one\n  two\n   three"),
+        ("multiline_text_inkscape_bounded.svg", "zero\n one\n  two\n   three"),
+        (
+            "multiline_text_inkscape_unbounded_trailing_newline.svg",
+            "zero\n one\n  two\n   three\n",
+        ),
+        (
+            "multiline_text_inkscape_unbounded_trailing_newline.svg",
+            "zero\n one\n  two\n   three\n",
+        ),
+        # Simple non-inkscape multi-line case
+        ("multiline_text_plain.svg", "zero\n one\n  two\n   three"),
+        (
+            "multiline_text_plain_trailing_newline.svg",
+            "zero\n one\n  two\n   three\n",
+        ),
+        # Multiline text with soft line breaks (which should be ignored)
+        (
+            "oneline_text_inkscape_bounded_wrapped.svg",
+            "One two three four.\nFive six seven.",
+        ),
+        # Messy Inkscape one-line case with extra <tspans>
+        ("oneline_text_formatted.svg", "one two three"),
+        ("oneline_text_shifted.svg", "one two three"),
+        ("oneline_text_supertext.svg", "one two three"),
+        # XXX: Inkscape's Line-wrapping is indistinguishable from non-inkscape
+        # multiline text when only a single logical line is present. As such
+        # this case is actually handled wrong but there isn't much we can do!
+        ("oneline_text_bounded_wrapped.svg", "one two \nthree"),
+    ],
+)
+def test_extract_multiline_text(svg: str, exp: str) -> None:
+    (text,) = get_svg(svg).findall(f".//{{{SVG_NAMESPACE}}}text")
+    assert text is not None
+    assert extract_multiline_text(text) == exp
