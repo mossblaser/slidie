@@ -8,7 +8,7 @@ import numpy as np
 
 from svgs import get_svg_filename
 
-from slidie.xml_namespaces import SVG_NAMESPACE
+from slidie.xml_namespaces import SVG_NAMESPACE, SLIDIE_NAMESPACE
 from slidie.inkscape import Inkscape, InkscapeError, FileOpenError
 
 
@@ -35,6 +35,19 @@ class TestInkscape:
     def test_file_open_valid(self, inkscape: Inkscape) -> None:
         # Shouldn't crash...
         inkscape.file_open(get_svg_filename("empty.svg"))
+
+    def test_file_open_with_non_svg_tags(
+        self, inkscape: Inkscape, tmp_path: Path
+    ) -> None:
+        # Shouldn't crash...
+        inkscape.file_open(get_svg_filename("non_svg_tags.svg"))
+
+        inkscape.export(tmp_path / "out.svg")
+        exported = ET.parse(tmp_path / "out.svg").getroot()
+
+        # Sanity check: Non-SVG elements should still be present
+        (elem,) = exported.findall(f".//{{{SLIDIE_NAMESPACE}}}foo")
+        assert elem.text == "Bar"
 
     def test_file_close(self, inkscape: Inkscape) -> None:
         inkscape.file_open(get_svg_filename("empty.svg"))

@@ -68,10 +68,21 @@ class Inkscape:
                 return buf
         return buf
 
-    def _run_cmd(self, cmd: str) -> str:
+    def _run_cmd(
+        self,
+        cmd: str,
+        strip_warnings: bool = False,
+        strip_gtk_warnings: bool = True,
+    ) -> str:
         """
-        Run a command and return any output it produces, up to and including
+        Run a command and return any output it produces, up to but excluding
         the next prompt.
+
+        If strip_warnings is true, all lines starting with "WARNING:" will be
+        removed from the output.
+
+        If strip_gtk_warnings is true, all lines containing "Gtk-WARNING" will
+        be stripped from the output.
         """
         assert self._proc.stdin  # For mypy's benefit...
 
@@ -120,7 +131,16 @@ class Inkscape:
 
         # XXX: Filter GTK warnings (ideally these could be suppressed another
         # way..)
-        out = "\n".join(line for line in out.splitlines() if "Gtk-WARNING" not in line)
+        if strip_gtk_warnings:
+            out = "\n".join(
+                line for line in out.splitlines() if "Gtk-WARNING" not in line
+            )
+
+        # Filter out any Inkscape warnings
+        if strip_warnings:
+            out = "\n".join(
+                line for line in out.splitlines() if not line.startswith("WARNING:")
+            )
 
         return out
 
@@ -132,8 +152,14 @@ class Inkscape:
         # NB: Resolving to absolute path to avoid having to special-case
         # filenames which start with a space... (Filenames with newlines in?
         # You get what you deserve...)
-        if out := self._run_cmd(f"file-open: {str(filename.resolve())}"):
-            raise FileOpenError(out)
+        #
+        # NB: We ignore Inkscape warnings as these are typically produced when
+        # it encounters non-SVG (e.g. slidie) XML elements.
+        if out := self._run_cmd(
+            f"file-open: {str(filename.resolve())}", strip_warnings=True
+        ):
+            if out:
+                raise FileOpenError(out)
 
     def file_close(self) -> None:
         if out := self._run_cmd(f"file-close"):
