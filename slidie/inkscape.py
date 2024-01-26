@@ -31,6 +31,15 @@ class Inkscape:
             stderr=STDOUT,
             text=True,
             bufsize=0,
+            env=dict(
+                os.environ,
+                # XXX: The following variables are to try and force consistent
+                # behaviour of GNU Readline by disabling any locally customised
+                # options and force it to assume a known terminal width. See
+                # comment in _run_cmd for more details...
+                COLUMNS="80",
+                INPUTRC=os.devnull,
+            ),
         )
         self._wait_for_prompt()
 
@@ -65,6 +74,36 @@ class Inkscape:
         the next prompt.
         """
         assert self._proc.stdin  # For mypy's benefit...
+
+        # XXX: In certain builds of Inkscape since v1.1, GNU Readline is used
+        # to handle input in --shell mode. Unfortunately, readline always
+        # assumes it is connected to a TTY (and not a dumb pipe as in this
+        # case). As well as echoing back all text sent to stdin (which we look
+        # for and strip below) it also includes special-case behaviour when the
+        # input exactly fits the width of a terminal.
+        #
+        # Specifically, pressing return at the end of a screen-width line of
+        # text will result in the terminal's cursor ending up two lines below
+        # the text, not one. To compensate, GNU Readline emits a series of
+        # cursor movement escape sequences which move the cursor back to the
+        # end of the line of text, followed by the last character in the line.
+        # This way, the next character printed to the screen will end up
+        # (correctly) on the line immediately below. All of this results in a
+        # lot of junk ending up in stdout.
+        #
+        # This issue has Inkscape issue #9881.
+        # https://gitlab.com/inkscape/inbox/-/issues/9881
+        #
+        # One potential solution we could look for this eventuality and handle
+        # it by skipping past these characters. This solution, however, is
+        # likely to be quite complex and brittle.
+        #
+        # The solution we use instead is to prevent the sending of any commands
+        # which would end exactly at the edge of the screen. We do this by
+        # adding a ';' to the command which Inkscape will then ignore.
+        if (len("> ") + len(cmd)) % 80 == 0:
+            cmd += ";"
+
         self._proc.stdin.write(f"{cmd}\n")
         self._proc.stdin.flush()
 

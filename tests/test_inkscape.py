@@ -17,6 +17,16 @@ class TestInkscape:
         with Inkscape() as i:
             i.quit()
 
+    def test_terminal_width_command(self, inkscape: Inkscape, tmp_path: Path) -> None:
+        # Test that we correctly work-around commands which lead to the prompt
+        # + command being a multiple of 80 characters long.
+        #
+        cmd = "file-new"
+        padding = 80 - len("> ") - len(cmd)
+        cmd += padding * ";"
+
+        assert inkscape._run_cmd(cmd) == ""
+
     def test_file_open_invalid(self, inkscape: Inkscape, tmp_path: Path) -> None:
         with pytest.raises(FileOpenError) as exc_info:
             inkscape.file_open(tmp_path / "nope.svg")
