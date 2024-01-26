@@ -142,6 +142,7 @@ function wrapInShadowDom(elem, className="shadow-dom-wrapper", tag="div", mode="
  *
  * Has the following useful properties:
  *
+ * * slideElem -- the <svg> root element of the slide
  * * slide -- the slide number
  * * step -- the step index (always counting from 0)
  * * stepNumber -- the step number (as used in the build spec, may start from
@@ -150,6 +151,7 @@ function wrapInShadowDom(elem, className="shadow-dom-wrapper", tag="div", mode="
 class StepperEvent extends Event {
   constructor(type, stepper) {
     super(type, {composed: true, cancelable: false, bubbles: true});
+    this.slideElem = stepper.slides[stepper.curSlide];
     this.slide = stepper.curSlide;
     this.step = stepper.curSlideStep;
     this.stepNumber = stepper.slideBuildStepNumbers[stepper.curSlide][stepper.curSlideStep];
@@ -192,7 +194,8 @@ function parseUrlHash(hash) {
  * (which will non-cancellably bubble all the way to the non-shaddow document
  * root):
  *
- * * slidechange: When the slide is shown (or the build step changes)
+ * * slidechange: When slide changes (but not on build step changes).
+ * * stepchange: When the visible build step changes OR the slide changes.
  * * slideblank: When the screen is blanked
  * * slideunblank: When the screen is unblanked
  *
@@ -248,7 +251,9 @@ class Stepper {
     
     // Do nothing if already on correct slide (avoids producing change events
     // when nothing has actually changed)
-    if (this.curSlide === slide && this.curSlideStep === step) {
+    const slideChanged = this.curSlide !== slide;
+    const stepChanged = this.curSlideStep !== step;
+    if (!(slideChanged || stepChanged)) {
       return true;
     }
     
@@ -272,8 +277,11 @@ class Stepper {
     // Update the URL with the new offset
     window.location.hash = toUrlHash(this.curSlide, this.curSlideStep);
     
-    // Fire change event
-    this.slides[this.curSlide].dispatchEvent(new StepperEvent("slidechange", this));
+    // Fire change events
+    if (slideChanged) {
+      this.slides[this.curSlide].dispatchEvent(new StepperEvent("slidechange", this));
+    }
+    this.slides[this.curSlide].dispatchEvent(new StepperEvent("stepchange", this));
     
     return true;
   }
@@ -467,7 +475,7 @@ function loadThumbnails(slides) {
   });
   
   // Apply the 'selected' class to the currently selected slide
-  window.addEventListener("slidechange", ({slide, step}) => {
+  window.addEventListener("stepchange", ({slide, step}) => {
     for (const [thisSlide, steps] of thumbElems.entries()) {
       for (const [thisStep, elem] of steps.entries()) {
         if (thisSlide === slide && thisStep === step) {
@@ -515,7 +523,7 @@ function loadNotes(slides) {
   
   // Update the notes container as we navigate through the show
   let curSlide = null;
-  window.addEventListener("slidechange", ({slide, stepNumber}) => {
+  window.addEventListener("stepchange", ({slide, stepNumber}) => {
     // On slide change, replace the notes
     if (curSlide !== slide) {
       curSlide = slide;
