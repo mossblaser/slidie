@@ -84,6 +84,34 @@ function getThumbnails(svgRoot) {
 }
 
 /**
+ * Given an SVG with embedded slidie speaker notes, return an array [{steps,
+ * text}, ...].
+ */
+function getSpeakerNotes(svgRoot) {
+  const svgDocument = svgRoot.ownerDocument;
+  const result = svgDocument.evaluate(
+      "//slidie:notes/slidie:note",
+      svgRoot,
+      ns,
+      XPathResult.ORDERED_NODE_ITERATOR_TYPE,
+  );
+  
+  const out = [];
+  let elem;
+  while ((elem = result.iterateNext())) {
+    let steps = null;
+    if (elem.hasAttribute("steps")) {
+      steps = JSON.parse(elem.getAttribute("steps"));
+    }
+    const text = elem.innerHTML;
+    
+    out.push({ steps, text });
+  }
+  
+  return out;
+}
+
+/**
  * Wraps an element in a shadow DOM within its parent document. Returns the
  * wrapper element.
  *
@@ -454,16 +482,69 @@ function loadThumbnails(slides) {
 }
 
 
+/**
+ * A wrapper around the Marked markdown parser which parses the generated HTML
+ * and returns a NodeList of the corresponding elements.
+ */
+function markdownToXHTML(source) {
+  const html = marked.parse(source)
+  const mdDocument = new DOMParser().parseFromString(html, "text/html");
+  return mdDocument.body.childNodes;
+}
+
+
+/**
+ * Load (and parse the markdown of) the speaker notes in each slide, and setup
+ * callbacks to display the current slide's notes in the #notes container.
+ */
+function loadNotes(slides) {
+  const container = document.getElementById("notes");
+  const template = document.getElementById("note");
+  
+  // For each slide, an array [{steps, elem}, ...] giving a series of DOM
+  // elements to insert into the notes viewer and the step indices at which
+  // those elements should have the 'current' class applied.
+  const slideNotes = [];
+  for (const slide of slides) {
+    slideNotes.push(getSpeakerNotes(slide).map(({steps, text}) => {
+      const elem = template.content.cloneNode(true).firstElementChild;
+      markdownToXHTML(text).forEach(n => elem.appendChild(n));
+      return {steps, elem};
+    }));
+  }
+  
+  // Update the notes container as we navigate through the show
+  let curSlide = null;
+  window.addEventListener("slidechange", ({slide, stepNumber}) => {
+    // On slide change, replace the notes
+    if (curSlide !== slide) {
+      curSlide = slide;
+      Array.from(container.childNodes).forEach(elem => elem.remove());
+      slideNotes[slide].forEach(({elem}) => container.appendChild(elem));
+    }
+    
+    // Mark the appropriate notes as current
+    for (const {steps, elem} of slideNotes[slide]) {
+      if (steps === null || steps.indexOf(stepNumber) >= 0) {
+        elem.classList.add("current");
+      } else {
+        elem.classList.remove("current");
+      }
+    }
+  });
+}
+
+
 /******************************************************************************/
 
 (() => {
   // Find the slides in the document
-  const containerElem = document.getElementById("slides");
-  const slides = Array.from(containerElem.children);
+  const slidesContainerElem = document.getElementById("slides");
   
   // Wrap all slides in a Shadow DOM to give them all their own namespaces for
   // IDs etc.
-  const containers = slides.map(slide => wrapInShadowDom(slide, "slide-container"));
+  const slides = Array.from(slidesContainerElem.children);
+  const slideContainers = slides.map(slide => wrapInShadowDom(slide, "slide-container"));
   
   // Expand SVGs to fill their container (which will be sized and positioned
   // via CSS more conventionally). Only necessary because the SVG element is in
@@ -474,14 +555,15 @@ function loadThumbnails(slides) {
     slide.style.height = "100%";
   }
   
-  // Populate the thumbnail bar (NB: do this before creating the stepper to
-  // ensure initial slidechange event is observed
+  // NB: Perform these steps *before* creating the stepper so the initial
+  // slide change events are caught to setup the initial UI state.
   loadThumbnails(slides);
+  loadNotes(slides);
   
-  const stepper = new Stepper(slides, containers);
+  const stepper = new Stepper(slides, slideContainers);
     
   // Click to advance by one step
-  containerElem.addEventListener("click", evt => {
+  slidesContainerElem.addEventListener("click", evt => {
     stepper.nextStep();
     evt.preventDefault();
     evt.stopPropagation();

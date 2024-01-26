@@ -23,6 +23,7 @@ from slidie.svg_utils import (
     clip_to_inkscape_pages,
 )
 from slidie.file_numbering import extract_numerical_prefix
+from slidie.speaker_notes import embed_speaker_notes
 
 
 BASE_TEMPLATE_FILENAME = Path(__file__).parent / "base.xhtml"
@@ -90,19 +91,30 @@ def render_slide(
     The passed SVG may (or may not) be mutated arbitrarily as a side effect of
     this function. The returned value should be used in any case.
     """
-    # Since there isn't a good way to do self-contained font embedding,
-    # convert text to paths and include invisible selectable text for
-    # screen readers and copy-paste purposes.
-    svg = text_to_selectable_paths(svg, inkscape)
+
+    # The Javascript presentation runner will use these annotations to step
+    # through builds
+    #
+    # NB: These annotations are required for many of the steps which follow and
+    # so must be performed early on
+    annotate_build_steps(svg)
+
+    # Extract speaker notes into a <slidie:notes> element
+    #
+    # NB: Must come before text_to_selectable_paths and embed_thumbnails since
+    # this will remove the magic <text> elements and we don't want them
+    # appearing later.
+    embed_speaker_notes(svg)
 
     # We (probably) want the background displayed in Inkscape to back the SVG
     # since otherwise you'll just get a transparent background onto the black
     # background of the presentation viewer.
     fill_inkscape_page_background(svg)
 
-    # The Javascript presentation runner will use these annotations to step
-    # through builds
-    annotate_build_steps(svg)
+    # Since there isn't a good way to do self-contained font embedding,
+    # convert text to paths and include invisible selectable text for
+    # screen readers and copy-paste purposes.
+    svg = text_to_selectable_paths(svg, inkscape)
 
     # Embed thumbnail renders of each build step (for use in slide listing)
     #
