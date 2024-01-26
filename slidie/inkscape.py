@@ -120,7 +120,7 @@ class Inkscape:
 
         # XXX: Filter GTK warnings (ideally these could be suppressed another
         # way..)
-        out = "".join(line for line in out.splitlines() if "Gtk-WARNING" not in line)
+        out = "\n".join(line for line in out.splitlines() if "Gtk-WARNING" not in line)
 
         return out
 
