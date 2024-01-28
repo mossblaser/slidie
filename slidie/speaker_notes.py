@@ -3,7 +3,7 @@ from xml.etree import ElementTree as ET
 import json
 
 from slidie.xml_namespaces import SLIDIE_NAMESPACE
-from slidie.magic_text import find_magic_text
+from slidie.svg_utils import find_text_with_prefix
 
 
 def extract_speaker_notes(svg: ET.Element) -> list[tuple[tuple[int, ...] | None, str]]:
@@ -23,7 +23,7 @@ def extract_speaker_notes(svg: ET.Element) -> list[tuple[tuple[int, ...] | None,
     """
     notes = []
 
-    for elems, text in find_magic_text(svg, "###\n"):
+    for elems, text in find_text_with_prefix(svg, "###\n"):
         # Find steps (if any)
         steps: tuple[int, ...] | None = None
         for elem in reversed(elems):

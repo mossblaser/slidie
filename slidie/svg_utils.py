@@ -294,3 +294,29 @@ def extract_multiline_text(text: ET.Element) -> str:
         first_line_tspan.text = (first_line_tspan.text or "").removeprefix("\n")
 
     return "".join(text.itertext())
+
+
+def find_text_with_prefix(
+    root: ET.Element,
+    prefix: str,
+    _parents: tuple[ET.Element, ...] = (),
+) -> Iterator[tuple[tuple[ET.Element, ...], str]]:
+    """
+    Iterate over all text blocks within a document with the given prefix.
+
+    Generates a series of (path, str) pairs. Here the string is the text
+    embedded in the <text> with the leading prefix removed. The path is a tuple
+    starting with the passed in root element and all intermediate elements
+    until the matched <text> block. This may be useful for 'magic' text objects
+    which are sensitive to sibling or parent objects (since ElementTree doesn't
+    include parent references!).
+
+    The _parents argument is for internal use only.
+    """
+    if root.tag == f"{{{SVG_NAMESPACE}}}text":
+        text = extract_multiline_text(root)
+        if text.startswith(prefix):
+            yield (_parents + (root,), text.removeprefix(prefix))
+    elif root.tag.startswith(f"{{{SVG_NAMESPACE}}}"):
+        for child in root:
+            yield from find_text_with_prefix(child, prefix, _parents + (root,))

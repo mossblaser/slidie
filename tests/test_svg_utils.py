@@ -3,6 +3,7 @@ import pytest
 from svgs import get_svg
 
 import json
+from itertools import zip_longest
 
 from slidie.xml_namespaces import SLIDIE_NAMESPACE, SVG_NAMESPACE
 
@@ -18,6 +19,7 @@ from slidie.svg_utils import (
     get_view_box,
     get_inkscape_pages,
     extract_multiline_text,
+    find_text_with_prefix,
 )
 
 
@@ -181,3 +183,24 @@ def test_extract_multiline_text(svg: str, exp: str) -> None:
     (text,) = get_svg(svg).findall(f".//{{{SVG_NAMESPACE}}}text")
     assert text is not None
     assert extract_multiline_text(text) == exp
+
+
+def test_find_text_with_prefix() -> None:
+    svg = get_svg("speaker_notes.svg")
+
+    for (elems, text), exp in zip_longest(
+        find_text_with_prefix(svg, "###\n"),
+        [
+            "Note on step 2 only",
+            "Note on step 1 and 2",
+            "Slide-wide speaker's note.\nThat was a newline.",
+        ],
+    ):
+        # Check text extraction
+        assert text == exp
+
+        # Check element hierarchy
+        assert elems[0] is svg
+        for parent, child in zip(elems[:-1], elems[1:]):
+            assert child in parent
+        assert elems[-1].tag == f"{{{SVG_NAMESPACE}}}text"
