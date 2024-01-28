@@ -20,19 +20,17 @@ function ns(name) {
   * layer.
   */
 function findBuildSteps(svgRoot) {
-  const svgDocument = svgRoot.ownerDocument;
-  const result = svgDocument.evaluate(
-      "//svg:*[@slidie:steps]",
-      svgRoot,
-      ns,
-      XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-  );
-  
   const out = [];
-  let elem;
-  while ((elem = result.iterateNext())) {
-    const steps = JSON.parse(elem.getAttributeNS(ns("slidie"), "steps"));
-    out.push({ elem, steps });
+  for (const elem of svgRoot.querySelectorAll("*")) {
+    // The following logic is equivalent to the following XPath 2.0 query, but
+    // alas, Chrome doesn't yet support XPath 2.0 (unlike other browsers)...
+    //
+    //     //svg:*[@slidie:steps]
+    //
+    if (elem.namespaceURI == ns("svg") && elem.hasAttributeNS(ns("slidie"), "steps")) {
+      const steps = JSON.parse(elem.getAttributeNS(ns("slidie"), "steps"));
+      out.push({ elem, steps });
+    }
   }
   
   return out;
@@ -59,25 +57,24 @@ function layerStepIndices(layerSteps) {
  * dataUrl}, ...].
  */
 function getThumbnails(svgRoot) {
-  const svgDocument = svgRoot.ownerDocument;
-  const result = svgDocument.evaluate(
-      "//slidie:thumbnails/slidie:thumbnail",
-      svgRoot,
-      ns,
-      XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-  );
-  
+  // The following logic is (a slacker...) equivalent to the following XPath
+  // 2.0 query, but alas, Chrome doesn't yet support XPath 2.0 (unlike other
+  // browsers)...
+  //
+  //     //slidie:thumbnails/slidie:thumbnail
+  //
   const out = [];
-  let elem;
-  while ((elem = result.iterateNext())) {
-    const step = JSON.parse(elem.getAttribute("step"));
-    const type = elem.getAttribute("type");
-    const encoding = elem.getAttribute("encoding");
-    const codedData = elem.innerHTML;
-    
-    const dataUrl = `data:${type};${encoding},${codedData}`;
-    
-    out.push({ step, dataUrl });
+  for (const parentElem of svgRoot.getElementsByTagNameNS(ns("slidie"), "thumbnails")) {
+    for (const elem of parentElem.getElementsByTagNameNS(ns("slidie"), "thumbnail")) {
+      const step = JSON.parse(elem.getAttribute("step"));
+      const type = elem.getAttribute("type");
+      const encoding = elem.getAttribute("encoding");
+      const codedData = elem.innerHTML;
+      
+      const dataUrl = `data:${type};${encoding},${codedData}`;
+      
+      out.push({ step, dataUrl });
+    }
   }
   
   return out;
@@ -88,24 +85,23 @@ function getThumbnails(svgRoot) {
  * text}, ...].
  */
 function getSpeakerNotes(svgRoot) {
-  const svgDocument = svgRoot.ownerDocument;
-  const result = svgDocument.evaluate(
-      "//slidie:notes/slidie:note",
-      svgRoot,
-      ns,
-      XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-  );
-  
+  // The following logic is (a slacker...) equivalent to the following XPath
+  // 2.0 query, but alas, Chrome doesn't yet support XPath 2.0 (unlike other
+  // browsers)...
+  //
+  //     //slidie:notes/slidie:note
+  //
   const out = [];
-  let elem;
-  while ((elem = result.iterateNext())) {
-    let steps = null;
-    if (elem.hasAttribute("steps")) {
-      steps = JSON.parse(elem.getAttribute("steps"));
+  for (const parentElem of svgRoot.getElementsByTagNameNS(ns("slidie"), "notes")) {
+    for (const elem of parentElem.getElementsByTagNameNS(ns("slidie"), "note")) {
+      let steps = null;
+      if (elem.hasAttribute("steps")) {
+        steps = JSON.parse(elem.getAttribute("steps"));
+      }
+      const text = elem.innerHTML;
+      
+      out.push({ steps, text });
     }
-    const text = elem.innerHTML;
-    
-    out.push({ steps, text });
   }
   
   return out;
