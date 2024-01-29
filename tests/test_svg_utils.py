@@ -14,6 +14,7 @@ from slidie.svg_utils import (
     annotate_build_steps,
     find_build_elements,
     get_build_step_range,
+    get_visible_build_steps,
     get_inkscape_page_colour,
     ViewBox,
     get_view_box,
@@ -109,6 +110,18 @@ def test_get_build_step_range(filename: str, exp: range) -> None:
     svg = get_svg(filename)
     annotate_build_steps(svg)
     assert get_build_step_range(svg) == exp
+
+
+def test_get_visible_build_steps() -> None:
+    svg = get_svg("get_visible_build_steps.svg")
+    annotate_build_steps(svg)
+    for parents, text in find_text_with_prefix(svg, "assert steps == "):
+        exp = json.loads(text)
+        actual = get_visible_build_steps(parents)
+        if exp is None:
+            assert actual is None
+        else:
+            assert actual == tuple(exp)
 
 
 @pytest.mark.parametrize(

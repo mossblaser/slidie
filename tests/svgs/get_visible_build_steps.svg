@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   sodipodi:docname="get_visible_build_steps.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.43719246"
+     inkscape:cx="399.13772"
+     inkscape:cy="561.53759"
+     inkscape:window-width="1340"
+     inkscape:window-height="1041"
+     inkscape:window-x="576"
+     inkscape:window-y="18"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer5"
+     inkscape:label="Step two and three &lt;2, 3&gt;">
+    <text
+       xml:space="preserve"
+       style="font-size:8.88007px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.555003"
+       x="33.090622"
+       y="84.28772"
+       id="text4"><tspan
+         sodipodi:role="line"
+         id="tspan4"
+         style="stroke-width:0.555003"
+         x="33.090622"
+         y="84.28772">assert steps == [2, 3]</tspan></text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="One and two &lt;1, 2&gt;">
+    <text
+       xml:space="preserve"
+       style="font-size:8.88007px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.555003"
+       x="33.090622"
+       y="52.537727"
+       id="text2"><tspan
+         sodipodi:role="line"
+         id="tspan2"
+         style="stroke-width:0.555003"
+         x="33.090622"
+         y="52.537727">assert steps == [1, 2]</tspan></text>
+    <g
+       inkscape:groupmode="layer"
+       id="layer4"
+       inkscape:label="Step two only &lt;2, 3&gt;">
+      <text
+         xml:space="preserve"
+         style="font-size:8.88007px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.555003"
+         x="33.090622"
+         y="68.412727"
+         id="text3"><tspan
+           sodipodi:role="line"
+           id="tspan3"
+           style="stroke-width:0.555003"
+           x="33.090622"
+           y="68.412727">assert steps == [2]</tspan></text>
+    </g>
+  </g>
+  <g
+     inkscape:label="Always visible"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-size:8.88007px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.555003"
+       x="33.090622"
+       y="36.662724"
+       id="text1"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         style="stroke-width:0.555003"
+         x="33.090622"
+         y="36.662724">assert steps == null</tspan></text>
+  </g>
+</svg>

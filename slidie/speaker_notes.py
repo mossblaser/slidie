@@ -3,7 +3,7 @@ from xml.etree import ElementTree as ET
 import json
 
 from slidie.xml_namespaces import SLIDIE_NAMESPACE
-from slidie.svg_utils import find_text_with_prefix
+from slidie.svg_utils import find_text_with_prefix, get_visible_build_steps
 
 
 def extract_speaker_notes(svg: ET.Element) -> list[tuple[tuple[int, ...] | None, str]]:
@@ -25,13 +25,7 @@ def extract_speaker_notes(svg: ET.Element) -> list[tuple[tuple[int, ...] | None,
 
     # NB: Capture in list to allow safe mutation as we iterate
     for elems, text in list(find_text_with_prefix(svg, "###\n")):
-        # Find steps (if any)
-        steps: tuple[int, ...] | None = None
-        for elem in reversed(elems):
-            if steps_json := elem.attrib.get(f"{{{SLIDIE_NAMESPACE}}}steps"):
-                steps = tuple(json.loads(steps_json))
-                break
-
+        steps = get_visible_build_steps(elems)
         notes.append((steps, text))
 
         # Remove the <text> element from the document

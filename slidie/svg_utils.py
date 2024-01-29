@@ -2,7 +2,7 @@
 Utilities for probing and interacting with (primarily) Inkscape-derrived SVGs.
 """
 
-from typing import NamedTuple, Iterator
+from typing import NamedTuple, Iterator, Iterable
 
 from xml.etree import ElementTree as ET
 from copy import deepcopy
@@ -114,6 +114,30 @@ def get_build_step_range(svg: ET.Element) -> range:
     # (which is always present).
     steps_and_zero = sum(find_build_elements(svg).values(), start=[0])
     return range(min(steps_and_zero), max(steps_and_zero) + 1)
+
+
+def get_visible_build_steps(parents: Iterable[ET.Element]) -> tuple[int, ...] | None:
+    """
+    Given the element heirarchy leading from the root to a particular element,
+    enumerate the build steps during which it will be visible. Returns None if
+    always visible.
+
+    Requires :py:func:`annotate_build_steps` to have been run beforehand.
+    """
+    steps: set[int] | None = None
+
+    for elem in parents:
+        if steps_json := elem.attrib.get(f"{{{SLIDIE_NAMESPACE}}}steps"):
+            this_steps = set(json.loads(steps_json))
+            if steps is not None:
+                steps &= this_steps
+            else:
+                steps = this_steps
+
+    if steps is not None:
+        return tuple(sorted(steps))
+    else:
+        return None
 
 
 def get_inkscape_page_colour(svg: ET.Element) -> str | None:
