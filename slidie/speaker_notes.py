@@ -23,7 +23,8 @@ def extract_speaker_notes(svg: ET.Element) -> list[tuple[tuple[int, ...] | None,
     """
     notes = []
 
-    for elems, text in find_text_with_prefix(svg, "###\n"):
+    # NB: Capture in list to allow safe mutation as we iterate
+    for elems, text in list(find_text_with_prefix(svg, "###\n")):
         # Find steps (if any)
         steps: tuple[int, ...] | None = None
         for elem in reversed(elems):
