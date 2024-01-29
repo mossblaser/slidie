@@ -114,7 +114,7 @@ def render_slide(
     # Since there isn't a good way to do self-contained font embedding,
     # convert text to paths and include invisible selectable text for
     # screen readers and copy-paste purposes.
-    svg = text_to_selectable_paths(svg, inkscape)
+    text_to_selectable_paths(svg, inkscape)
 
     # Embed thumbnail renders of each build step (for use in slide listing)
     #

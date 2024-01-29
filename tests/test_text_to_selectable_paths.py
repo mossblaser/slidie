@@ -6,14 +6,15 @@ from slidie.text_to_selectable_paths import text_to_selectable_paths
 
 
 def test_text_to_selectable_paths(inkscape: Inkscape) -> None:
-    out = text_to_selectable_paths(get_svg("simple_text.svg"), inkscape)
+    svg = get_svg("simple_text.svg")
+    text_to_selectable_paths(svg, inkscape)
 
     # Sanity check: Old text is now not a <text> element
-    new_text = out.find(".//*[@id='text1']")
+    new_text = svg.find(".//*[@id='text1']")
     assert new_text is not None
     assert new_text.tag != f"{{{SVG_NAMESPACE}}}text"
 
     # Sanity check: Selectable text is a <text> element
-    selectable_text = out.find(".//*[@id='text1-selectable']")
+    selectable_text = svg.find(".//*[@id='text1-selectable']")
     assert selectable_text is not None
     assert selectable_text.tag == f"{{{SVG_NAMESPACE}}}text"
