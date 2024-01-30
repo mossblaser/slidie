@@ -143,10 +143,13 @@ function wrapInShadowDom(elem, className="shadow-dom-wrapper", tag="div", mode="
  * * step -- the step index (always counting from 0)
  * * stepNumber -- the step number (as used in the build spec, may start from
  *   a number other than zero.)
+ *
+ * The 'composed' argument can be set to false to prevent the event bubbling
+ * out of the slide in which it was sent to to the top level DOM.
  */
 class StepperEvent extends Event {
-  constructor(type, stepper) {
-    super(type, {composed: true, cancelable: false, bubbles: true});
+  constructor(type, stepper, composed = true) {
+    super(type, {composed, cancelable: false, bubbles: true});
     this.slideElem = stepper.slides[stepper.curSlide];
     this.slide = stepper.curSlide;
     this.step = stepper.curSlideStep;
@@ -190,7 +193,10 @@ function parseUrlHash(hash) {
  * (which will non-cancellably bubble all the way to the non-shaddow document
  * root):
  *
- * * slidechange: When slide changes (but not on build step changes).
+ * * slideenter: When entering a slide (but not between steps)
+ * * slideexit: When leaving a slide. NB: Contains the slide details of the
+ *   slide which replaces it. NB: Unlike other events, this does not bubble out
+ *   of the slide it is raised in.
  * * stepchange: When the visible build step changes OR the slide changes.
  * * slideblank: When the screen is blanked
  * * slideunblank: When the screen is unblanked
@@ -253,6 +259,8 @@ class Stepper {
       return true;
     }
     
+    const lastSlide = this.curSlide;
+    const lastStep = this.curSlideStep;
     this.curSlide = slide;
     this.curSlideStep = step;
     
@@ -275,7 +283,10 @@ class Stepper {
     
     // Fire change events
     if (slideChanged) {
-      this.slides[this.curSlide].dispatchEvent(new StepperEvent("slidechange", this));
+      this.slides[this.curSlide].dispatchEvent(new StepperEvent("slideenter", this));
+      if (lastSlide !== null) {
+        this.slides[lastSlide].dispatchEvent(new StepperEvent("slideexit", this, false));
+      }
     }
     this.slides[this.curSlide].dispatchEvent(new StepperEvent("stepchange", this));
     
