@@ -32,6 +32,11 @@ class MagicText(NamedTuple):
     element which contained the magic text.
     """
 
+    text: str
+    """
+    The text provided in this magic string, for error reporting purposes only.
+    """
+
 
 class MagicError(Exception):
     """Base class for errors resulting from parsing magic text."""
@@ -59,20 +64,21 @@ def extract_magic(svg: ET.Element) -> dict[str, list[MagicText]]:
     for elems, text in list(find_text_with_prefix(svg, "@@@\n")):
         # Remove the <text> element from the document
         elems[-2].remove(elems[-1])
+        parents = elems[:-1]
 
         try:
             parsed = tomllib.loads(text)
         except tomllib.TOMLDecodeError as e:
-            raise MagicTOMLDecodeError(elems, text, e)
+            raise MagicTOMLDecodeError(parents, text, e)
 
         if len(parsed) == 0:
-            raise NotEnoughMagicError(elems, text)
+            raise NotEnoughMagicError(parents, text)
         elif len(parsed) > 1:
-            raise TooMuchMagicError(elems, text, list(parsed))
+            raise TooMuchMagicError(parents, text, list(parsed))
 
         (name,) = parsed.keys()
         parameters = parsed[name]
 
-        out[name].append(MagicText(parameters, elems[:-1]))
+        out[name].append(MagicText(parameters, parents, text))
 
     return out
