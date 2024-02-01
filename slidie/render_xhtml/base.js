@@ -4,6 +4,7 @@
 function ns(name) {
   return {
     "svg": "http://www.w3.org/2000/svg",
+    "xhtml": "http://www.w3.org/1999/xhtml",
     "xlink": "http://www.w3.org/1999/xlink",
     "inkscape": "http://www.inkscape.org/namespaces/inkscape",
     "sodipodi": "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd",
@@ -549,6 +550,37 @@ function loadNotes(slides) {
   });
 }
 
+/**
+ * Setup automatic video play/pause on slide entry/exit for videos inserted
+ * using magic text.
+ */
+function setupMagicVideoPlayback(slides) {
+  for (const slide of slides) {
+    for (const video of slide.getElementsByTagNameNS(ns("xhtml"), "video")) {
+      if (video.hasAttributeNS(ns("slidie"), "magic")) {
+        const start = parseFloat(video.getAttributeNS(ns("slidie"), "start") || "0");
+        const steps = JSON.parse(video.getAttributeNS(ns("slidie"), "steps") || "null");
+        
+        video.currentTime = start;
+        
+        slide.addEventListener("stepchange", ({stepNumber}) => {
+          if (steps === null || steps.indexOf(stepNumber) >= 0) {
+            video.play();  // NB: NOP if already playing
+          } else {
+            video.pause();
+            video.currentTime = start;
+          }
+        });
+        
+        slide.addEventListener("slideexit", () => {
+          video.pause();
+          video.currentTime = start;
+        });
+      }
+    }
+  }
+}
+
 
 /******************************************************************************/
 
@@ -574,6 +606,7 @@ function loadNotes(slides) {
   // slide change events are caught to setup the initial UI state.
   loadThumbnails(slides);
   loadNotes(slides);
+  setupMagicVideoPlayback(slides);
   
   const stepper = new Stepper(slides, slideContainers);
     
