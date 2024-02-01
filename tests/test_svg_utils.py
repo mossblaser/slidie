@@ -74,13 +74,23 @@ def test_annotate_build_steps() -> None:
     annotate_build_steps(svg)
 
     assert always.get(f"{{{SLIDIE_NAMESPACE}}}steps") is None
+    assert json.loads(always.get(f"{{{SLIDIE_NAMESPACE}}}tags", "null")) == ["always"]
+
     assert json.loads(first.get(f"{{{SLIDIE_NAMESPACE}}}steps", "null")) == [
         1,
         2,
         3,
     ]
+    assert json.loads(first.get(f"{{{SLIDIE_NAMESPACE}}}tags", "null")) == [
+        "first",
+        "foo",
+    ]
+
     assert json.loads(second.get(f"{{{SLIDIE_NAMESPACE}}}steps", "null")) == [2, 3]
+    assert second.get(f"{{{SLIDIE_NAMESPACE}}}tags") is None
+
     assert json.loads(third.get(f"{{{SLIDIE_NAMESPACE}}}steps", "null")) == [3]
+    assert third.get(f"{{{SLIDIE_NAMESPACE}}}tags") is None
 
 
 def test_find_build_elements() -> None:
@@ -92,7 +102,7 @@ def test_find_build_elements() -> None:
     }
 
     assert elems_by_name == {
-        "First <+->": [1, 2, 3],
+        "First <+-> @first @foo": [1, 2, 3],
         "Second <+->": [2, 3],
         "Third <+->": [3],
     }

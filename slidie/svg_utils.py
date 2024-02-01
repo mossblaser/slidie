@@ -76,9 +76,12 @@ def get_inkscape_layer_name(layer: ET.Element) -> str:
 
 def annotate_build_steps(svg: ET.Element) -> None:
     """
-    Evaluate the build steps defined on layers in an Inkscape SVG and add a
-    slidie:steps attribute to them giving the visible step numbers as a JSON
-    array.
+    Evaluate the build steps defined on layers in an Inkscape SVG and add the
+    following attributes to them:
+
+    * ``slidie:steps`` giving the visible step numbers as a JSON array.
+    * ``slidie:tags`` giving the tag names given to that name (if any) as a
+      JSON array. Omitted if no tags assigned.
 
     Modifies 'svg' in-place.
     """
@@ -86,9 +89,11 @@ def annotate_build_steps(svg: ET.Element) -> None:
 
     layer_steps = evaluate_build_steps(list(map(get_inkscape_layer_name, layers)))
 
-    for layer, steps in zip(layers, layer_steps):
+    for layer, (steps, tags) in zip(layers, layer_steps):
         if steps is not None:
             layer.set(f"{{{SLIDIE_NAMESPACE}}}steps", json.dumps(steps))
+        if tags:
+            layer.set(f"{{{SLIDIE_NAMESPACE}}}tags", json.dumps(sorted(tags)))
 
 
 def find_build_elements(svg: ET.Element) -> dict[ET.Element, list[int]]:

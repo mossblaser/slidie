@@ -836,14 +836,16 @@ def normalise_specs(layer_specs: list[list[NumericStep]]) -> list[list[NumericSt
     return [sorted(set(spec)) for spec in layer_specs]
 
 
-def evaluate_build_steps(layer_names: list[str]) -> list[list[int] | None]:
+def evaluate_build_steps(
+    layer_names: list[str],
+) -> list[tuple[list[int] | None, set[str]]]:
     """
-    Given a list of layer names, returns the step indices at which each layer
-    is visible.
+    Given a list of layer names, returns a (step_indices, tags) tuple for each.
+    The step_indices list gives the step numbers during which each layer is
+    visible. The 'tags' value gives the set of tags names given to that layer
+    (if any).
 
-    For layers which don't specify a build system, returns None. (Tag
-    references to layers without a build spec are treated as being always
-    visible).
+    For layers which don't specify a build spec, step_indices will be None.
     """
     # Parse specs and tags from layer names.
     input_layer_specs = [parse_build_specification(name) for name in layer_names]
@@ -873,6 +875,9 @@ def evaluate_build_steps(layer_names: list[str]) -> list[list[int] | None]:
     # Remove specs from layers without a build spec. This prevents these layers
     # being bogusly forced to be visible/invisible by the build process.
     return [
-        spec if input_spec is not None else None
-        for input_spec, spec in zip(input_layer_specs, layer_specs)
+        (
+            spec if input_spec is not None else None,
+            tags,
+        )
+        for input_spec, spec, tags in zip(input_layer_specs, layer_specs, layer_tags)
     ]

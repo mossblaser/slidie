@@ -627,12 +627,12 @@ class TestEvaluateBuildSteps:
                 "F <@bar>",
             ]
         ) == [
-            [2],
-            [3],
-            [2],
-            [0, 1, 2, 3],
-            None,
-            [0, 1, 2, 3],
+            ([2], {"foo"}),
+            ([3], set()),
+            ([2], set()),
+            ([0, 1, 2, 3], set()),
+            (None, {"bar"}),
+            ([0, 1, 2, 3], set()),
         ]
 
     def test_identifier_not_found_layer_names(self) -> None:
