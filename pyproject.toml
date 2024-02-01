@@ -9,3 +9,4 @@ dependencies = []
 
 [project.scripts]
 slidie = "slidie.scripts.slidie_cmd:main"
+slidie-video-stills = "slidie.scripts.slidie_video_stills_cmd:main"

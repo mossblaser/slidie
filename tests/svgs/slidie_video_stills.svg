@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   sodipodi:docname="slidie_video_stills.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="1.1332228"
+     inkscape:cx="303.55902"
+     inkscape:cy="493.72463"
+     inkscape:window-width="1788"
+     inkscape:window-height="1401"
+     inkscape:window-x="768"
+     inkscape:window-y="18"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g7"
+       transform="matrix(4.5317274,0,0,4.5317274,-79.333726,9.8181547)">
+      <rect
+         style="fill:#f57900;stroke:none;stroke-width:0.152257;stroke-linecap:round;stroke-linejoin:round"
+         id="test_video"
+         width="24.361122"
+         height="13.703132"
+         x="21.266884"
+         y="6.5645089"
+         rx="2.0049517"
+         ry="2.0049517" />
+      <text
+         xml:space="preserve"
+         style="font-size:1.39731px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.0873314"
+         x="22.811064"
+         y="8.8041992"
+         id="text6"><tspan
+           sodipodi:role="line"
+           id="tspan6"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.0873314"
+           x="22.811064"
+           y="8.8041992">@@@</tspan><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.0873314"
+           x="22.811064"
+           y="10.677992"
+           id="tspan7">[video]</tspan><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.0873314"
+           x="22.811064"
+           y="12.551785"
+           id="tspan16">url = &quot;test_video.mp4&quot;</tspan></text>
+    </g>
+    <g
+       id="g4"
+       transform="matrix(4.5317274,0,0,4.5317274,-79.333726,102.94592)">
+      <rect
+         style="fill:#f57900;stroke:none;stroke-width:0.152257;stroke-linecap:round;stroke-linejoin:round"
+         id="missing_video"
+         width="24.361122"
+         height="13.703132"
+         x="21.266884"
+         y="6.5645089"
+         rx="2.0049517"
+         ry="2.0049517" />
+      <text
+         xml:space="preserve"
+         style="font-size:1.39731px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.0873314"
+         x="22.811064"
+         y="8.8041992"
+         id="text4"><tspan
+           sodipodi:role="line"
+           id="tspan2"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.0873314"
+           x="22.811064"
+           y="8.8041992">@@@</tspan><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.0873314"
+           x="22.811064"
+           y="10.677992"
+           id="tspan3">[video]</tspan><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Monospace;-inkscape-font-specification:Monospace;stroke-width:0.0873314"
+           x="22.811064"
+           y="12.551785"
+           id="tspan4">url = &quot;missing_video.mp4&quot;</tspan></text>
+    </g>
+  </g>
+</svg>
