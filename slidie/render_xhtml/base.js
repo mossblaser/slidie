@@ -581,6 +581,22 @@ function setupMagicVideoPlayback(slides) {
   }
 }
 
+/**
+ * Given an event, test whether that event involves any kind of hyperlink or
+ * not (specifically an XHTML or SVG <a> tag). If it does, returns true.
+ * Otherwise returns false.
+ */
+function eventInvolvesHyperlink(evt) {
+  for (const elem of evt.composedPath()) {
+    if (
+      (elem.namespaceURI == ns("xhtml") || elem.namespaceURI == ns("svg"))
+      && elem.localName == "a"
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
 
 /******************************************************************************/
 
@@ -612,10 +628,12 @@ function setup() {
     
   // Click to advance by one step
   slidesContainerElem.addEventListener("click", evt => {
-    stepper.nextStep();
-    evt.preventDefault();
-    evt.stopPropagation();
-    return false;
+    if (!eventInvolvesHyperlink(evt)) {
+      stepper.nextStep();
+      evt.preventDefault();
+      evt.stopPropagation();
+      return false;
+    }
   });
   
   // Keyboard navigation
