@@ -584,7 +584,7 @@ function setupMagicVideoPlayback(slides) {
 
 /******************************************************************************/
 
-(() => {
+function setup() {
   // Find the slides in the document
   const slidesContainerElem = document.getElementById("slides");
   
@@ -672,5 +672,5 @@ function setupMagicVideoPlayback(slides) {
     evt.preventDefault();
     evt.stopPropagation();
   });
- })();
+}
 
