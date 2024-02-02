@@ -16,9 +16,9 @@ function ns(name) {
   * Given an SVG root node, find all SVG elements containing a slidie
   * 'steps' attribute.
   *
-  * Returns a list of {elem, steps} objects where 'elem' is the SVG
-  * element and 'steps' is the list of integer step numbers for that
-  * layer.
+  * Returns a list of {elem, steps, tags} objects where 'elem' is the SVG
+  * element and 'steps' is the list of integer step numbers for that layer and
+  * 'tags' is the list of tags assigned to that layer.
   */
 function findBuildSteps(svgRoot) {
   const out = [];
@@ -30,7 +30,8 @@ function findBuildSteps(svgRoot) {
     //
     if (elem.namespaceURI == ns("svg") && elem.hasAttributeNS(ns("slidie"), "steps")) {
       const steps = JSON.parse(elem.getAttributeNS(ns("slidie"), "steps"));
-      out.push({ elem, steps });
+      const tags = JSON.parse(elem.getAttributeNS(ns("slidie"), "tags") || "[]");
+      out.push({ elem, steps, tags });
     }
   }
   
@@ -51,6 +52,27 @@ function layerStepIndices(layerSteps) {
     out.push(i);
   }
   return out;
+}
+
+/**
+ * Given an array [{elem, steps}, ...], returns an Map from tag names to
+ * (zero-indexed) step indices.
+ */
+function layerStepTags(layerSteps) {
+  const stepNumbers = layerStepIndices(layerSteps);
+  
+  const map = new Map();
+  
+  for (const {steps, tags}  of layerSteps) {
+    const stepNumber = Math.min(0, ...steps);
+    const step = stepNumbers.indexOf(stepNumber);
+    
+    for (const tag of tags) {
+      map.set(tag, step);
+    }
+  }
+  
+  return map;
 }
 
 /**
@@ -160,7 +182,7 @@ class StepperEvent extends Event {
 
 
 /**
- * Given a zero-indexed slide number and zero-index step index, return a URL
+ * Given a zero-indexed slide number and zero-indexed step index, return a URL
  * hash which encodes that position.
  */
 function toUrlHash(slide, step=0) {
@@ -172,18 +194,90 @@ function toUrlHash(slide, step=0) {
 }
 
 /**
- * Inverse of the toUrlHash function. Returns a [slide, step] pair or null if
- * the hash is not valid.
+ * Parse a URL hash, resolving the specification into a [slide, step] pair.
+ *
+ * Returns null if an *syntactically* invalid link is provided.
+ *
+ * Out-of-range slide/step numbers are returned as-is.
+ *
+ * When an unknown slide_id is given, returns null. Conversely an unknown build
+ * step tag or out-of-range build step number is given, the step is treated as
+ * zero instead.
+ *
+ * @param currentSlide The current 0-indexed slide number.
+ * @param slideIds A Map() from slide ID to slide index.
+ * @param slideBuildStepNumbers An array of arrays giving the step numbers of
+ *        each step.
+ * @param slideBuildStepTags An array of Map() from tag to step index, one per
+ *        slide.
  */
-function parseUrlHash(hash) {
-  const match = window.location.hash.match(/^#([0-9]+)(#([-+]?[0-9]+))?$/);
-  if (match !== null) {
-    const slide = parseInt(match[1]) - 1;
-    const step = parseInt(match[3] || "1") - 1;
-    return [slide, step]
-  } else {
+function parseUrlHash(
+  hash,
+  currentSlide,
+  slideIds,
+  slideBuildStepNumbers,
+  slideBuildStepTags,
+) {
+  const linkRegex = new RegExp(
+    "^#" +
+    // Slide spec
+    "(?:" +
+      "(?<slide_index>[0-9]+)" +
+      "|" +
+      "(?<slide_id>[^0-9#@<][^#@<]*)" +
+    ")?" +
+    // Build step spec
+    "(?:" +
+      "(?:#(?<step_index>[0-9]+))" +
+      "|" +
+      "(?:<(?<step_number>[-+]?[0-9]+)>)" +
+      "|" +
+      "(?:@(?<step_tag>[^\\s<>.@]+))" +
+    ")?" +
+    "$"
+  );
+  
+  const match = linkRegex.exec(hash);
+  
+  if (match === null) {
     return null;
   }
+  
+  // Work out slide index
+  let slide = currentSlide;
+  if (match.groups.slide_index !== undefined) {
+    slide = parseInt(match.groups.slide_index) - 1;
+  } else if (match.groups.slide_id !== undefined) {
+    const slideId = match.groups.slide_id;
+    if (slideIds.has(slideId)) {
+      slide = slideIds.get(slideId);
+    } else {
+      // Unknown slide ID
+      return null;
+    }
+  }
+  
+  // Work out step index
+  let step = 0;
+  if (match.groups.step_index !== undefined) {
+    step = parseInt(match.groups.step_index) - 1;
+  } else if (match.groups.step_number !== undefined) {
+    if (slide < slideBuildStepNumbers.length) {
+      step = slideBuildStepNumbers[slide].indexOf(parseInt(match.groups.step_number));
+      if (step < 0) { // Treat non-existant step number as zero
+        step = 0;
+      }
+    }
+  } else if (match.groups.step_tag !== undefined) {
+    if (slide < slideBuildStepTags.length) {
+      const tag = match.groups.step_tag;
+      if (slideBuildStepTags[slide].has(tag)) {
+        step = slideBuildStepTags[slide].get(tag);
+      }
+    }
+  }
+  
+  return [slide, step];
 }
 
 
@@ -215,11 +309,21 @@ class Stepper {
     this.slides = slides;
     this.containers = containers;
     
+    // Extract IDs from slides which have them
+    this.slideIds = new Map();
+    for (const [slide, elem] of this.slides.entries()) {
+      if (elem.hasAttributeNS(ns("slidie"), "id")) {
+        const id = elem.getAttributeNS(ns("slidie"), "id");
+        this.slideIds.set(id, slide);
+      }
+    }
+    
     // Extract the build steps from all slides. NB: Build step numbers can
     // start from < 0. To keep things simpler, in all public functions of this
     // class we take build step indices (which are always zero based).
     this.slideBuilds = this.slides.map(slide => findBuildSteps(slide));
-    this.slideBuildStepNumbers = this.slideBuilds.map(steps => layerStepIndices(steps));
+    this.slideBuildStepNumbers = this.slideBuilds.map(layerSteps => layerStepIndices(layerSteps));
+    this.slideBuildStepTags = this.slideBuilds.map(layerSteps => layerStepTags(layerSteps));
     
     // Initially don't blank the screen
     this.blanked = false;
@@ -239,9 +343,14 @@ class Stepper {
   /**
    * Show a particular slide/step.
    *
+   * The updateHash argument is intended for use only by showFromHash and may
+   * be used to prevent the hash in the URL from being changed to match the
+   * current slide. This ensures that if the user uses a particular hash format
+   * to specify the slide/step we don't immediately replace that.
+   *
    * Returns true iff the slide exists, false otherwise.
    */
-  show(slide, step=0) {
+  show(slide, step=0, updateHash=true) {
     // Check in range
     if (slide >= this.slides.length || step >= this.slideBuildStepNumbers[slide].length) {
       return false;
@@ -280,7 +389,9 @@ class Stepper {
     }
     
     // Update the URL with the new offset
-    window.location.hash = toUrlHash(this.curSlide, this.curSlideStep);
+    if (updateHash) {
+      window.location.hash = toUrlHash(this.curSlide, this.curSlideStep);
+    }
     
     // Fire change events
     if (slideChanged) {
@@ -324,9 +435,15 @@ class Stepper {
    * called on instantiation and after a hashchange event anyway.
    */
   showFromHash() {
-    const match = parseUrlHash(window.location.hash);
+    const match = parseUrlHash(
+      window.location.hash,
+      this.curSlide,
+      this.slideIds,
+      this.slideBuildStepNumbers,
+      this.slideBuildStepTags,
+    );
     if (match !== null) {
-      return this.show(match[0], match[1]);
+      return this.show(match[0], match[1], false);
     } else {
       return false;
     }

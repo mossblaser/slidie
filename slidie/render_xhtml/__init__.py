@@ -28,6 +28,7 @@ from slidie.file_numbering import extract_numerical_prefix
 from slidie.speaker_notes import embed_speaker_notes
 from slidie.magic import MagicText, extract_magic
 from slidie.video import find_video_magic
+from slidie.links import annotate_slide_id_from_magic
 
 
 BASE_TEMPLATE_FILENAME = Path(__file__).parent / "base.xhtml"
@@ -150,6 +151,8 @@ def render_slide(
     # NB: Must also be done before text_to_selectable_paths and
     # embed_thumbnails
     magic = extract_magic(svg)
+
+    annotate_slide_id_from_magic(magic)
 
     # We (probably) want the background displayed in Inkscape to back the SVG
     # since otherwise you'll just get a transparent background onto the black
