@@ -715,6 +715,25 @@ function eventInvolvesHyperlink(evt) {
   return false;
 }
 
+/**
+ * Sets the specified class on the specified element whenever the mouse hasn't
+ * moved over it in the last timeout milliseconds.
+ */
+function setClassWhileMouseIdle(elem, className="mouse-idle", timeout=2000) {
+  let timeoutId = null;
+  elem.addEventListener("mousemove", evt => {
+    elem.classList.remove(className)
+    
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => {
+      elem.classList.add(className)
+      timeoutId = null;
+    }, timeout);
+  });
+}
+
 /******************************************************************************/
 
 function setup() {
@@ -742,7 +761,15 @@ function setup() {
   setupMagicVideoPlayback(slides);
   
   const stepper = new Stepper(slides, slideContainers);
-    
+  
+  // Fullscreen button
+  document.getElementById("full-screen").addEventListener("click", () => {
+    slidesContainerElem.requestFullscreen();
+  });
+  
+  // Show mouse in full-screen mode when mouse recently moved
+  setClassWhileMouseIdle(slidesContainerElem);
+  
   // Click to advance by one step
   slidesContainerElem.addEventListener("click", evt => {
     if (!eventInvolvesHyperlink(evt)) {

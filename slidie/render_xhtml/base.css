@@ -2,6 +2,55 @@
   box-sizing: border-box;
 }
 
+:root {
+  --input-h-padding: 8px;
+}
+
+button {
+  line-height: 2.0;
+  padding: 0 var(--input-h-padding);
+  text-align: center;
+  
+  color: #fff;
+  background-color: #555;
+  
+  border: 0;
+  border-color: #777;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 8px;
+}
+button:hover,
+button:focus {
+  outline: none;
+  background-color: #666;
+  border-color: #aaa;
+}
+button:active {
+  background-color: #444;
+  border-color: #555;
+}
+
+
+input[type=text] {
+  line-height: 2.0;
+  padding: 0 var(--input-h-padding);
+  
+  color: #fff;
+  background-color: #555;
+  
+  border: 0;
+  border-color: #777;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 4px;
+}
+input[type=text]:focus {
+  outline: none;
+  background-color: #666;
+  border-color: #aaa;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -15,13 +64,19 @@ body {
   
   display: grid;
   grid-template-columns: min-content 1fr;
-  grid-template-rows: 1fr min-content;
+  grid-template-rows: min-content 1fr min-content;
   
   --ui-background: #333;
 }
 
-body > #slides {
+body > #toolbar {
   grid-row: 1;
+  grid-column: 1/-1;
+  
+  background-color: var(--ui-background);
+}
+body > #slides {
+  grid-row: 2;
   grid-column: 2;
   
   /* Allow the slides to shrink to fit into the grid */
@@ -29,7 +84,7 @@ body > #slides {
   min-height: 0;
 }
 body > #thumbnails {
-  grid-row: 1/-1;
+  grid-row: 2/-1;
   grid-column: 1;
   
   width: 256px;
@@ -37,7 +92,7 @@ body > #thumbnails {
   background-color: var(--ui-background);
 }
 body > #notes {
-  grid-row: 2;
+  grid-row: 3;
   grid-column: 2;
   
   max-height: 256px;
@@ -48,23 +103,50 @@ body > #notes {
 @media (max-aspect-ratio: 1/1) {  /* Portrait */
   body {
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr min-content min-content;
+    grid-template-rows: min-content 1fr min-content min-content;
   }
   body > #slides {
-    grid-row: 1;
+    grid-row: 2;
     grid-column: 1;
   }
   body > #thumbnails {
-    grid-row: 3;
+    grid-row: 4;
     grid-column: 1;
     
     width: auto;
     height: 134px;
   }
   body > #notes {
-    grid-row: 2;
+    grid-row: 3;
     grid-column: 1;
   }
+}
+
+
+#toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  
+  padding: 8px;
+  gap: 4px;
+}
+#toolbar > * {
+  display: block;
+}
+
+#toolbar > hr{
+  visibility: hidden;
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+button#full-screen {
+  padding-left: calc(1em + 16px);
+  background-size: 1em;
+  background-repeat: no-repeat;
+  background-position: 8px center;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 6.35 6.35" xmlns:v="https://vecta.io/nano"><path d="M.359 6.35l5.631-3.175L.359 0z" fill="white"/></svg>');
 }
 
 
@@ -83,6 +165,13 @@ body > #notes {
   height: 100%;
   
   padding: 8px;
+}
+
+#slides:fullscreen.mouse-idle {
+  cursor: none;
+}
+#slides:fullscreen > .slide-container {
+  padding: 0;
 }
 
 
