@@ -763,11 +763,14 @@ function setup() {
     }
     
     switch (evt.key) {
-      // Left/Down or Right/Up: Move a step at a time
+      // Left/Down/Space/Enter or Right/Up/Backspace: Move a step at a time
+      case "Backspace":
       case "ArrowUp":
       case "ArrowLeft":
         stepper.previousStep();
         break;
+      case " ":
+      case "Enter":
       case "ArrowDown":
       case "ArrowRight":
         stepper.nextStep();
