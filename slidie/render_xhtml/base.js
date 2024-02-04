@@ -194,7 +194,8 @@ function toUrlHash(slide, step=0) {
 }
 
 /**
- * Parse a URL hash, resolving the specification into a [slide, step] pair.
+ * Parse a (already-uri-decoded) URL hash, resolving the specification into a
+ * [slide, step] pair.
  *
  * Returns null if an *syntactically* invalid link is provided.
  *
@@ -436,7 +437,7 @@ class Stepper {
    */
   showFromHash() {
     const match = parseUrlHash(
-      window.location.hash,
+      decodeURI(window.location.hash),
       this.curSlide,
       this.slideIds,
       this.slideBuildStepNumbers,
