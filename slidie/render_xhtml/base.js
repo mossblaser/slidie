@@ -75,6 +75,7 @@ function layerStepTags(layerSteps) {
   return map;
 }
 
+
 /**
  * Given an SVG with embedded slidie thumbnails, return an array [{step,
  * dataUrl}, ...].
@@ -279,6 +280,45 @@ function parseUrlHash(
   }
   
   return [slide, step];
+}
+
+/**
+ * Enumerate the complete set of absolute slide hashes. Takes a list of slide
+ * <svg> root elements. Returns all possible combinations of hash.
+ *
+ * Does not include 'relative' hashes where the current slide is implied.
+ */
+function enumerateSlideHashes(slides) {
+  const out = [];
+  
+  for (const [slideNum, slide] of slides.entries()) {
+    // Enumerate ways of identifying the slide
+    const slideValues = [`${slideNum + 1}`];
+    if (slide.hasAttributeNS(ns("slidie"), "id")) {
+      slideValues.push(slide.getAttributeNS(ns("slidie"), "id"));
+    }
+    
+    // Enumerate ways of identifying the step
+    const stepValues = [];
+    const layerSteps = findBuildSteps(slide);
+    for (const [step, stepNumber] of layerStepIndices(layerSteps).entries()) {
+      stepValues.push(`#${step + 1}`);
+      stepValues.push(`<${stepNumber}>`);
+    }
+    for (const tag of layerStepTags(layerSteps).keys()) {
+      stepValues.push(`@${tag}`);
+    }
+    
+    // Enumerate all combinations of the above
+    for (const slideValue of slideValues) {
+      out.push(`${slideValue}`);
+      for (const stepValue of stepValues) {
+        out.push(`${slideValue}${stepValue}`);
+      }
+    }
+  }
+  
+  return out;
 }
 
 
@@ -735,6 +775,50 @@ function setClassWhileMouseIdle(elem, className="mouse-idle", timeout=2000) {
   });
 }
 
+/**
+ * Setup the textual slide selection box.
+ */
+function setupSlideSelector(slides) {
+  const slideSelectorElem = document.getElementById("slide-selector");
+  
+  // Set overall slide count
+  slideSelectorElem.querySelector(".slide-count").innerText = slides.length;
+  
+  const slideNumberBox = slideSelectorElem.querySelector(".slide-number");
+  
+  // Show the current slide number
+  window.addEventListener("stepchange", () => {
+    // NB: Hash is updated by Stepper just before stepchange is emitted and
+    // will contain the same syntax entered by the user.
+    slideNumberBox.value = decodeURI(window.location.hash.substring(1));
+    slideNumberBox.style.width = `${Math.max(2, slideNumberBox.value.length)}em`;
+  });
+  
+  // Allow changing the slide number
+  slideNumberBox.addEventListener("change", () => {
+    window.location.hash = `#${slideNumberBox.value}`;
+    slideNumberBox.blur();
+  });
+  
+  // Select/defocus box on click/exit
+  slideNumberBox.addEventListener("focus", () => { slideNumberBox.select(); });
+  slideNumberBox.addEventListener("keydown", evt => {
+    if (evt.key == "Escape" || evt.key == "Enter") {
+      slideNumberBox.blur();
+    }
+    // Prevent the slide navigation keyboard handler running
+    evt.stopPropagation();
+  });
+  
+  // Setup auto-completion values
+  const dataList = slideSelectorElem.querySelector("datalist");
+  for (const value of enumerateSlideHashes(slides)) {
+    const option = document.createElementNS(ns("xhtml"), "option");
+    option.value = value;
+    dataList.appendChild(option);
+  }
+}
+
 /******************************************************************************/
 
 function setup() {
@@ -760,6 +844,7 @@ function setup() {
   loadThumbnails(slides);
   loadNotes(slides);
   setupMagicVideoPlayback(slides);
+  setupSlideSelector(slides);
   
   const stepper = new Stepper(slides, slideContainers);
   

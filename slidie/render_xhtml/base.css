@@ -141,6 +141,17 @@ body > #notes {
   flex-shrink: 1;
 }
 
+#slide-selector input.slide-number {
+  box-sizing: content-box;
+  width: 3em;
+  text-align: right;
+  
+  transition: width 0.2s;
+}
+#slide-selector input.slide-number:focus {
+  width: 12em!important;  /* Override the custom resizing by JS */
+}
+
 button#full-screen {
   padding-left: calc(1em + 16px);
   background-size: 1em;
