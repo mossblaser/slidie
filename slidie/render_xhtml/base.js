@@ -1087,6 +1087,10 @@ function setup() {
   
   setupMagicVideoPlayback(slides);
   
+  if (slides[0].hasAttributeNS(ns("slidie"), "title")) {
+    document.title = `${slides[0].getAttributeNS(ns("slidie"), "title")} - Slidie`;
+  }
+  
   // The main store of state
   const stepper = new Stepper(slides, slideContainers);
   

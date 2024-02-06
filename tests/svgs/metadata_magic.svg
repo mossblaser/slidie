@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   sodipodi:docname="metadata_magic.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.42333333"
+     inkscape:cx="396.85039"
+     inkscape:cy="561.02362"
+     inkscape:window-width="1340"
+     inkscape:window-height="1041"
+     inkscape:window-x="576"
+     inkscape:window-y="18"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-size:11.9204px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="60.722454"
+       y="66.974846"
+       id="text1"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         style="stroke-width:0.264583"
+         x="60.722454"
+         y="66.974846">@@@</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="60.722454"
+         y="81.875343"
+         id="tspan2">title = &quot;Foo&quot;</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:11.9204px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="60.722454"
+       y="104.01649"
+       id="text4"><tspan
+         sodipodi:role="line"
+         id="tspan3"
+         style="stroke-width:0.264583"
+         x="60.722454"
+         y="104.01649">@@@</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="60.722454"
+         y="118.91698"
+         id="tspan4">author = &quot;Bar&quot;</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:11.9204px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="60.722454"
+       y="141.05817"
+       id="text6"><tspan
+         sodipodi:role="line"
+         id="tspan5"
+         style="stroke-width:0.264583"
+         x="60.722454"
+         y="141.05817">@@@</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="60.722454"
+         y="155.95866"
+         id="tspan6">date = &quot;Tomorrow&quot;</tspan></text>
+  </g>
+</svg>
