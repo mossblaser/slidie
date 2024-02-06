@@ -14,6 +14,8 @@ body {
   grid-template-rows: min-content 1fr min-content;
   
   --ui-background: #333;
+  --ui-resize-handle-colour: #444;
+  --ui-resize-handle-width: 8px;
 }
 
 body > #toolbar {
@@ -37,14 +39,24 @@ body > #thumbnails {
   width: 256px;
   
   background-color: var(--ui-background);
+  
+  border-color: var(--ui-resize-handle-colour);
+  border-width: var(--ui-resize-handle-width);
+  border-style: none;
+  border-right-style: solid;
 }
 body > #notes {
   grid-row: 3;
   grid-column: 2;
   
-  max-height: 256px;
+  height: 64px;
   
   background-color: var(--ui-background);
+  
+  border-color: var(--ui-resize-handle-colour);
+  border-width: var(--ui-resize-handle-width);
+  border-style: none;
+  border-top-style: solid;
 }
 
 @media (max-aspect-ratio: 1/1) {  /* Portrait */
@@ -60,12 +72,20 @@ body > #notes {
     grid-row: 4;
     grid-column: 1;
     
-    width: auto;
+    width: auto !important;  /* Survive manual resizes whilst landscape */
     height: 134px;
+  
+    border-top-style: solid;
+    border-right-style: none;
   }
   body > #notes {
     grid-row: 3;
     grid-column: 1;
+  }
+}
+@media not (max-aspect-ratio: 1/1) {  /* Landscape */
+  body > #thumbnails {
+    height: 100% !important;  /* Survive manual resizes whilst portrait */
   }
 }
 
@@ -142,7 +162,7 @@ button#presenter-view {
 
 
 #thumbnails {
-  overflow-y: scroll;
+  overflow-y: auto;
   
   display: flex;
   flex-direction: column;
@@ -202,7 +222,7 @@ button#presenter-view {
 
 @media (max-aspect-ratio: 1/1) {  /* Portrait */
   #thumbnails {
-    overflow-x: scroll;
+    overflow-x: auto;
     overflow-y: hidden;
     flex-direction: row;
   }
@@ -239,6 +259,7 @@ button#presenter-view {
 #notes {
   overflow-y: auto;
   padding: 8px;
+  padding-top: 0;
   
   --subdued-opacity: 0.25;
   --paragraph-spacing: 8px;
