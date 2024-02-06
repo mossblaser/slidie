@@ -849,9 +849,14 @@ function setup() {
   const stepper = new Stepper(slides, slideContainers);
   
   // Fullscreen button
-  document.getElementById("full-screen").addEventListener("click", () => {
-    slidesContainerElem.requestFullscreen();
-  });
+  function toggleFullScreen() {
+    if (document.fullscreenElement === null) {
+      slidesContainerElem.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }
+  document.getElementById("full-screen").addEventListener("click", toggleFullScreen);
   
   // Show mouse in full-screen mode when mouse recently moved
   setClassWhileMouseIdle(slidesContainerElem);
@@ -915,6 +920,11 @@ function setup() {
         stepper.toggleBlank();
         break;
       
+      // 'f': Toggle full-screen
+      case 'f':
+      case 'F':
+        toggleFullScreen();
+        break;
       // Other keys: Do nothing.
       default:
         return;
