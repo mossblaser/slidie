@@ -34,7 +34,7 @@ from slidie.links import annotate_slide_id_from_magic
 BASE_TEMPLATE_FILENAME = Path(__file__).parent / "base.xhtml"
 
 
-def inline_css_and_js(root: ET.Element, path: Path) -> None:
+def inline_css_and_js_and_templates(root: ET.Element, path: Path) -> None:
     """
     Given an XHTML document, inline any external CSS and Javascript files
     referenced by <link> and <script> tags in-place.
@@ -61,6 +61,17 @@ def inline_css_and_js(root: ET.Element, path: Path) -> None:
             script_filename = path / Path(src)
             elem.text = script_filename.read_text()
 
+    # Substitute <template src="..."> for <template>...</template>
+    for elem in root.iterfind(f".//{{{XHTML_NAMESPACE}}}template"):
+        if "src" in elem.attrib:
+            src = elem.attrib.pop("src")
+            assert src is not None
+
+            template_path = path / Path(src)
+            template = ET.parse(template_path).getroot()
+            inline_css_and_js_and_templates(template, template_path.parent)  # Recurse!
+            elem.append(template)
+
 
 def get_base_template() -> tuple[ET.Element, ET.Element]:
     """
@@ -75,7 +86,7 @@ def get_base_template() -> tuple[ET.Element, ET.Element]:
     # separate files with the base.xhtml file referencing them using <link> and
     # <script src="..."> tags. We substitute those for inline <style> and
     # <script> tags.
-    inline_css_and_js(root, BASE_TEMPLATE_FILENAME.parent)
+    inline_css_and_js_and_templates(root, BASE_TEMPLATE_FILENAME.parent)
 
     # To split the (text-based) document at an arbitrary point, we insert a
     # unique string which we'll later split the file on.
