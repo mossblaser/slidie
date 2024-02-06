@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" >
+  <head>
+    <meta charset="utf-8"/>
+    <title>Slidie Presenter View</title>
+    <link rel="stylesheet" href="common.css"/>
+    <link rel="stylesheet" href="presenter_view.css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  </head>
+  <body>
+    <div id="thumbnails">
+      <!-- Wrapping <div>s are a workaround for Chrome's inability to correctly
+           rescale images in a flexbox... -->
+      <div class="now"><img id="thumbnail-now" /></div>
+      <div class="next"><img id="thumbnail-next" /></div>
+    </div>
+    <div id="notes" />
+    
+    <div id="status">
+      <div class="slide-number">
+        Slide <span id="slide-number"/>
+        of <span id="slide-count"/>
+      </div>
+      <div id="clock" />
+      <div class="timer">
+        <span id="timer" />
+        <button id="timer-pause">Pause</button>
+        <button id="timer-reset">Reset</button>
+      </div>
+    </div>
+  </body>
+</html>

@@ -81,3 +81,23 @@ test("parseUrlHash", async (t) => {
     });
   }
 });
+
+test("formatDuration", async (t) => {
+  for (const [duration, exp] of [
+    [0, "0:00"],
+    // Should round-down
+    [999, "0:00"],
+    [1000, "0:01"],
+    [59000, "0:59"],
+    // Roll-over to minutes
+    [60000, "1:00"],
+    [600000, "10:00"],
+    // Roll-over to hours
+    [3600000, "1:00:00"],
+    [3661000, "1:01:01"],
+  ]) {
+    await t.test(`expect ${duration} -> ${exp}`, (t) => {
+      assert.strictEqual(formatDuration(duration), exp);
+    });
+  }
+});

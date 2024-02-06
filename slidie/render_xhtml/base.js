@@ -174,10 +174,10 @@ function wrapInShadowDom(elem, className="shadow-dom-wrapper", tag="div", mode="
 class StepperEvent extends Event {
   constructor(type, stepper, composed = true) {
     super(type, {composed, cancelable: false, bubbles: true});
-    this.slideElem = stepper.slides[stepper.curSlide];
+    this.slideElem = stepper.curSlideElem;
     this.slide = stepper.curSlide;
     this.step = stepper.curSlideStep;
-    this.stepNumber = stepper.slideBuildStepNumbers[stepper.curSlide][stepper.curSlideStep];
+    this.stepNumber = stepper.curSlideStepNumber;
   }
 }
 
@@ -379,6 +379,14 @@ class Stepper {
     
     // Move between slides based on URL changes
     window.addEventListener("hashchange", () => this.showFromHash());
+  }
+  
+  get curSlideElem() {
+    return this.slides[this.curSlide];
+  }
+  
+  get curSlideStepNumber() {
+    return this.slideBuildStepNumbers[this.curSlide][this.curSlideStep];
   }
   
   /**
@@ -604,17 +612,15 @@ class Stepper {
  * Load the thumbnails embedded in the slides, populating the thumbnails
  * sidebar.
  */
-function loadThumbnails(slides) {
-  const thumbnailsElem = document.getElementById("thumbnails")
-  
+function loadThumbnails(stepper, container) {
   const thumbnailGroupTemplate = document.getElementById("thumbnail-group")
   const thumbnailTemplate = document.getElementById("thumbnail")
   
   // For each slide (shown as a group of thumbnails: one for each step)...
-  const numberedThumbs = Array.from(slides.map(getThumbnails).entries());
+  const numberedThumbs = Array.from(stepper.slides.map(getThumbnails).entries());
   const thumbElems = numberedThumbs.map(([slideNum, slideThumbs]) => {
     const groupElem = thumbnailGroupTemplate.content.cloneNode(true).firstElementChild;
-    thumbnailsElem.appendChild(groupElem);
+    container.appendChild(groupElem);
     
     // Show slide number
     groupElem.querySelector(".slide-number").innerText = `${slideNum + 1}`;
@@ -627,7 +633,7 @@ function loadThumbnails(slides) {
       slideThumbnailsElem.appendChild(elem)
       
       // Add link and tooltip
-      const sourceFilename = slides[slideNum].getAttributeNS(ns("slidie"), "source");
+      const sourceFilename = stepper.slides[slideNum].getAttributeNS(ns("slidie"), "source");
       elem.title = `${sourceFilename}\nstep number ${step}`;
       elem.href = toUrlHash(slideNum, stepNum);
       
@@ -640,19 +646,68 @@ function loadThumbnails(slides) {
     });
   });
   
-  // Apply the 'selected' class to the currently selected slide
-  window.addEventListener("stepchange", ({slide, step}) => {
+  // Apply the 'selected' and 'next' classes to the currently selected slide
+  function onStepChange({slide, step}) {
+    let lastSlideSelected = false
     for (const [thisSlide, steps] of thumbElems.entries()) {
       for (const [thisStep, elem] of steps.entries()) {
         if (thisSlide === slide && thisStep === step) {
           elem.classList.add("selected");
           elem.scrollIntoView({ block: "nearest", inline: "nearest" });
+          
+          lastSlideSelected = true;
+          elem.classList.remove("next");
         } else {
           elem.classList.remove("selected");
+          
+          if (lastSlideSelected) {
+            elem.classList.add("next");
+            lastSlideSelected = false;
+          } else {
+            elem.classList.remove("next");
+          }
         }
       }
     }
-  });
+  }
+  window.addEventListener("stepchange", onStepChange);
+  onStepChange({slide: stepper.curSlide, step: stepper.curSlideStep});
+}
+
+
+/**
+ * Display thumbnails of the current and next slides into the provided images.
+ */
+function loadNowNextThumbnails(stepper, nowImg, nextImg) {
+  // Create an array of arrays of {now, next} objects, one for each step of
+  // each slide.
+  const allThumbs = [];
+  let lastStep = {};
+  for (const [slide, steps] of Array.from(stepper.slides.map(getThumbnails)).entries()) {
+    const slideThumbs = [];
+    for (const [step, {dataUrl}] of steps.entries()) {
+      lastStep.next = dataUrl;
+      const thisStep = lastStep = {now: dataUrl};
+      slideThumbs.push(thisStep);
+    }
+    allThumbs.push(slideThumbs);
+  }
+  
+  // Update the now/next images
+  function setThumbs({slide, step}) {
+    const {now, next} = allThumbs[slide][step];
+    nowImg.src = now;
+    
+    if (next !== undefined) {
+      nextImg.src = next;
+      nextImg.style.visibility = "visible";
+    } else {
+      nextImg.src = now;  // Just for consistency of behavior
+      nextImg.style.visibility = "hidden";
+    }
+  }
+  window.addEventListener("stepchange", setThumbs);
+  setThumbs({slide: stepper.curSlide, step: stepper.curSlideStep});
 }
 
 
@@ -671,15 +726,14 @@ function markdownToXHTML(source) {
  * Load (and parse the markdown of) the speaker notes in each slide, and setup
  * callbacks to display the current slide's notes in the #notes container.
  */
-function loadNotes(slides) {
-  const container = document.getElementById("notes");
+function loadNotes(stepper, container) {
   const template = document.getElementById("note");
   
   // For each slide, an array [{steps, elem}, ...] giving a series of DOM
   // elements to insert into the notes viewer and the step indices at which
   // those elements should have the 'current' class applied.
   const slideNotes = [];
-  for (const slide of slides) {
+  for (const slide of stepper.slides) {
     slideNotes.push(getSpeakerNotes(slide).map(({steps, text}) => {
       const elem = template.content.cloneNode(true).firstElementChild;
       markdownToXHTML(text).forEach(n => elem.appendChild(n));
@@ -689,7 +743,7 @@ function loadNotes(slides) {
   
   // Update the notes container as we navigate through the show
   let curSlide = null;
-  window.addEventListener("stepchange", ({slide, stepNumber}) => {
+  function onStepChange({slide, stepNumber}) {
     // On slide change, replace the notes
     if (curSlide !== slide) {
       curSlide = slide;
@@ -705,7 +759,9 @@ function loadNotes(slides) {
         elem.classList.remove("current");
       }
     }
-  });
+  }
+  window.addEventListener("stepchange", onStepChange);
+  onStepChange({slide: stepper.curSlide, stepNumber: stepper.curSlideStepNumber})
 }
 
 /**
@@ -741,14 +797,21 @@ function setupMagicVideoPlayback(slides) {
 
 /**
  * Given an event, test whether that event involves any kind of hyperlink or
- * not (specifically an XHTML or SVG <a> tag). If it does, returns true.
- * Otherwise returns false.
+ * button not (specifically an XHTML or SVG <a> or <button> or <input> tag). If
+ * it does, returns true.  Otherwise returns false.
  */
 function eventInvolvesHyperlink(evt) {
   for (const elem of evt.composedPath()) {
     if (
-      (elem.namespaceURI == ns("xhtml") || elem.namespaceURI == ns("svg"))
-      && elem.localName == "a"
+      (
+        (elem.namespaceURI == ns("xhtml") || elem.namespaceURI == ns("svg"))
+        && elem.localName == "a"
+      ) || (
+        elem.namespaceURI == ns("xhtml") && (
+          elem.localName == "button"
+          || elem.localName == "input"
+        )
+      )
     ) {
       return true;
     }
@@ -778,21 +841,22 @@ function setClassWhileMouseIdle(elem, className="mouse-idle", timeout=2000) {
 /**
  * Setup the textual slide selection box.
  */
-function setupSlideSelector(slides) {
+function setupSlideSelector(stepper) {
   const slideSelectorElem = document.getElementById("slide-selector");
   
   // Set overall slide count
-  slideSelectorElem.querySelector(".slide-count").innerText = slides.length;
+  slideSelectorElem.querySelector(".slide-count").innerText = stepper.slides.length;
   
   const slideNumberBox = slideSelectorElem.querySelector(".slide-number");
   
   // Show the current slide number
-  window.addEventListener("stepchange", () => {
+  function update() {
     // NB: Hash is updated by Stepper just before stepchange is emitted and
     // will contain the same syntax entered by the user.
     slideNumberBox.value = decodeURI(window.location.hash.substring(1));
     slideNumberBox.style.width = `${Math.max(2, slideNumberBox.value.length)}em`;
-  });
+  }
+  window.addEventListener("stepchange", update);
   
   // Allow changing the slide number
   slideNumberBox.addEventListener("change", () => {
@@ -812,11 +876,192 @@ function setupSlideSelector(slides) {
   
   // Setup auto-completion values
   const dataList = slideSelectorElem.querySelector("datalist");
-  for (const value of enumerateSlideHashes(slides)) {
+  for (const value of enumerateSlideHashes(stepper.slides)) {
     const option = document.createElementNS(ns("xhtml"), "option");
     option.value = value;
     dataList.appendChild(option);
   }
+}
+
+/**
+ * Given a duration in milliseconds, format this in human-readable terms of
+ * hours, minutes and seconds.
+ */
+function formatDuration(milliseconds) {
+  let seconds = Math.floor(milliseconds / 1000);
+  
+  const hours = Math.floor(seconds / (60 * 60));
+  seconds -= hours * 60 * 60;
+  
+  const minutes = Math.floor(seconds / 60);
+  seconds -= minutes * 60;
+  
+  const hh = hours.toString();
+  const mm = minutes.toString().padStart(2, "0");
+  const ss = seconds.toString().padStart(2, "0");
+  
+  if (hours > 0) {
+    return `${hh}:${mm}:${ss}`;
+  } else {
+    return `${minutes}:${ss}`;
+  }
+}
+
+/**
+ * Simple state machine for a stopwatch-style timer intended for the presenter
+ * view.
+ */
+class Stopwatch {
+  constructor(timerRunning=false) {
+    this.reset();
+    this.timerRunning = timerRunning;
+  }
+  
+  /** Pause the timer. */
+  pause() {
+    if (this.timerRunning) {
+      this.timerEnd = Date.now();
+      this.timerRunning = false;
+    }
+  }
+  
+  /** Resume the timer. */
+  resume() {
+    if (!this.timerRunning) {
+      const now = Date.now();
+      this.timerStart += now - this.timerEnd;
+      this.timerEnd = now;
+      this.timerRunning = true;
+    }
+  }
+  
+  /** Toggle the pause state. Returns 'true' iff now running. */
+  togglePause() {
+    if (this.timerRunning) {
+      this.pause();
+    } else {
+      this.resume();
+    }
+    
+    return this.timerRunning;
+  }
+  
+  /** Reset the timer */
+  reset() {
+    this.timerStart = Date.now();
+    this.timerEnd = this.timerStart;
+  }
+  
+  /** Return the number of milliseconds on the timer. */
+  read() {
+    if (this.timerRunning) {
+      this.timerEnd = Date.now();
+    }
+    return this.timerEnd - this.timerStart;
+  }
+}
+
+/** Clone an event object. */
+function cloneEvent(evt) {
+  return new evt.constructor(evt.type, evt);
+}
+
+/**
+ * Show the current slide number (and slide count) in the provided pair of
+ * elements.
+ */
+function showSlideNumber(stepper, slideNumberElem, slideCountElem) {
+  // Show slide number
+  function updateSlideNumber({slide}) {
+    slideNumberElem.innerText = (slide + 1).toString();
+  }
+  window.addEventListener("stepchange", updateSlideNumber)
+  updateSlideNumber({slide: stepper.curSlide});
+  
+  // Show slide count
+  slideCountElem.innerText = stepper.slides.length.toString();
+}
+
+/**
+ * Display the time and stopwatch, along with control buttons.
+ */
+function setupStopwatchUI(stopwatch, clockElem, timerElem, pauseButton, resetButton) {
+  // Continuously refresh time
+  function updateTimers() {
+    clockElem.innerText = new Date().toLocaleTimeString();
+    timerElem.innerText = formatDuration(stopwatch.read());
+    
+    if (stopwatch.timerRunning) {
+      pauseButton.innerText = "Pause";
+      pauseButton.classList.add("pause");
+      pauseButton.classList.remove("resume");
+    } else {
+      if (stopwatch.read() == 0) {
+        pauseButton.innerText = "Start";
+      } else {
+        pauseButton.innerText = "Resume";
+      }
+      pauseButton.classList.add("resume");
+      pauseButton.classList.remove("pause");
+    }
+  }
+  window.setInterval(updateTimers, 1000);
+  updateTimers();
+  
+  // Setup buttons
+  pauseButton.addEventListener("click", evt => {
+    stopwatch.togglePause();
+    updateTimers();
+    evt.stopPropagation();
+  });
+  resetButton.addEventListener("click", evt => {
+    stopwatch.reset();
+    updateTimers();
+    evt.stopPropagation();
+  });
+}
+
+/**
+ * Create a presenter view window and link it up to the main Slidie UI. Returns
+ * a reference to the created window.
+ */
+function showPresenterView(stepper, stopwatch, clickForwardingTarget) {
+  const wnd = window.open("", "presenter-view", {popup: true});
+  
+  // Instantiate the presenter view template
+  const presenterViewTemplaate = document.getElementById("presenter-view-template");
+  const root = presenterViewTemplaate.content.cloneNode(true).firstElementChild;
+  wnd.document.removeChild(wnd.document.firstElementChild);
+  wnd.document.appendChild(root);
+
+  // Populate with slide state
+  loadNotes(stepper, wnd.document.getElementById("notes"));
+  loadNowNextThumbnails(
+    stepper,
+    wnd.document.getElementById("thumbnail-now"),
+    wnd.document.getElementById("thumbnail-next"),
+  );
+  showSlideNumber(
+    stepper,
+    wnd.document.getElementById("slide-number"),
+    wnd.document.getElementById("slide-count"),
+  );
+  setupStopwatchUI(
+    stopwatch,
+    wnd.document.getElementById("clock"),
+    wnd.document.getElementById("timer"),
+    wnd.document.getElementById("timer-pause"),
+    wnd.document.getElementById("timer-reset"),
+  );
+  
+  // Forward mouse/keyboard events to main show
+  wnd.addEventListener("click", evt => { clickForwardingTarget.dispatchEvent(cloneEvent(evt)); });
+  wnd.addEventListener("keydown", evt => { window.dispatchEvent(cloneEvent(evt)); });
+  
+  // Close the presenter view if we navigate away from this Slidie instance
+  window.addEventListener("pagehide", () => wnd.close());
+  
+  return wnd;
 }
 
 /******************************************************************************/
@@ -839,18 +1084,36 @@ function setup() {
     slide.style.height = "100%";
   }
   
-  // NB: Perform these steps *before* creating the stepper so the initial
-  // slide change events are caught to setup the initial UI state.
-  loadThumbnails(slides);
-  loadNotes(slides);
   setupMagicVideoPlayback(slides);
-  setupSlideSelector(slides);
   
+  // The main store of state
   const stepper = new Stepper(slides, slideContainers);
+  
+  // Setup main UI elements
+  loadThumbnails(stepper, document.getElementById("thumbnails"));
+  loadNotes(stepper, document.getElementById("notes"));
+  setupSlideSelector(stepper);
+  
+  // Create a stopwatch in the main Slidie window even though it is only shown
+  // in presenter view so that timings are preserved when the presenter view is
+  // closed and reopened.
+  const stopwatch = new Stopwatch();
+  
+  // Presenter view button
+  let presenterView = null;
+  function showOrFocusPresenterView() {
+    if (presenterView !== null && !presenterView.closed) {
+      presenterView.focus();
+    } else {
+      presenterView = showPresenterView(stepper, stopwatch, slidesContainerElem);
+    }
+  }
+  document.getElementById("presenter-view").addEventListener("click", showOrFocusPresenterView);
   
   // Fullscreen button
   function toggleFullScreen() {
     if (document.fullscreenElement === null) {
+      stopwatch.resume();  // Automatically start presentation timer
       slidesContainerElem.requestFullscreen();
     } else {
       document.exitFullscreen();
@@ -925,6 +1188,13 @@ function setup() {
       case 'F':
         toggleFullScreen();
         break;
+      
+      // 'p': Show presenter view
+      case 'p':
+      case 'P':
+        showOrFocusPresenterView();
+        break;
+      
       // Other keys: Do nothing.
       default:
         return;

@@ -1,0 +1,174 @@
+body {
+  margin: 0;
+  padding: 0;
+  width: 100dvw;
+  height: 100dvh;
+  
+  font-family: sans-serif;
+  font-size: 200%;
+  
+  background-color: #333;
+  color: #FFFFFF;
+  
+  display: grid;
+  grid-template-columns: minmax(33vw, min-content) 1fr;
+  grid-template-rows: 1fr min-content;
+  justify-items: center;
+  
+  --spacing: max(1em, 5vw);
+  padding: var(--spacing);
+  gap: var(--spacing);
+}
+
+body > #thumbnails {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+body > #notes {
+  grid-row: 1;
+  grid-column: 2;
+}
+
+body > #status {
+  grid-row: 2;
+  grid-column: 1/-1;
+}
+
+@media (max-aspect-ratio: 1/1) {  /* Portrait */
+  body {
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content 1fr min-content;
+  }
+  body > #notes {
+    grid-row: 2;
+    grid-column: 1;
+  }
+  body > #status {
+    grid-row: 3;
+  }
+}
+
+
+#thumbnails {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  
+  max-width: 512px;
+}
+#thumbnails > div.now {
+  width: 100%;
+}
+#thumbnails > div.next {
+  width: 50%;
+}
+
+#thumbnails img {
+  width: 100%;
+  display: block;
+}
+
+@media (max-aspect-ratio: 1/1) {  /* Portrait */
+  #thumbnails {
+    flex-direction: row;
+    max-width: calc(512px + 256px + 1em);
+  }
+}
+
+
+#notes {
+  overflow-y: auto;
+  padding: 8px;
+  
+  width: 100%;
+  
+  --subdued-opacity: 0.25;
+  --paragraph-spacing: 1em;
+}
+
+#notes:empty::before {
+  content: "No speaker notes for this slide.";
+  font-style: italic;
+  opacity: var(--subdued-opacity);
+  
+  display: block;
+  margin-top: var(--paragraph-spacing);
+  margin-bottom: var(--paragraph-spacing);
+}
+
+#notes p {
+  margin-top: var(--paragraph-spacing);
+  margin-bottom: var(--paragraph-spacing);
+}
+
+#notes > .note {
+  opacity: var(--subdued-opacity);
+}
+#notes > .note.current {
+  opacity: 1;
+}
+
+
+#status {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 2em;
+}
+
+#clock {
+  padding-left: calc(1em + 8px);
+  background-size: 1em;
+  background-repeat: no-repeat;
+  background-position: 0 center;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 8.467 8.467" stroke="white" stroke-width=".661" xmlns:v="https://vecta.io/nano"><circle cx="4.233" cy="4.233" r="3.903" fill="none"/><g fill="white" stroke-linecap="round"><path d="M4.126 4.341V2.022"/><path d="M4.126 4.341l1.14 1.121"/></g></svg>');
+}
+
+.timer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 0.5em;
+  
+  padding-left: calc(1em + 8px);
+  background-size: 1em;
+  background-repeat: no-repeat;
+  background-position: 0 center;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 8.467 8.467" xmlns:v="https://vecta.io/nano"><g stroke="white" stroke-width=".661"><circle cx="4.233" cy="5.076" r="3.06" fill="none"/><path d="M4.149 5.16l1.255-1.509" fill="white" stroke-linecap="round"/><g fill="none"><path d="M3.274.331h1.918"/><path d="M4.233.331v1.918"/></g></g><path d="M3.516.352L4.951.309m-.718.022v1.141" transform="rotate(35.194 3.308 4.442)" fill="none" stroke="white" stroke-width=".661"/><path d="M3.516.352L4.951.309m-.718.022v1.068" transform="matrix(-.817205 .576347 .576347 .817205 5.301559 -1.094611)" fill="none" stroke="white" stroke-width=".661"/></svg>');
+}
+
+.timer > #timer {
+  display: block;
+  padding-right: 0.5em;
+}
+
+button#timer-pause {
+  padding-left: calc(1em + 16px);
+  background-size: 1em;
+  background-repeat: no-repeat;
+  background-position: 8px center;
+}
+button#timer-pause.resume {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 6.35 6.35" xmlns:v="https://vecta.io/nano"><path d="M.359 6.35l5.631-3.175L.359 0z" fill="white"/></svg>');
+}
+button#timer-pause.pause {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 6.35 6.35" fill="none" stroke="white" stroke-width="1.058" stroke-linecap="round" xmlns:v="https://vecta.io/nano"><path d="M2.029 1.455v3.44m2.292-3.44v3.44"/></svg>');
+}
+
+button#timer-reset {
+  padding-left: calc(1em + 16px);
+  background-size: 1em;
+  background-repeat: no-repeat;
+  background-position: 8px center;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 6.35 6.35" xmlns:v="https://vecta.io/nano"><path d="M1.356 5.139c1.085 1.086 2.844 1.087 3.928.002a2.78 2.78 0 0 0-.002-3.93C4.197.125 2.438.124 1.354 1.209c-.149.149-.277.31-.385.481l-.049.081c-.081.139-.052.18-.205.432" fill="none" stroke="white" stroke-width=".529" stroke-linecap="round"/><g fill="white" fill-rule="evenodd"><path d="M.161 3.12l.037-1.85 1.585.959z"/><path d="M.079 1.054L.034 3.331 2.03 2.233z"/></g></svg>');
+}
+
+@media (max-aspect-ratio: 1/1) {  /* Portrait */
+  #status {
+    flex-direction: column;
+    gap: 0.5em;
+  }
+}

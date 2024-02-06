@@ -1,0 +1,52 @@
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+:root {
+  --input-h-padding: 8px;
+}
+
+button {
+  line-height: 2.0;
+  padding: 0 var(--input-h-padding);
+  text-align: center;
+  
+  color: #fff;
+  background-color: #555;
+  
+  border: 0;
+  border-color: #777;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 8px;
+}
+button:hover,
+button:focus {
+  outline: none;
+  background-color: #666;
+  border-color: #aaa;
+}
+button:active {
+  background-color: #444;
+  border-color: #555;
+}
+
+
+input[type=text] {
+  line-height: 2.0;
+  padding: 0 var(--input-h-padding);
+  
+  color: #fff;
+  background-color: #555;
+  
+  border: 0;
+  border-color: #777;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 4px;
+}
+input[type=text]:focus {
+  outline: none;
+  background-color: #666;
+  border-color: #aaa;
+}

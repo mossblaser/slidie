@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8"/>
     <title>Slidie</title>
+    <link rel="stylesheet" href="common.css"/>
     <link rel="stylesheet" href="base.css"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
   </head>
@@ -16,6 +17,7 @@
       
       <hr />
       
+      <button id="presenter-view">Presenter View</button>
       <button id="full-screen">Start</button>
     </nav>
     
@@ -43,6 +45,8 @@
     <template id="note">
       <div class="note" />
     </template>
+    
+    <template src="presenter_view.xhtml" id="presenter-view-template" />
     
     <script src="marked.js" />
     <script src="base.js" />

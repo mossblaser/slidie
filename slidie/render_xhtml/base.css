@@ -1,61 +1,8 @@
-*, *:before, *:after {
-  box-sizing: border-box;
-}
-
-:root {
-  --input-h-padding: 8px;
-}
-
-button {
-  line-height: 2.0;
-  padding: 0 var(--input-h-padding);
-  text-align: center;
-  
-  color: #fff;
-  background-color: #555;
-  
-  border: 0;
-  border-color: #777;
-  border-width: 2px;
-  border-style: solid;
-  border-radius: 8px;
-}
-button:hover,
-button:focus {
-  outline: none;
-  background-color: #666;
-  border-color: #aaa;
-}
-button:active {
-  background-color: #444;
-  border-color: #555;
-}
-
-
-input[type=text] {
-  line-height: 2.0;
-  padding: 0 var(--input-h-padding);
-  
-  color: #fff;
-  background-color: #555;
-  
-  border: 0;
-  border-color: #777;
-  border-width: 2px;
-  border-style: solid;
-  border-radius: 4px;
-}
-input[type=text]:focus {
-  outline: none;
-  background-color: #666;
-  border-color: #aaa;
-}
-
 body {
   margin: 0;
   padding: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100dvw;
+  height: 100dvh;
   
   font-family: sans-serif;
   
@@ -158,6 +105,14 @@ button#full-screen {
   background-repeat: no-repeat;
   background-position: 8px center;
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 6.35 6.35" xmlns:v="https://vecta.io/nano"><path d="M.359 6.35l5.631-3.175L.359 0z" fill="white"/></svg>');
+}
+
+button#presenter-view {
+  padding-left: calc(1em + 16px);
+  background-size: 1em;
+  background-repeat: no-repeat;
+  background-position: 8px center;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 6.35 6.35" xmlns:v="https://vecta.io/nano"><g fill="none" stroke="white" stroke-width=".529"><path d="M.827.265v.467 1.262.65c0 .259.209.467.468.467h3.76c.259 0 .467-.208.467-.467v-.65V.732.265h-.467-3.76z"/><path d="M3.175 3.111l.013 2.974m-1.208 0h2.415M0 .265h6.35"/></g><path d="M1.899 1.22H4.45m-2.551.818H4.45" stroke="white" fill="white" stroke-width=".265"/></svg>');
 }
 
 
