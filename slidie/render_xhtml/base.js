@@ -857,6 +857,7 @@ function setupSlideSelector(stepper) {
     slideNumberBox.style.width = `${Math.max(2, slideNumberBox.value.length)}em`;
   }
   window.addEventListener("stepchange", update);
+  update();
   
   // Allow changing the slide number
   slideNumberBox.addEventListener("change", () => {
