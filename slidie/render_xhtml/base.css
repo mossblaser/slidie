@@ -93,19 +93,14 @@ body > #notes {
 #toolbar {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: baseline;
   
   padding: 8px;
   gap: 4px;
 }
 #toolbar > * {
   display: block;
-}
-
-#toolbar > hr{
-  visibility: hidden;
-  flex-grow: 1;
-  flex-shrink: 1;
+  flex-shrink: 0;
 }
 
 #slide-selector input.slide-number {
@@ -117,6 +112,22 @@ body > #notes {
 }
 #slide-selector input.slide-number:focus {
   width: 12em!important;  /* Override the custom resizing by JS */
+}
+
+#title {
+  flex-grow: 1;
+  flex-shrink: 1;
+  
+  text-align: center;
+  font-weight: bold;
+  
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  
+  margin-left: 1em;
+  margin-right: 1em;
 }
 
 button#full-screen {

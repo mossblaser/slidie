@@ -10,6 +10,7 @@ button {
   line-height: 2.0;
   padding: 0 var(--input-h-padding);
   text-align: center;
+  white-space: nowrap;
   
   color: #fff;
   background-color: #555;

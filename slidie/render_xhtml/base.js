@@ -854,7 +854,7 @@ function setupSlideSelector(stepper) {
     // NB: Hash is updated by Stepper just before stepchange is emitted and
     // will contain the same syntax entered by the user.
     slideNumberBox.value = decodeURI(window.location.hash.substring(1));
-    slideNumberBox.style.width = `${Math.max(2, slideNumberBox.value.length)}em`;
+    slideNumberBox.style.width = `${Math.max(3, slideNumberBox.value.length)}em`;
   }
   window.addEventListener("stepchange", update);
   update();
@@ -1173,7 +1173,9 @@ function setup() {
   setupMagicVideoPlayback(slides);
   
   if (slides[0].hasAttributeNS(ns("slidie"), "title")) {
-    document.title = `${slides[0].getAttributeNS(ns("slidie"), "title")} - Slidie`;
+    const title = slides[0].getAttributeNS(ns("slidie"), "title");
+    document.title = `${title} - Slidie`;
+    document.getElementById("title").innerText = title;
   }
   
   // The main store of state
