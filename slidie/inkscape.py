@@ -1,5 +1,6 @@
 """
-Thin wrapper around Inkscape's `--shell` mode.
+A thin wrapper around Inkscape's `--shell` mode, along with a handful of
+slidie-specific helper routines.
 """
 
 from typing import TextIO, Self
@@ -8,6 +9,7 @@ from types import TracebackType
 import os
 from subprocess import Popen, PIPE, STDOUT
 from pathlib import Path
+from xml.etree import ElementTree as ET
 
 
 class InkscapeError(Exception):
@@ -210,3 +212,24 @@ class Inkscape:
     def selection_unhide(self) -> None:
         if out := self._run_cmd(f"selection-unhide"):
             InkscapeError(out)
+
+
+def set_visible_step(
+    inkscape: Inkscape,
+    build_elements: dict[ET.Element, list[int]],
+    step: int,
+) -> None:
+    """
+    Manipulate layer visibilities to make the state of the document match a
+    particular step number.
+
+    Takes a build_elements dictionary from
+    :py:func:`svg_utils.find_build_elements` and a step number to show.
+    """
+    for elem, steps in build_elements.items():
+        inkscape.select_clear()
+        inkscape.select_by_id(elem.attrib["id"])
+        if step in steps:
+            inkscape.selection_unhide()
+        else:
+            inkscape.selection_hide()

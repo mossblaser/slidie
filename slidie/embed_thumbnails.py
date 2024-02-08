@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 from xml.etree import ElementTree as ET
 from base64 import b64encode
 
-from slidie.inkscape import Inkscape
+from slidie.inkscape import Inkscape, set_visible_step
 from slidie.xml_namespaces import SLIDIE_NAMESPACE
 from slidie.svg_utils import find_build_elements, get_build_step_range, get_view_box
 
@@ -68,14 +68,7 @@ def embed_thumbnails(
         output_filenames = {}
         try:
             for step in get_build_step_range(svg):
-                # Show/hide elements for this build step
-                for elem, steps in build_elements.items():
-                    inkscape.select_clear()
-                    inkscape.select_by_id(elem.attrib["id"])
-                    if step in steps:
-                        inkscape.selection_unhide()
-                    else:
-                        inkscape.selection_hide()
+                set_visible_step(inkscape, build_elements, step)
 
                 # Generate thumbnail
                 output_filename = tmp_path / f"{step}.png"
