@@ -82,6 +82,7 @@ test("parseUrlHash", async (t) => {
   }
 });
 
+
 test("formatDuration", async (t) => {
   for (const [duration, exp] of [
     [0, "0:00"],
@@ -100,4 +101,36 @@ test("formatDuration", async (t) => {
       assert.strictEqual(formatDuration(duration), exp);
     });
   }
+});
+
+
+test("matchKeypress", async (t) => {
+  await t.test("empty", (t) => {
+    assert.strictEqual(matchKeypress({key: "x"}, []), null);
+  });
+  
+  await t.test("non-letters", (t) => {
+    const shortcuts = [
+      {id: 100, keys: ["PageUp", "PageDown"]},
+      {id: 200, keys: ["Backspace"]},
+    ]
+    assert.strictEqual(matchKeypress({key: "PageUp"}, shortcuts).id, 100);
+    assert.strictEqual(matchKeypress({key: "PageDown"}, shortcuts).id, 100);
+    assert.strictEqual(matchKeypress({key: "Backspace"}, shortcuts).id, 200);
+    assert.strictEqual(matchKeypress({key: "Enter"}, shortcuts), null);
+  });
+  
+  await t.test("letters", (t) => {
+    const shortcuts = [
+      {id: 100, keys: ["a", "B"]},
+      {id: 200, keys: ["c"]},
+    ]
+    assert.strictEqual(matchKeypress({key: "a"}, shortcuts).id, 100);
+    assert.strictEqual(matchKeypress({key: "A"}, shortcuts).id, 100);
+    assert.strictEqual(matchKeypress({key: "b"}, shortcuts).id, 100);
+    assert.strictEqual(matchKeypress({key: "B"}, shortcuts).id, 100);
+    assert.strictEqual(matchKeypress({key: "c"}, shortcuts).id, 200);
+    assert.strictEqual(matchKeypress({key: "C"}, shortcuts).id, 200);
+    assert.strictEqual(matchKeypress({key: "x"}, shortcuts), null);
+  });
 });

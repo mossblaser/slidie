@@ -820,6 +820,21 @@ function eventInvolvesHyperlink(evt) {
 }
 
 /**
+ * Given a keydown event, test whether handling this event may interfere with
+ * keyboard operation of a <button> or hyperlink.
+ */
+function keyboardEventInterferesWithHyperlink(evt) {
+  switch (evt.key) {
+    case "Enter":
+    case "Space":
+      return eventInvolvesHyperlink(evt);
+    
+    default:
+      return false;
+  }
+}
+
+/**
  * Sets the specified class on the specified element whenever the mouse hasn't
  * moved over it in the last timeout milliseconds.
  */
@@ -1047,6 +1062,8 @@ function showPresenterView(stepper, stopwatch, clickForwardingTarget) {
     wnd.document.getElementById("slide-number"),
     wnd.document.getElementById("slide-count"),
   );
+  
+  // Display clock/stopwatch
   setupStopwatchUI(
     stopwatch,
     wnd.document.getElementById("clock"),
@@ -1055,9 +1072,27 @@ function showPresenterView(stepper, stopwatch, clickForwardingTarget) {
     wnd.document.getElementById("timer-reset"),
   );
   
+  // Populate help screen
+  const helpDialog = document.getElementById("help").cloneNode(true);
+  helpDialog.close();  // Incase it is already open
+  wnd.document.body.appendChild(helpDialog);
+  
   // Forward mouse/keyboard events to main show
   wnd.addEventListener("click", evt => { clickForwardingTarget.dispatchEvent(cloneEvent(evt)); });
-  wnd.addEventListener("keydown", evt => { window.dispatchEvent(cloneEvent(evt)); });
+  wnd.addEventListener("keydown", evt => {
+    // ...except handle the shortcut to show help locally since we will want to
+    // show that in presenter view!
+    if (keyboardEventInterferesWithHyperlink(evt)) {
+      return;
+    }
+    if (evt.key == "F1" || evt.key == "?") {
+      toggleModalDialog(helpDialog);
+      evt.preventDefault();
+      evt.stopPropagation();
+    } else {
+      window.dispatchEvent(cloneEvent(evt));
+    }
+  });
   
   // Close the presenter view if we navigate away from this Slidie instance
   window.addEventListener("pagehide", () => wnd.close());
@@ -1146,6 +1181,86 @@ function resizeOnBorderDrag(elem) {
   });
 }
 
+/**
+ * Given a keyboard event and an array of objects with a 'keys' value, returns
+ * the first object whose 'keys' value contains the pressed key. Returns null
+ * if no key matches.
+ *
+ * Keys should be an array of key names (e.g. "PageDown" or "X"). When
+ * individual letters are specified, both lower- and upper-case versions will
+ * be matched.
+ */
+function matchKeypress(evt, shortcuts) {
+  // For now we don't support matching on modifiers so just check none are
+  // pressed. (NB: We ignore shift as a special case.)
+  if (evt.altKey || evt.ctrlKey || evt.metaKey) {
+    return null;
+  }
+  
+  for (const entry of shortcuts) {
+    for (const key of entry.keys) {
+      if (key.match(/^[a-zA-Z]$/) !== null) {
+        // Special case: Case-insensitive comparison of single letter keys
+        if (key.toLowerCase() == evt.key.toLowerCase()) {
+          return entry;
+        }
+      } else if (key == evt.key) {
+        return entry;
+      }
+    }
+  }
+  return null;
+}
+
+const keyboardKeysToSymbols = new Map([
+  ["ArrowLeft", "\u2190"],
+  ["ArrowUp", "\u2191"],
+  ["ArrowRight", "\u2192"],
+  ["ArrowDown", "\u2193"],
+  ["Backspace", "\u232B"],
+  ["Enter", "\u23CE"],
+]);
+
+
+/**
+ * Populate the help dialog with the available keyboard shortcuts.
+ */
+function populateKeyboardHelp(shortcuts) {
+  const container = document.getElementById("help-keyboard-shortcuts");
+  for (const {keys, description} of shortcuts) {
+    
+    const keysElem = document.createElementNS(ns("xhtml"), "dt");
+    for (const [i, key] of keys.entries()) {
+      if (i > 0) {
+        keysElem.append(" or ");
+      }
+      const kbd = document.createElementNS(ns("xhtml"), "kbd");
+      if (keyboardKeysToSymbols.has(key)) {
+        kbd.innerText = keyboardKeysToSymbols.get(key);
+      } else {
+        kbd.innerText = key;
+      }
+      keysElem.append(kbd);
+    }
+    
+    const descriptionElem = document.createElementNS(ns("xhtml"), "dd");
+    descriptionElem.innerText = description;
+    
+    container.append(keysElem, descriptionElem);
+  }
+}
+
+/** Toggles the open state of a <dialog> element */
+function toggleModalDialog(dialog) {
+  if (dialog.open) {
+    dialog.close();
+  } else {
+    dialog.showModal();
+    dialog.focus();
+  }
+}
+
+
 /******************************************************************************/
 
 function setup() {
@@ -1202,6 +1317,12 @@ function setup() {
   }
   document.getElementById("presenter-view").addEventListener("click", showOrFocusPresenterView);
   
+  // Help button
+  const helpDialog = document.getElementById("help");
+  document.getElementById("show-help").addEventListener("click", () => {
+    toggleModalDialog(helpDialog)
+  });
+  
   // Fullscreen button
   function toggleFullScreen() {
     if (document.fullscreenElement === null) {
@@ -1226,74 +1347,73 @@ function setup() {
     }
   });
   
-  // Keyboard navigation
+  // Handle keyboard navigation
+  const keyboardShortcuts = [
+    {
+      description: "Next step/slide",
+      keys: ["Backspace", "ArrowUp", "ArrowLeft", "K"],
+      action: () => stepper.previousStep(),
+    },
+    {
+      description: "Previous step/slide",
+      keys: ["Enter", "ArrowDown", "ArrowRight", "J"],
+      action: () => stepper.nextStep(),
+    },
+    {
+      description: "Jump to previous slide (skip build steps)",
+      keys: ["PageUp"],
+      action: () => stepper.previousSlide(),
+    },
+    {
+      description: "Jump to next slide (skip build steps)",
+      keys: ["PageDown"],
+      action: () => stepper.nextSlide(),
+    },
+    {
+      description: "Jump to start",
+      keys: ["Home"],
+      action: () => stepper.start(),
+    },
+    {
+      description: "Jump to end",
+      keys: ["End"],
+      action: () => stepper.end(),
+    },
+    {
+      description: "Black screen",
+      keys: ["Z", "B", "."],
+      action: () => stepper.toggleBlank(),
+    },
+    {
+      description: "Toggle full screen",
+      keys: ["F"],
+      action: () => toggleFullScreen(),
+    },
+    {
+      description: "Open presenter view",
+      keys: ["P"],
+      action: () => showOrFocusPresenterView(),
+    },
+    {
+      description: "Show help",
+      keys: ["F1", "?"],
+      action: () => toggleModalDialog(helpDialog),
+    },
+  ];
+  
+  populateKeyboardHelp(keyboardShortcuts);
+  
   window.addEventListener("keydown", evt => {
-    // No keyboard shortcuts have modifiers (we'll ignore shift for now!) --
-    // prevent handling of these cases to ensure (e.g.) browser history
-    // shortcuts work as usual.
-    if (evt.altKey || evt.ctrlKey || evt.metaKey) {
+    if (keyboardEventInterferesWithHyperlink(evt)) {
       return;
     }
     
-    switch (evt.key) {
-      // Left/Down/Space/Enter or Right/Up/Backspace: Move a step at a time
-      case "Backspace":
-      case "ArrowUp":
-      case "ArrowLeft":
-        stepper.previousStep();
-        break;
-      case " ":
-      case "Enter":
-      case "ArrowDown":
-      case "ArrowRight":
-        stepper.nextStep();
-        break;
-      
-      // Page up/down: Move a slide at a time
-      case "PageUp":
-        stepper.previousSlide();
-        break;
-      case "PageDown":
-        stepper.nextSlide();
-        break;
-      
-      // Home/End: Jump to first or last step
-      case "Home":
-        stepper.start();
-        break;
-      case "End":
-        stepper.end();
-        break;
-      
-      // 'Z', 'B' or '.': Toggle blanking the screen.
-      //case "Z":
-      case "z":
-      case "Z":
-      case "b":
-      case "B":
-      case ".":
-        stepper.toggleBlank();
-        break;
-      
-      // 'f': Toggle full-screen
-      case 'f':
-      case 'F':
-        toggleFullScreen();
-        break;
-      
-      // 'p': Show presenter view
-      case 'p':
-      case 'P':
-        showOrFocusPresenterView();
-        break;
-      
-      // Other keys: Do nothing.
-      default:
-        return;
+    const match = matchKeypress(evt, keyboardShortcuts);
+    if (match !== null) {
+      match.action();
+      evt.preventDefault();
+      evt.stopPropagation();
     }
-    
-    evt.preventDefault();
-    evt.stopPropagation();
   });
 }
 

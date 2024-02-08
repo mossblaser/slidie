@@ -5,17 +5,12 @@ body {
   height: 100dvh;
   
   font-family: sans-serif;
-  
   background-color: #000000;
   color: #FFFFFF;
   
   display: grid;
   grid-template-columns: min-content 1fr;
   grid-template-rows: min-content 1fr min-content;
-  
-  --ui-background: #333;
-  --ui-resize-handle-colour: #444;
-  --ui-resize-handle-width: 8px;
 }
 
 body > #toolbar {
@@ -128,6 +123,14 @@ body > #notes {
   
   margin-left: 1em;
   margin-right: 1em;
+}
+
+button#show-help {
+  padding-left: calc(1em + 16px);
+  background-size: 1em;
+  background-repeat: no-repeat;
+  background-position: 8px center;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 4.233 4.233" xmlns:v="https://vecta.io/nano"><path d="M2.452 3.09c0-.376.04-.438.381-.677.529-.376.683-.626.683-1.104C3.516.535 2.936 0 2.1 0 1.61 0 1.229.171.984.506c-.188.25-.262.523-.267.99h.774c0-.512.239-.825.632-.825.336 0 .592.279.592.654 0 .256-.068.364-.398.637-.455.387-.586.643-.569 1.127zm.091.313H1.69v.831h.853z" fill="white"/></svg>');
 }
 
 button#full-screen {
@@ -297,3 +300,5 @@ button#presenter-view {
 #notes > .note.current {
   opacity: 1;
 }
+
+

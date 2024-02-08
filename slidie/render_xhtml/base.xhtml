@@ -17,6 +17,7 @@
       
       <div id="title" />
       
+      <button id="show-help" aria-label="Help">Help</button>
       <button id="presenter-view">Presenter View</button>
       <button id="full-screen">Start</button>
     </nav>
@@ -26,6 +27,12 @@
     <div id="notes" />
     
     <div id="thumbnails" />
+    
+    <dialog id="help">
+      <h1>Slidie Keyboard Shortcuts</h1>
+      <form method="dialog"><button id="close-help" aria-label="Close" /></form>
+      <dl id="help-keyboard-shortcuts" />
+    </dialog>
     
     <template id="thumbnail-group">
       <div class="thumbnail-group">

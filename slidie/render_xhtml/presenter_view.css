@@ -172,3 +172,7 @@ button#timer-reset {
     gap: 0.5em;
   }
 }
+
+#help {
+  font-size: 1rem;
+}
