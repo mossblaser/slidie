@@ -138,5 +138,5 @@ dialog#help::backdrop {
   background-size: calc(2em - 12px);
   background-repeat: no-repeat;
   background-position: center center;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 4.233 4.233" fill="none" stroke="white" stroke-width=".794" xmlns:v="https://vecta.io/nano"><path d="M.281.281l3.672 3.672"/><path d="M3.953.281L.281 3.953"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 4.233 4.233" fill="none" stroke="white" stroke-width=".794"><path d="M.281.281l3.672 3.672"/><path d="M3.953.281L.281 3.953"/></svg>');
 }

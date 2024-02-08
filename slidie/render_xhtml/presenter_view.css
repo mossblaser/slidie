@@ -124,7 +124,7 @@ body > #status {
   background-size: 1em;
   background-repeat: no-repeat;
   background-position: 0 center;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 8.467 8.467" stroke="white" stroke-width=".661" xmlns:v="https://vecta.io/nano"><circle cx="4.233" cy="4.233" r="3.903" fill="none"/><g fill="white" stroke-linecap="round"><path d="M4.126 4.341V2.022"/><path d="M4.126 4.341l1.14 1.121"/></g></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 8.467 8.467" stroke="white" stroke-width=".661"><circle cx="4.233" cy="4.233" r="3.903" fill="none"/><g fill="white" stroke-linecap="round"><path d="M4.126 4.341V2.022"/><path d="M4.126 4.341l1.14 1.121"/></g></svg>');
 }
 
 .timer {
@@ -137,7 +137,7 @@ body > #status {
   background-size: 1em;
   background-repeat: no-repeat;
   background-position: 0 center;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 8.467 8.467" xmlns:v="https://vecta.io/nano"><g stroke="white" stroke-width=".661"><circle cx="4.233" cy="5.076" r="3.06" fill="none"/><path d="M4.149 5.16l1.255-1.509" fill="white" stroke-linecap="round"/><g fill="none"><path d="M3.274.331h1.918"/><path d="M4.233.331v1.918"/></g></g><path d="M3.516.352L4.951.309m-.718.022v1.141" transform="rotate(35.194 3.308 4.442)" fill="none" stroke="white" stroke-width=".661"/><path d="M3.516.352L4.951.309m-.718.022v1.068" transform="matrix(-.817205 .576347 .576347 .817205 5.301559 -1.094611)" fill="none" stroke="white" stroke-width=".661"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 8.467 8.467"><g stroke="white" stroke-width=".661"><circle cx="4.233" cy="5.076" r="3.06" fill="none"/><path d="M4.149 5.16l1.255-1.509" fill="white" stroke-linecap="round"/><g fill="none"><path d="M3.274.331h1.918"/><path d="M4.233.331v1.918"/></g></g><path d="M3.516.352L4.951.309m-.718.022v1.141" transform="rotate(35.194 3.308 4.442)" fill="none" stroke="white" stroke-width=".661"/><path d="M3.516.352L4.951.309m-.718.022v1.068" transform="matrix(-.817205 .576347 .576347 .817205 5.301559 -1.094611)" fill="none" stroke="white" stroke-width=".661"/></svg>');
 }
 
 .timer > #timer {
@@ -152,10 +152,10 @@ button#timer-pause {
   background-position: 8px center;
 }
 button#timer-pause.resume {
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 6.35 6.35" xmlns:v="https://vecta.io/nano"><path d="M.359 6.35l5.631-3.175L.359 0z" fill="white"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 6.35 6.35"><path d="M.359 6.35l5.631-3.175L.359 0z" fill="white"/></svg>');
 }
 button#timer-pause.pause {
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 6.35 6.35" fill="none" stroke="white" stroke-width="1.058" stroke-linecap="round" xmlns:v="https://vecta.io/nano"><path d="M2.029 1.455v3.44m2.292-3.44v3.44"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 6.35 6.35" fill="none" stroke="white" stroke-width="1.058" stroke-linecap="round"><path d="M2.029 1.455v3.44m2.292-3.44v3.44"/></svg>');
 }
 
 button#timer-reset {
@@ -163,7 +163,7 @@ button#timer-reset {
   background-size: 1em;
   background-repeat: no-repeat;
   background-position: 8px center;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 6.35 6.35" xmlns:v="https://vecta.io/nano"><path d="M1.356 5.139c1.085 1.086 2.844 1.087 3.928.002a2.78 2.78 0 0 0-.002-3.93C4.197.125 2.438.124 1.354 1.209c-.149.149-.277.31-.385.481l-.049.081c-.081.139-.052.18-.205.432" fill="none" stroke="white" stroke-width=".529" stroke-linecap="round"/><g fill="white" fill-rule="evenodd"><path d="M.161 3.12l.037-1.85 1.585.959z"/><path d="M.079 1.054L.034 3.331 2.03 2.233z"/></g></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 6.35 6.35"><path d="M1.356 5.139c1.085 1.086 2.844 1.087 3.928.002a2.78 2.78 0 0 0-.002-3.93C4.197.125 2.438.124 1.354 1.209c-.149.149-.277.31-.385.481l-.049.081c-.081.139-.052.18-.205.432" fill="none" stroke="white" stroke-width=".529" stroke-linecap="round"/><g fill="white" fill-rule="evenodd"><path d="M.161 3.12l.037-1.85 1.585.959z"/><path d="M.079 1.054L.034 3.331 2.03 2.233z"/></g></svg>');
 }
 
 @media (max-aspect-ratio: 1/1) {  /* Portrait */
