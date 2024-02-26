@@ -199,7 +199,9 @@ def render_xhtml(source_directory: Path, output: Path) -> None:
     """
     xhtml_root, slide_container = get_base_template()
 
-    slide_filenames = sorted(Path().glob("*.svg"), key=extract_numerical_prefix)
+    slide_filenames = sorted(
+        source_directory.glob("*.svg"), key=extract_numerical_prefix
+    )
 
     with Inkscape() as inkscape:
         for filename in slide_filenames:
