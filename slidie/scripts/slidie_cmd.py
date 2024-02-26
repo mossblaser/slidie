@@ -26,7 +26,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--output",
-        "-",
+        "-o",
         type=Path,
         default=Path("out.xhtml"),
         help="""
