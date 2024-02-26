@@ -7,6 +7,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 from slidie.render_xhtml import render_xhtml
+from slidie.render_pdf import render_pdf
 
 
 def main() -> None:
@@ -41,6 +42,8 @@ def main() -> None:
     match args.output.suffix:
         case ".xhtml":
             render_xhtml(args.source, args.output)
+        case ".pdf":
+            render_pdf(args.source, args.output)
         case suffix:
             raise NotImplementedError(suffix)
 
