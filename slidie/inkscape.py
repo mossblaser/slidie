@@ -3,13 +3,15 @@ A thin wrapper around Inkscape's `--shell` mode, along with a handful of
 slidie-specific helper routines.
 """
 
-from typing import TextIO, Self
+from typing import TextIO, Self, Iterator
 from types import TracebackType
 
 import os
 from subprocess import Popen, PIPE, STDOUT
 from pathlib import Path
 from xml.etree import ElementTree as ET
+from contextlib import contextmanager
+from tempfile import TemporaryDirectory
 
 
 class InkscapeError(Exception):
@@ -233,3 +235,22 @@ def set_visible_step(
             inkscape.selection_unhide()
         else:
             inkscape.selection_hide()
+
+
+@contextmanager
+def open_etree_in_inkscape(inkscape: Inkscape, svg: ET.Element) -> Iterator[None]:
+    """
+    Context manager which opens an SVG residing in an SVG element by internally
+    writing it to a temporary directory.
+    """
+    with TemporaryDirectory() as tmp_dir:
+        input_file = Path(tmp_dir) / "input.svg"
+        with input_file.open("wb") as f:
+            ET.ElementTree(svg).write(f)
+
+        inkscape.file_open(input_file)
+
+        try:
+            yield
+        finally:
+            inkscape.file_close()

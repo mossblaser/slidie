@@ -10,7 +10,7 @@ from xml.etree import ElementTree as ET
 from itertools import chain
 
 from slidie.xml_namespaces import SVG_NAMESPACE
-from slidie.inkscape import Inkscape
+from slidie.inkscape import Inkscape, open_etree_in_inkscape
 
 
 def text_to_selectable_paths(svg: ET.Element, inkscape: Inkscape) -> None:
@@ -37,14 +37,8 @@ def text_to_selectable_paths(svg: ET.Element, inkscape: Inkscape) -> None:
         output_file = tmp_path / "output.svg"
 
         # Use Inkscape to convert text to paths
-        with input_file.open("wb") as f:
-            ET.ElementTree(svg).write(f)
-
-        inkscape.file_open(input_file)
-        try:
+        with open_etree_in_inkscape(inkscape, svg):
             inkscape.export(output_file, text_to_path=True)
-        finally:
-            inkscape.file_close()
 
         processed_svg = ET.parse(output_file).getroot()
 

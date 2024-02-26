@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 from xml.etree import ElementTree as ET
 from base64 import b64encode
 
-from slidie.inkscape import Inkscape, set_visible_step
+from slidie.inkscape import Inkscape, set_visible_step, open_etree_in_inkscape
 from slidie.xml_namespaces import SLIDIE_NAMESPACE
 from slidie.svg_utils import find_build_elements, get_build_step_range, get_view_box
 
@@ -57,16 +57,10 @@ def embed_thumbnails(
     with TemporaryDirectory() as tmp_dir:
         tmp_path = Path(tmp_dir)
 
-        # Write SVG to temporary file and open in Inkscape
-        input_file = tmp_path / "input.svg"
-        with input_file.open("wb") as f:
-            ET.ElementTree(svg).write(f)
-        inkscape.file_open(input_file)
-
         # Use Inkscape to render each build step
         build_elements = find_build_elements(svg)
         output_filenames = {}
-        try:
+        with open_etree_in_inkscape(inkscape, svg):
             for step in get_build_step_range(svg):
                 set_visible_step(inkscape, build_elements, step)
 
@@ -78,8 +72,6 @@ def embed_thumbnails(
                     width=width,
                     height=height,
                 )
-        finally:
-            inkscape.file_close()
 
         # Embed generated thumbnails in the SVG
         thumbnails = ET.SubElement(svg, f"{{{SLIDIE_NAMESPACE}}}thumbnails")
