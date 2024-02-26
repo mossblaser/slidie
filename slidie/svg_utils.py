@@ -121,6 +121,20 @@ def get_build_step_range(svg: ET.Element) -> range:
     return range(min(steps_and_zero), max(steps_and_zero) + 1)
 
 
+def get_build_tags(svg: ET.Element) -> dict[str, set[int]]:
+    """
+    Returns the step numbers associated with each build spec tag.
+    """
+    out: dict[str, set[int]] = {}
+
+    for elem, steps in find_build_elements(svg).items():
+        for tag in json.loads(elem.get(f"{{{SLIDIE_NAMESPACE}}}tags", "[]")):
+            for step in steps:
+                out.setdefault(tag, set()).add(step)
+
+    return out
+
+
 def get_visible_build_steps(parents: Iterable[ET.Element]) -> tuple[int, ...] | None:
     """
     Given the element heirarchy leading from the root to a particular element,

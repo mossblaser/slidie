@@ -14,6 +14,7 @@ from slidie.svg_utils import (
     annotate_build_steps,
     find_build_elements,
     get_build_step_range,
+    get_build_tags,
     get_visible_build_steps,
     get_inkscape_page_colour,
     ViewBox,
@@ -120,6 +121,26 @@ def test_get_build_step_range(filename: str, exp: range) -> None:
     svg = get_svg(filename)
     annotate_build_steps(svg)
     assert get_build_step_range(svg) == exp
+
+
+@pytest.mark.parametrize(
+    "filename, exp",
+    [
+        ("empty.svg", {}),
+        ("no_layers.svg", {}),
+        (
+            "simple_build.svg",
+            {
+                "first": {1, 2, 3},
+                "foo": {1, 2, 3},
+            },
+        ),
+    ],
+)
+def test_get_build_tags(filename: str, exp: range) -> None:
+    svg = get_svg(filename)
+    annotate_build_steps(svg)
+    assert get_build_tags(svg) == exp
 
 
 def test_get_visible_build_steps() -> None:
