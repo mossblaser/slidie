@@ -22,7 +22,7 @@ from xml.etree import ElementTree as ET
 import json
 
 from slidie.svg_utils import find_text_with_prefix, get_visible_build_steps
-from slidie.magic import MagicText, MagicError, get_magic_rectangle
+from slidie.magic import MagicText, MagicError, get_magic_rectangle, MagicRectangle
 
 
 class VideoMagic(NamedTuple):
@@ -30,12 +30,8 @@ class VideoMagic(NamedTuple):
     A 'magic' video definition found in a slide.
     """
 
-    # The SVG element which contains the video (usually a <g>)
-    container: ET.Element
-
-    # The placeholder SVG element (a <rect> or an <image>) which should be
-    # replaced with the video
-    placeholder: ET.Element
+    # The rectangle (and its container) which will be replaced with a video
+    magic_rectangle: MagicRectangle
 
     # The step numbers during which the video is visible (or None if always
     # visible)
@@ -67,7 +63,7 @@ def find_video_magic(magic: dict[str, list[MagicText]]) -> list[VideoMagic]:
     out = []
 
     for magic_text in magic.pop("video", []):
-        container, placeholder = get_magic_rectangle(magic_text)
+        magic_rectangle = get_magic_rectangle(magic_text)
 
         # Handle short-form
         if not isinstance(magic_text.parameters, dict):
@@ -77,8 +73,7 @@ def find_video_magic(magic: dict[str, list[MagicText]]) -> list[VideoMagic]:
 
         out.append(
             VideoMagic(
-                container=container,
-                placeholder=placeholder,
+                magic_rectangle=magic_rectangle,
                 steps=get_visible_build_steps(magic_text.parents),
                 url=parameters["url"],
                 start=parameters.get("start", 0.0),

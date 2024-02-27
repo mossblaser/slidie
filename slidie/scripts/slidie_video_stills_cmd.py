@@ -100,7 +100,7 @@ def main(test_args: list[str] | None = None):
                 continue
 
             # Replace placeholder with image
-            placeholder_id = video.placeholder.attrib["id"]
+            placeholder_id = video.magic_rectangle.rectangle.attrib["id"]
             placeholder_to_image(svg, placeholder_id, data_url)
 
         with open(filename, "wb") if filename != "-" else sys.stdout.buffer as f:

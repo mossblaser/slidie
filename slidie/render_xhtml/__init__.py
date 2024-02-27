@@ -12,10 +12,8 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 from uuid import uuid4
-import mimetypes
-import json
 
-from slidie.xml_namespaces import XHTML_NAMESPACE, SVG_NAMESPACE, SLIDIE_NAMESPACE
+from slidie.xml_namespaces import XHTML_NAMESPACE, SLIDIE_NAMESPACE
 from slidie.inkscape import Inkscape
 from slidie.text_to_selectable_paths import text_to_selectable_paths
 from slidie.embed_thumbnails import embed_thumbnails
@@ -27,9 +25,9 @@ from slidie.svg_utils import (
 from slidie.file_numbering import extract_numerical_prefix
 from slidie.speaker_notes import embed_speaker_notes
 from slidie.magic import MagicText, extract_magic
-from slidie.video import find_video_magic
 from slidie.links import annotate_slide_id_from_magic
 from slidie.metadata import annotate_metadata_from_magic
+from slidie.render_xhtml.browser_magic import embed_videos
 
 
 BASE_TEMPLATE_FILENAME = Path(__file__).parent / "base.xhtml"
@@ -96,41 +94,6 @@ def get_base_template() -> tuple[ET.Element, ET.Element]:
     (slides_elem,) = root.findall(f".//{{{XHTML_NAMESPACE}}}*[@id='slides']")
 
     return (root, slides_elem)
-
-
-def embed_videos(magic: dict[str, list[MagicText]]) -> None:
-    """
-    Given any magic video specifications, inserts <video> elements within a
-    <foreignObject> where the placeholder <rect> or <image> was.
-    """
-    for video in find_video_magic(magic):
-        video.container.remove(video.placeholder)
-
-        # Swap the placeholder for a <foreignObject> of equivalent size and
-        # identity
-        foreign_object = ET.SubElement(
-            video.container, f"{{{SVG_NAMESPACE}}}foreignObject"
-        )
-        for attrib in ["id", "x", "y", "width", "height", "transform"]:
-            if attrib in video.placeholder.attrib:
-                foreign_object.attrib[attrib] = video.placeholder.attrib[attrib]
-
-        # Setup <video> element
-        video_elem = ET.SubElement(foreign_object, f"{{{XHTML_NAMESPACE}}}video")
-        if video.loop:
-            video_elem.attrib["loop"] = "true"
-        if video.mute:
-            video_elem.attrib["muted"] = "true"
-        video_elem.attrib["preload"] = "auto"
-        video_elem.attrib["style"] = "display: block; width: 100%; height: 100%"
-        video_elem.attrib[f"{{{SLIDIE_NAMESPACE}}}steps"] = json.dumps(video.steps)
-        video_elem.attrib[f"{{{SLIDIE_NAMESPACE}}}start"] = str(video.start)
-        video_elem.attrib[f"{{{SLIDIE_NAMESPACE}}}magic"] = "ta-da!"
-
-        source_elem = ET.SubElement(video_elem, f"{{{XHTML_NAMESPACE}}}source")
-        source_elem.attrib["src"] = video.url
-        if mimetype := mimetypes.guess_type(video.url)[0]:
-            source_elem.attrib["type"] = mimetype
 
 
 def render_slide(
