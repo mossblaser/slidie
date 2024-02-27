@@ -15,6 +15,7 @@ from xml.etree import ElementTree as ET
 from collections import defaultdict
 import tomllib
 
+from slidie.xml_namespaces import SVG_NAMESPACE
 from slidie.svg_utils import find_text_with_prefix
 
 
@@ -82,3 +83,47 @@ def extract_magic(svg: ET.Element) -> dict[str, list[MagicText]]:
         out[name].append(MagicText(parameters, parents, text))
 
     return out
+
+
+class SingleRectOrImageExpectedError(MagicError):
+    """
+    Thrown if a magic text which applies some effect to a rectangular region
+    was placed into a container with more than just a <rect> or <image> element
+    in it.
+    """
+
+
+class MagicRectangle(NamedTuple):
+    """Output of :py:func:`check_magic_rectangle`."""
+
+    container: ET.Element
+    """
+    The container element with a single child: :py:attr:`rectangle`.
+    """
+
+    rectangle: ET.Element
+    """
+    The <image> or <rect> element defining the rectangle.
+    """
+
+
+def get_magic_rectangle(magic_text: MagicText) -> MagicRectangle:
+    """
+    Given a :py:class:`MagicText`, verify that the magic text appeared in a <g>
+    containing only that text and either an <image> or <rect> object.
+
+    Throws a :py:exc:`SingleRectOrImageExpectedError` exception if the
+    """
+    container = magic_text.parents[-1]
+
+    # Check we have a single <image> or <rect>
+    if len(container) != 1:
+        raise SingleRectOrImageExpectedError(magic_text.parents, magic_text.text)
+    rectangle = container[0]
+    if rectangle.tag not in (
+        f"{{{SVG_NAMESPACE}}}rect",
+        f"{{{SVG_NAMESPACE}}}image",
+    ):
+        raise SingleRectOrImageExpectedError(magic_text.parents, magic_text.text)
+
+    return MagicRectangle(container, rectangle)

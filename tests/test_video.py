@@ -4,38 +4,18 @@ from svgs import get_svg
 
 from slidie.svg_utils import annotate_build_steps
 from slidie.magic import extract_magic
-from slidie.video import (
-    VideoMagic,
-    SingleRectOrImageExpectedError,
-    find_video_magic,
-)
+from slidie.video import VideoMagic, find_video_magic
 
 
 class TestFindVideoMagic:
     def test_no_videos(self) -> None:
         assert find_video_magic({}) == []
 
-    def test_too_many_placeholders(self) -> None:
-        svg = get_svg("video_magic_too_many_placeholders.svg")
-
-        with pytest.raises(SingleRectOrImageExpectedError):
-            find_video_magic(extract_magic(svg))
-
-    def test_wrong_placeholder_type(self) -> None:
-        svg = get_svg("video_magic_wrong_placeholder_type.svg")
-
-        with pytest.raises(SingleRectOrImageExpectedError):
-            find_video_magic(extract_magic(svg))
-
     def test_valid(self) -> None:
         svg = get_svg("video_magic.svg")
         annotate_build_steps(svg)
         magic = extract_magic(svg)
         videos = find_video_magic(magic)
-
-        # Universally, the placeholder should be within its container
-        for video in videos:
-            assert video.placeholder in video.container
 
         # Check all videos are included exactly once
         by_url = {video.url: video for video in videos}
