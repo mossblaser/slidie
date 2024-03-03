@@ -8,20 +8,27 @@ import json
 import mimetypes
 
 from slidie.xml_namespaces import XHTML_NAMESPACE, SVG_NAMESPACE, SLIDIE_NAMESPACE
-from slidie.magic import MagicText, MagicRectangle
+from slidie.magic import MagicText, MagicRectangle, get_magic_rectangle
 from slidie.video import find_video_magic
 
 
-def substitute_foreign_object(magic_rectangle: MagicRectangle) -> ET.Element:
+def substitute_foreign_object(
+    magic_rectangle: MagicRectangle,
+    scale: float = 1.0,
+) -> ET.Element:
     """
     Substitute an <image> or <rect> for a <foreignObject> of equivalent size
     and identity.
+
+    The scale argument indicates the scale at which the foreign object should
+    be scaled relative to its native size.
     """
     magic_rectangle.container.remove(magic_rectangle.rectangle)
 
     foreign_object = ET.SubElement(
         magic_rectangle.container, f"{{{SVG_NAMESPACE}}}foreignObject"
     )
+    foreign_object.attrib[f"{{{SLIDIE_NAMESPACE}}}scale"] = json.dumps(scale)
 
     for attrib in ["id", "x", "y", "width", "height", "transform"]:
         if attrib in magic_rectangle.rectangle.attrib:
@@ -54,3 +61,49 @@ def embed_videos(magic: dict[str, list[MagicText]]) -> None:
         source_elem.attrib["src"] = video.url
         if mimetype := mimetypes.guess_type(video.url)[0]:
             source_elem.attrib["type"] = mimetype
+
+
+def embed_iframes(magic: dict[str, list[MagicText]]) -> None:
+    """
+    Embed an <iframe> when an 'iframe' magic is used.
+
+    The 'iframe' magic may either be a string (a URL to show) or a table
+    containing the following entries:
+
+    * url: The URL to display. Defaults to ``about:blank``.
+    * scale: The scale factor to use for the displayed contents. Defaults to 1.
+    * name: The name attribute for the resultant <iframe>. This makes the
+      iframe 'targetable' by links on the slide.
+    * id: The ID to give to the <iframe> element.
+
+    A message will be posted (via window.postMessage) to the iframe with an
+    object of the following form whenever the slide it resides is visible and
+    the step changes, and on leaving the slide::
+
+        {
+            visible: <bool>,
+            step: <int or null>,
+            stepNumber: <int or null>,
+            tags: <list[str] or null>,
+        }
+    """
+    for magic_text in magic.pop("iframe", []):
+        parameters = magic_text.parameters
+        if isinstance(parameters, str):
+            parameters = {"url": parameters}
+
+        url = magic_text.parameters.get("url", "about:blank")
+        scale = magic_text.parameters.get("scale")
+        name = magic_text.parameters.get("name")
+        id = magic_text.parameters.get("id")
+
+        magic_rectangle = get_magic_rectangle(magic_text)
+        foreign_object = substitute_foreign_object(magic_rectangle, scale)
+
+        iframe_elem = ET.SubElement(foreign_object, f"{{{XHTML_NAMESPACE}}}iframe")
+        iframe_elem.attrib["style"] = "border: none; width: 100%; height: 100%;"
+        iframe_elem.attrib["src"] = url
+        if name is not None:
+            iframe_elem.attrib["name"] = name
+        if id is not None:
+            iframe_elem.attrib["id"] = id

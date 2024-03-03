@@ -27,7 +27,7 @@ from slidie.speaker_notes import embed_speaker_notes
 from slidie.magic import MagicText, extract_magic
 from slidie.links import annotate_slide_id_from_magic
 from slidie.metadata import annotate_metadata_from_magic
-from slidie.render_xhtml.browser_magic import embed_videos
+from slidie.render_xhtml.browser_magic import embed_videos, embed_iframes
 
 
 BASE_TEMPLATE_FILENAME = Path(__file__).parent / "base.xhtml"
@@ -152,6 +152,7 @@ def render_slide(
     clip_to_inkscape_pages(svg)
 
     embed_videos(magic)
+    embed_iframes(magic)
 
     return svg
 

@@ -170,6 +170,7 @@ function wrapInShadowDom(elem, className="shadow-dom-wrapper", tag="div", mode="
  * * step -- the step index (always counting from 0)
  * * stepNumber -- the step number (as used in the build spec, may start from
  *   a number other than zero.)
+ * * tags -- an array of any tags assigned to currently visible build steps.
  *
  * The 'composed' argument can be set to false to prevent the event bubbling
  * out of the slide in which it was sent to to the top level DOM.
@@ -181,6 +182,14 @@ class StepperEvent extends Event {
     this.slide = stepper.curSlide;
     this.step = stepper.curSlideStep;
     this.stepNumber = stepper.curSlideStepNumber;
+    
+    this.tags = [];
+    const buildStepTags = stepper.slideBuildStepTags[this.slide];
+    for (const [tag, steps] of buildStepTags.entries()) {
+      if (steps.indexOf(this.step) >= 0) {
+        this.tags.push(tag);
+      }
+    }
   }
 }
 
@@ -768,6 +777,264 @@ function loadNotes(stepper, container) {
 }
 
 /**
+ * Return the DOMMatrix which represents the Current Transform Matrix (from the
+ * object's coordinate system to the top level user units (i.e. within the
+ * viewBox, not on the screen)).
+ *
+ * By contrast with the built-in getCTM() method, this function uses only the
+ * transforms statically declared in the SVG meaning it can be used on
+ * non-displayed SVGs.  This does mean that the matrix returned does not
+ * account for other (e.g. CSS-applied) transforms.
+ */
+function getSvgStaticCTM(elem) {
+    // Get the parents in root-to-leaf order
+    const parents = [elem];
+    while (parents[0].parentElement) {
+      parents.splice(0, 0, parents[0].parentElement);
+    }
+    // Drop the top level 'svg' element since its transform matrix applies to
+    // the final SVG canvas, not to elements within it.
+    parents.splice(0, 1);
+    
+    // Assemble the DOMMatrix
+    const ctm = new DOMMatrix();
+    for (const elem of parents) {
+      for (const transform of elem.transform.baseVal) {
+        ctm.multiplySelf(transform.matrix);
+      }
+    }
+    return ctm;
+}
+
+/**
+ * Return the size of user units in an SVG in pixels in the X and Y axes
+ * (respectively) in a 2-element array.
+ */
+function getSvgUserUnitSize(svg) {
+  if (svg.viewBox.baseVal === null) {
+    // Special case: viewBox not defined, the SVG is rendered with one user
+    // unit per pixel
+    return [1, 1];
+  }
+  
+  const svgWidth = svg.width.baseVal.value;
+  const svgHeight = svg.height.baseVal.value;
+  
+  const svgVBWidth = svg.viewBox.baseVal.width;
+  const svgVBHeight = svg.viewBox.baseVal.height;
+  
+  const hScale = svgWidth / svgVBWidth;
+  const vScale = svgHeight / svgVBHeight;
+  
+  const par = svg.preserveAspectRatio.baseVal
+  if (par.align === SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_NONE) {
+    // Case: Uniform scaling not used so whatever distorted aspect ratio we
+    // happen to have is what we'll get
+    return [hScale, vScale];
+  } else {
+    // Case: Uniform scaling used.
+    const viewBoxWiderThanSVG = (svgVBWidth / svgVBHeight) > (svgWidth / svgHeight);
+    const meet = par.meet === SVGPreserveAspectRatio.SVG_MEETORSLICE_MEET;
+    if (meet == viewBoxWiderThanSVG) {
+      return [hScale, hScale];
+    } else {
+      return [vScale, vScale];
+    }
+  }
+}
+
+/**
+ * Return the width and height, in SVG pixels, of the provided element after
+ * all relevant transform matrices have been applied.
+ */
+function getSvgElementSizePx(elem) {
+  const ctm = getSvgStaticCTM(elem);
+  
+  const [sx, sy] = getSvgUserUnitSize(elem.ownerSVGElement);
+  ctm.scaleSelf(sx, sy);
+  
+  const topLeft = ctm.transformPoint(new DOMPoint(
+    elem.x.baseVal.value,
+    elem.y.baseVal.value,
+  ));
+  const topRight = ctm.transformPoint(new DOMPoint(
+    elem.x.baseVal.value + elem.width.baseVal.value,
+    elem.y.baseVal.value,
+  ));
+  const bottomLeft = ctm.transformPoint(new DOMPoint(
+    elem.x.baseVal.value,
+    elem.y.baseVal.value + elem.height.baseVal.value,
+  ));
+  
+  const dxW = topRight.x - topLeft.x;
+  const dyW = topRight.y - topLeft.y;
+  const width = Math.sqrt(dxW*dxW + dyW*dyW);
+  
+  const dxH = bottomLeft.x - topLeft.x;
+  const dyH = bottomLeft.y - topLeft.y;
+  const height = Math.sqrt(dxH*dxH + dyH*dyH);
+  
+  return [width, height];
+}
+
+/**
+ * Scale all <foreignObject> elements' contents according to the "native" size
+ * of the SVG. That is, if the SVG is viewed at native size, the
+ * <foreignObject> contents will be shown at native size too (regardless of any
+ * scaling applied to the <foreignObject> element).
+ *
+ * An optional scaling factor indicated by the slidie:scale attribute on the
+ * <foreignObject> may be used to enlarge (or shrink) the contents by a
+ * specified amount.
+ */
+function setupForeignObjectScaling(svg) {
+  for (const foreignObject of svg.getElementsByTagNameNS(ns("svg"), "foreignObject")) {
+    // The size of pixels within a <foreignObject> is determined by its width and
+    // height attributes. This means that if we have an <iframe> in a
+    // <foreignObject> with a width of 300 and height of 200, the iframe will
+    // be rendered as if on a 300x200 pixel display.
+    //
+    // Unfortunately, the width/height of a <foreignObject> is ordinarily given
+    // with reference to the local coordinate system potentially under the
+    // effect of some artbirary transformation matrix. This usually results in
+    // entirely unpredictable rendering sizes.
+    //
+    // To work around this we can set the width/height attributes to the
+    // desired size in pixels and then add a scale transform to resize the
+    // elemnt back to its original size.
+    
+    // First we'll grab the actual size in pixels of the element after all
+    // transforms are applied.
+    const [widthPx, heightPx] = getSvgElementSizePx(foreignObject);
+    
+    // Next we'll adjust this to achieve the scaling factor requested by the
+    // slidie:scale attribute
+    const scale = parseFloat(foreignObject.getAttributeNS(ns("slidie"), "scale") || "1");
+    const width = widthPx / scale;
+    const height = heightPx / scale;
+    
+    // Next we'll set the size attributes of the <foreignObject> to its size in
+    // pixels so that its contents are rendered at "native" size
+    const widthOrig = foreignObject.getAttribute("width");
+    const heightOrig = foreignObject.getAttribute("height");
+    foreignObject.setAttribute("width", width);
+    foreignObject.setAttribute("height", height);
+    
+    // Compute the corrective scale factor to restore the intended size of the
+    // <foreignObject>
+    const sx = widthOrig / width;
+    const sy = heightOrig / height;
+    
+    // We'll also need to move any x and y attributes into a translate
+    // transform which happens prior to scaling to avoid needing to scale these
+    // too.
+    const x = parseFloat(foreignObject.getAttribute("x") || "0");
+    const y = parseFloat(foreignObject.getAttribute("y") || "0");
+    foreignObject.removeAttribute("x");
+    foreignObject.removeAttribute("y");
+    
+    // Finally apply the corrective transform
+    const existingTransform = foreignObject.getAttribute("transform") || "";
+    foreignObject.setAttribute(
+      "transform",
+      `${existingTransform} translate(${x}, ${y}) scale(${sx}, ${sy})`
+    )
+  }
+}
+
+/**
+ * Enable links to target named <iframes> within a <foreignObject> in the same
+ * slide.
+ *
+ * Ordinarily, this is not supported so we must emulate this behaviour within
+ * Javascript.
+ */
+function setupIFrameLinkTargetSupport(svg) {
+  // Find all iframes on the slide
+  const iframes = new Map();
+  for (const iframe of svg.getElementsByTagNameNS(ns("xhtml"), "iframe")) {
+    const name = iframe.getAttribute("name");
+    if (name) {
+      iframes.set(name, iframe);
+    }
+  }
+  
+  // Add special handlers for links
+  for (const link of svg.getElementsByTagNameNS(ns("svg"), "a")) {
+    link.addEventListener("click", evt => {
+      const href = link.getAttributeNS(ns("xlink"), "href") || link.getAttribute("href");
+      const iframe = iframes.get(link.getAttribute("target"));
+      if (iframe) {
+        iframe.contentWindow.location = href;
+        evt.preventDefault();
+      }
+    });
+  }
+}
+
+/**
+ * Given an SVG element, returns a {stepNumbers, tags} for the build steps of
+ * the nearest parent element with build steps specified. If no parent has any
+ * build steps specified, returns null.
+ */
+function findElementBuildSteps(elem) {
+  while (elem) {
+    if (elem.namespaceURI == ns("svg") && elem.hasAttributeNS(ns("slidie"), "steps")) {
+      const stepNumbers = JSON.parse(elem.getAttributeNS(ns("slidie"), "steps"));
+      const tags = JSON.parse(elem.getAttributeNS(ns("slidie"), "tags") || "[]");
+      return {stepNumbers, tags};
+    }
+    elem = elem.parentElement;
+  }
+  return null;
+}
+
+/**
+ * Forward slide/step changing events to iframes via their postMessage
+ * mechanism.
+ *
+ * Whilst the slide the iframe resides on is visible, or upon leaving it,
+ * messages of the following form are sent:
+ *
+ *      {
+ *        visible: <bool>,
+ *        step: <int or null>,
+ *        stepNumber: <int or null>,
+ *        tags: <list[str] or null>,
+ *      }
+ *
+ * The 'visible' attribute indicates the visibility of the iframe. The step and
+ * stepNumber indicate the current step (regardless of whether the iframe is
+ * visible or not).
+ */
+function setupIFrameSlideEvents(svg) {
+  for (const iframe of svg.getElementsByTagNameNS(ns("xhtml"), "iframe")) {
+    svg.addEventListener("stepchange", evt => {
+      const iframeBuildSteps = findElementBuildSteps(iframe);
+      const visible = (
+        iframeBuildSteps
+          ? iframeBuildSteps.stepNumbers.indexOf(evt.stepNumber) >= 0
+          : true
+      );
+      iframe.contentWindow.postMessage({
+        visible,
+        step: evt.step,
+        stepNumber: evt.stepNumber,
+        tags: evt.tags,
+      });
+    });
+    svg.addEventListener("slideexit", evt => {
+      iframe.contentWindow.postMessage({
+        visible: false,
+        step: null,
+        stepNumber: null,
+        tags: null,
+      });
+    });
+  }
+}
+
+/**
  * Setup automatic video play/pause on slide entry/exit for videos inserted
  * using magic text.
  */
@@ -1286,6 +1553,9 @@ function setup() {
   resizeOnBorderDrag(document.getElementById("thumbnails"));
   resizeOnBorderDrag(document.getElementById("notes"));
   
+  slides.map(setupForeignObjectScaling);
+  slides.map(setupIFrameLinkTargetSupport);
+  slides.map(setupIFrameSlideEvents);
   slides.map(setupMagicVideoPlayback);
   
   if (slides[0].hasAttributeNS(ns("slidie"), "title")) {
