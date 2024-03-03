@@ -64,8 +64,8 @@ test("parseUrlHash", async (t) => {
         [0, 1],
       ];
       const slideBuildStepTags = [
-        new Map([["first-step", 0], ["last-step", 2]]),
-        new Map([["first-step", 0]]),
+        new Map([["first-step", [0]], ["last-step", [2]]]),
+        new Map([["first-step", [0]]]),
         new Map(),
       ];
       assert.deepEqual(

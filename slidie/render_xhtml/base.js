@@ -64,11 +64,14 @@ function layerStepTags(layerSteps) {
   const map = new Map();
   
   for (const {steps, tags}  of layerSteps) {
-    const stepNumber = Math.min(0, ...steps);
-    const step = stepNumbers.indexOf(stepNumber);
-    
     for (const tag of tags) {
-      map.set(tag, step);
+      if (!map.has(tag)) {
+        map.set(tag, []);
+      }
+      for (const stepNumber of steps){
+        map.get(tag).push(stepNumbers.indexOf(stepNumber));
+      }
+      map.get(tag).sort();
     }
   }
   
@@ -210,8 +213,8 @@ function toUrlHash(slide, step=0) {
  * @param slideIds A Map() from slide ID to slide index.
  * @param slideBuildStepNumbers An array of arrays giving the step numbers of
  *        each step.
- * @param slideBuildStepTags An array of Map() from tag to step index, one per
- *        slide.
+ * @param slideBuildStepTags An array of Map() from tag to an array of step
+ *        indices, one per slide.
  */
 function parseUrlHash(
   hash,
@@ -274,7 +277,7 @@ function parseUrlHash(
     if (slide < slideBuildStepTags.length) {
       const tag = match.groups.step_tag;
       if (slideBuildStepTags[slide].has(tag)) {
-        step = slideBuildStepTags[slide].get(tag);
+        step = slideBuildStepTags[slide].get(tag)[0];
       }
     }
   }
