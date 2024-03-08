@@ -1,0 +1,16 @@
+{
+  "main": "ts/index.ts",
+  "scripts": {
+    "build": "ts-node build.ts build",
+    "watch": "ts-node build.ts watch",
+    "check-up-to-date": "ts-node build.ts check-up-to-date",
+    "test": "node --require ts-node/register --test ./tests/*.test.ts",
+    "format": "prettier . --write"
+  },
+  "devDependencies": {
+    "esbuild": "0.20.1",
+    "prettier": "3.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
+  }
+}
