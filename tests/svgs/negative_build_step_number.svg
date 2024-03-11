@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   sodipodi:docname="negative_build_step_number.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.42459325"
+     inkscape:cx="395.6728"
+     inkscape:cy="561.71406"
+     inkscape:window-width="1341"
+     inkscape:window-height="1041"
+     inkscape:window-x="575"
+     inkscape:window-y="18"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     showgrid="false" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer5"
+     inkscape:label="Third &lt;+-&gt; @bar" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Second &lt;.&gt; @foo @bar">
+    <text
+       xml:space="preserve"
+       style="font-size:15.5142px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.969639"
+       x="41.264381"
+       y="108.39137"
+       id="on-second"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         style="stroke-width:0.969639"
+         x="41.264381"
+         y="108.39137">#on-second</tspan></text>
+    <g
+       id="g2">
+      <text
+         xml:space="preserve"
+         style="font-size:15.5142px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.969639"
+         x="41.264381"
+         y="132.1647"
+         id="in-group-on-second"><tspan
+           sodipodi:role="line"
+           id="tspan2"
+           style="stroke-width:0.969639"
+           x="41.264381"
+           y="132.1647">#in-group-on-second</tspan></text>
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="Always (explicit) &lt;@foo.before-&gt;" />
+  <g
+     inkscape:label="Always (implicit)"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-size:15.5142px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.969639"
+       x="41.264381"
+       y="87.224716"
+       id="not-on-build-step"><tspan
+         sodipodi:role="line"
+         id="tspan3"
+         style="stroke-width:0.969639"
+         x="41.264381"
+         y="87.224716">#not-on-build-step</tspan></text>
+  </g>
+</svg>
