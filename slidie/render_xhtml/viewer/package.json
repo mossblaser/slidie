@@ -8,7 +8,9 @@
     "format": "prettier . --write"
   },
   "devDependencies": {
+    "@types/jsdom": "^21.1.6",
     "esbuild": "0.20.1",
+    "jsdom": "^24.0.0",
     "prettier": "3.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.2"
