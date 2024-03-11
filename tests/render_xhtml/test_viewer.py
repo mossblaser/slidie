@@ -8,6 +8,8 @@ import pytest
 
 from typing import Callable
 
+import os
+import sys
 from pathlib import Path
 from subprocess import run
 
@@ -40,6 +42,13 @@ def npm_run() -> NpmRunFn:
         result = run(
             ["npm", "run", command],
             cwd=VIEWER_DIR,
+            env=dict(
+                os.environ,
+                # Make sure the same Python interpreter gets used
+                PATH=f"{Path(sys.executable).parent}:{os.environ.get('PATH', '')}",
+                # Make sure the same Python library search path is used
+                PYTHONPATH=":".join(sys.path),
+            ),
         )
 
         assert result.returncode == 0, fail_message
