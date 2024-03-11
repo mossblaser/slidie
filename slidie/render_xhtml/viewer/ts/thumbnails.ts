@@ -1,4 +1,4 @@
-import ns from "./xml_namespaces.ts";
+import ns from "./xmlNamespaces.ts";
 
 /**
  * Given an SVG with embedded slidie thumbnails, return an array of

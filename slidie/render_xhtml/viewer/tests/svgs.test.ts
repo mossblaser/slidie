@@ -3,7 +3,7 @@ import { strict as assert } from "node:assert";
 
 import { access } from "node:fs/promises";
 
-import ns from "../ts/xml_namespaces.ts";
+import ns from "../ts/xmlNamespaces.ts";
 import { getSvgFilename, getSvg, getProcessedSvg } from "./svgs.ts";
 
 test("svgs", async (t) => {

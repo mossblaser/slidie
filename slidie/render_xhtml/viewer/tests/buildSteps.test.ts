@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import { strict as assert } from "node:assert";
 
-import ns from "../ts/xml_namespaces.ts";
+import ns from "../ts/xmlNamespaces.ts";
 import { getProcessedSvg } from "./svgs.ts";
 
 import {
@@ -9,9 +9,9 @@ import {
   layerStepIndices,
   layerStepTags,
   findElementBuildSteps,
-} from "../ts/build_steps.ts";
+} from "../ts/buildSteps.ts";
 
-test("build_steps", async (t) => {
+test("buildSteps", async (t) => {
   const empty = await getProcessedSvg("empty.svg");
   const negativeBuildStepNumber = await getProcessedSvg(
     "negative_build_step_number.svg",

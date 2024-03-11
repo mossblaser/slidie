@@ -3,7 +3,7 @@
  * information from SVGs (e.g. build steps, thumbnails etc.).
  */
 
-import ns from "./xml_namespaces.ts";
+import ns from "./xmlNamespaces.ts";
 
 interface BuildStepVisibility {
   // The SVG element whose visibility is controlled by the build step
