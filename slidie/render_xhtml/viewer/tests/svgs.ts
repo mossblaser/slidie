@@ -23,9 +23,12 @@ export function getSvgFilename(name: string): string {
  * Return the JSDOM object containing the loaded svg from the pytest tests/svgs
  * directory.
  */
-export async function getSvg(name: string): Promise<JSDOM> {
+export async function getSvg(name: string): Promise<SVGSVGElement> {
   const filename = getSvgFilename(name);
-  return new JSDOM(await readFile(filename), { contentType: "image/svg+xml" });
+  const jsdom = new JSDOM(await readFile(filename), {
+    contentType: "image/svg+xml",
+  });
+  return jsdom.window.document.documentElement as any as SVGSVGElement;
 }
 
 /**
@@ -33,7 +36,7 @@ export async function getSvg(name: string): Promise<JSDOM> {
  * directory after processing by the slidie.render_xhtml.render_slide
  * function.
  */
-export async function getProcessedSvg(name: string): Promise<JSDOM> {
+export async function getProcessedSvg(name: string): Promise<SVGSVGElement> {
   const inputFile = getSvgFilename(name);
 
   const buildDir = await mkdtemp(
@@ -51,9 +54,10 @@ export async function getProcessedSvg(name: string): Promise<JSDOM> {
       resolve(outputFile),
     ]);
     await new Promise((resolve) => proc.on("close", resolve));
-    return new JSDOM(await readFile(outputFile), {
+    const jsdom = new JSDOM(await readFile(outputFile), {
       contentType: "image/svg+xml",
     });
+    return jsdom.window.document.documentElement as any as SVGSVGElement;
   } finally {
     await rm(buildDir, { recursive: true });
   }

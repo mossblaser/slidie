@@ -14,7 +14,7 @@ test("svgs", async (t) => {
 
   await t.test("getSvg", async (t) => {
     const dom = await getSvg("simple_text.svg");
-    const textElems = dom.window.document.getElementsByTagNameNS(
+    const textElems = dom.ownerDocument.getElementsByTagNameNS(
       ns("svg"),
       "tspan",
     );
@@ -25,7 +25,7 @@ test("svgs", async (t) => {
 
   await t.test("getProcessedSvg", async (t) => {
     const dom = await getProcessedSvg("speaker_notes.svg");
-    const notes = dom.window.document.getElementsByTagNameNS(
+    const notes = dom.ownerDocument.getElementsByTagNameNS(
       ns("slidie"),
       "notes",
     );
