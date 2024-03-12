@@ -3,6 +3,13 @@
  * in URL hashes following the scheme defined in `slidie/links.py`.
  */
 
+import ns from "./xmlNamespaces.ts";
+import {
+  findBuildSteps,
+  layerStepNumbers,
+  layerStepTags,
+} from "./buildSteps.ts";
+
 /**
  * Given a zero-indexed slide number and zero-indexed step index, return a URL
  * hash which encodes that position.
@@ -106,4 +113,42 @@ export function parseUrlHash(
   }
 
   return [slide, step];
+}
+
+/**
+ * Enumerate the complete set of absolute slide hashes.
+ *
+ * Does not include 'relative' hashes where the current slide is implied.
+ */
+export function enumerateAbsoluteHashes(slides: SVGSVGElement[]): string[] {
+  const out = [];
+
+  for (const [slideNum, slide] of slides.entries()) {
+    // Enumerate ways of identifying the slide
+    const slideValues = [`#${slideNum + 1}`];
+    if (slide.hasAttributeNS(ns("slidie"), "id")) {
+      slideValues.push(`#${slide.getAttributeNS(ns("slidie"), "id")}`);
+    }
+
+    // Enumerate ways of identifying the step
+    const stepValues = [];
+    const layerSteps = findBuildSteps(slide);
+    for (const [step, stepNumber] of layerStepNumbers(layerSteps).entries()) {
+      stepValues.push(`#${step + 1}`);
+      stepValues.push(`<${stepNumber}>`);
+    }
+    for (const tag of layerStepTags(layerSteps).keys()) {
+      stepValues.push(`@${tag}`);
+    }
+
+    // Enumerate all combinations of the above
+    for (const slideValue of slideValues) {
+      out.push(`${slideValue}`);
+      for (const stepValue of stepValues) {
+        out.push(`${slideValue}${stepValue}`);
+      }
+    }
+  }
+
+  return out;
 }
