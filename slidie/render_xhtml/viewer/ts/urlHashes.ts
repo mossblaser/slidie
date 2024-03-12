@@ -29,17 +29,17 @@ const LINK_REGEX = new RegExp(
   "^#" +
     // Slide spec
     "(?:" +
-    "(?<slide_index>[0-9]+)" +
+    "(?<slideIndex>[0-9]+)" +
     "|" +
-    "(?<slide_id>[^0-9#@<][^#@<]*)" +
+    "(?<slideId>[^0-9#@<][^#@<]*)" +
     ")?" +
     // Build step spec
     "(?:" +
-    "(?:#(?<step_index>[0-9]+))" +
+    "(?:#(?<stepIndex>[0-9]+))" +
     "|" +
-    "(?:<(?<step_number>[-+]?[0-9]+)>)" +
+    "(?:<(?<stepNumber>[-+]?[0-9]+)>)" +
     "|" +
-    "(?:@(?<step_tag>[^\\s<>.@]+))" +
+    "(?:@(?<stepTag>[^\\s<>.@]+))" +
     ")?" +
     "$",
 );
@@ -52,7 +52,7 @@ const LINK_REGEX = new RegExp(
  *
  * Out-of-range slide/step numbers are returned as-is.
  *
- * When an unknown slide_id is given, returns null. Conversely an unknown build
+ * When an unknown slideId is given, returns null. Conversely an unknown build
  * step tag or out-of-range build step number is given, the step is treated as
  * zero instead.
  *
@@ -80,10 +80,10 @@ export function parseUrlHash(
 
   // Work out slide index
   let slide = currentSlide;
-  if (groups.slide_index !== undefined) {
-    slide = parseInt(groups.slide_index) - 1;
-  } else if (groups.slide_id !== undefined) {
-    const slideId = groups.slide_id;
+  if (groups.slideIndex !== undefined) {
+    slide = parseInt(groups.slideIndex) - 1;
+  } else if (groups.slideId !== undefined) {
+    const slideId = groups.slideId;
     if (slideIds.has(slideId)) {
       slide = slideIds.get(slideId)!;
     } else {
@@ -98,16 +98,16 @@ export function parseUrlHash(
 
   // Work out step index
   let step = 0;
-  if (groups.step_index !== undefined) {
-    step = parseInt(groups.step_index) - 1;
-  } else if (groups.step_number !== undefined) {
-    step = slideStepNumbers[slide].indexOf(parseInt(groups.step_number));
+  if (groups.stepIndex !== undefined) {
+    step = parseInt(groups.stepIndex) - 1;
+  } else if (groups.stepNumber !== undefined) {
+    step = slideStepNumbers[slide].indexOf(parseInt(groups.stepNumber));
     if (step < 0) {
       // Treat non-existant step number as zero
       step = 0;
     }
-  } else if (groups.step_tag !== undefined) {
-    const tag = groups.step_tag;
+  } else if (groups.stepTag !== undefined) {
+    const tag = groups.stepTag;
     if (slideTags[slide].has(tag)) {
       step = slideTags[slide].get(tag)![0];
     }
