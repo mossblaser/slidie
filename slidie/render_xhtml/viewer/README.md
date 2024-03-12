@@ -61,10 +61,9 @@ hide/reveal content on a slide as we progress.
 Shadow DOMs
 -----------
 
-Unfortunately, when SVGs are inlined into an (X)HTML document they all resides
-in the same global identifier namespace. As a result, ID collisions will be
-rife causing all manner of things to break (e.g. gradients, clipping paths,
-...).
+When SVGs are inlined into an (X)HTML document they all resides in the same
+global identifier namespace. As a result, ID collisions will be rife causing
+all manner of things to break (e.g. gradients, clipping paths, ...).
 
 In principle we could pre-process the SVGs to uniquify their IDs but this is
 highly problematic. For example we would need to correctly locate all ID-based
@@ -75,7 +74,7 @@ Instead we use Javascript to place every SVG into its own [shadow
 DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM).
 This gives each of them an isolated environment, including their own ID
 namespaces. (NB: 'open' shadow DOMs are used to allow Javascript to reach into
-slides, for example to advance through build steps.
+slides, for example to advance through build steps.)
 
 NB: There is a [new
 mechanism](https://github.com/mfreed7/declarative-shadow-dom/blob/master/README.md#proposed-solution)
