@@ -35,15 +35,15 @@ test("urlHashes", async (t) => {
       await t.test(`Invalid hash '${hash}'`, (t) => {
         const currentSlide = 10;
         const slideIds = new Map();
-        const slideBuildStepNumbers = [[0]];
-        const slideBuildStepTags = [new Map()];
+        const slideStepNumbers = [[0]];
+        const slideTags = [new Map()];
         assert.strictEqual(
           parseUrlHash(
             hash,
             currentSlide,
             slideIds,
-            slideBuildStepNumbers,
-            slideBuildStepTags,
+            slideStepNumbers,
+            slideTags,
           ),
           null,
         );
@@ -67,12 +67,12 @@ test("urlHashes", async (t) => {
       await t.test(`${name} ('${hash}')`, (t) => {
         const currentSlide = 1;
         const slideIds = new Map([["third-slide", 2]]);
-        const slideBuildStepNumbers = [
+        const slideStepNumbers = [
           [-1, 0, 1],
           [-2, -1, 0],
           [0, 1],
         ];
-        const slideBuildStepTags = [
+        const slideTags = [
           new Map([
             ["first-step", [0]],
             ["last-step", [2]],
@@ -85,8 +85,8 @@ test("urlHashes", async (t) => {
             hash,
             currentSlide,
             slideIds,
-            slideBuildStepNumbers,
-            slideBuildStepTags,
+            slideStepNumbers,
+            slideTags,
           ),
           [expSlide, expStep],
         );

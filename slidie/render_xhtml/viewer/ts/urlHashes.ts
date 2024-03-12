@@ -58,18 +58,18 @@ const LINK_REGEX = new RegExp(
  *
  * @param currentSlide The current 0-indexed slide number.
  * @param slideIds A Map() from slide ID to slide index.
- * @param slideBuildStepNumbers An array of arrays giving the
+ * @param slideStepNumbers An array of arrays giving the
  *        (not-necessarily-zero-indexed) step numbers of each step for each
  *        slide.
- * @param slideBuildStepTags An array of Map() from tag to an array of step
+ * @param slideTags An array of Map() from tag to an array of step
  *        indices, one per slide.
  */
 export function parseUrlHash(
   hash: string,
   currentSlide: number,
   slideIds: Map<string, number>,
-  slideBuildStepNumbers: number[][],
-  slideBuildStepTags: Map<string, number[]>[],
+  slideStepNumbers: number[][],
+  slideTags: Map<string, number[]>[],
 ): [number, number] | null {
   const match = LINK_REGEX.exec(hash);
   if (match === null) {
@@ -96,18 +96,18 @@ export function parseUrlHash(
   if (groups.step_index !== undefined) {
     step = parseInt(groups.step_index) - 1;
   } else if (groups.step_number !== undefined) {
-    if (slide < slideBuildStepNumbers.length) {
-      step = slideBuildStepNumbers[slide].indexOf(parseInt(groups.step_number));
+    if (slide < slideStepNumbers.length) {
+      step = slideStepNumbers[slide].indexOf(parseInt(groups.step_number));
       if (step < 0) {
         // Treat non-existant step number as zero
         step = 0;
       }
     }
   } else if (groups.step_tag !== undefined) {
-    if (slide < slideBuildStepTags.length) {
+    if (slide < slideTags.length) {
       const tag = groups.step_tag;
-      if (slideBuildStepTags[slide].has(tag)) {
-        step = slideBuildStepTags[slide].get(tag)![0];
+      if (slideTags[slide].has(tag)) {
+        step = slideTags[slide].get(tag)![0];
       }
     }
   }
