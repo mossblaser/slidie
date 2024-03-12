@@ -62,19 +62,22 @@ export function findBuildSteps(svgRoot: SVGSVGElement): BuildStepVisibility[] {
 }
 
 /**
- * Given an array [{steps, ...}, ...] (e.g. from findBuildSteps), returns an
- * array enumerating the full range of step indices used by any build specs
- * provided.
+ * Given an array [{stepNumbers, ...}, ...] (e.g. from findBuildSteps), returns
+ * an array enumerating the full set of (maybe-not-zero-indexed) step numbers
+ * used by any build specs provided.
  */
-export function layerStepIndices(layerSteps: { steps: number[] }[]): number[] {
+export function layerStepNumbers(
+  layerSteps: { stepNumbers: number[] }[],
+): number[] {
   const allSteps = layerSteps
-    .map(({ steps }) => steps)
+    .map(({ stepNumbers }) => stepNumbers)
     .flat()
     .concat([0]);
+  const first = Math.min(...allSteps);
   const last = Math.max(...allSteps);
 
   const out = [];
-  for (let i = 0; i <= last; i++) {
+  for (let i = first; i <= last; i++) {
     out.push(i);
   }
   return out;

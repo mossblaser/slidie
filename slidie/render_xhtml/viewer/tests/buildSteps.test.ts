@@ -6,7 +6,7 @@ import { getProcessedSvg } from "./svgs.ts";
 
 import {
   findBuildSteps,
-  layerStepIndices,
+  layerStepNumbers,
   layerStepTags,
   findElementBuildSteps,
 } from "../ts/buildSteps.ts";
@@ -53,14 +53,14 @@ test("buildSteps", async (t) => {
     });
   });
 
-  await t.test("layerStepIndices", async (t) => {
+  await t.test("layerStepNumbers", async (t) => {
     await t.test("no steps", async (t) => {
-      assert.deepEqual(layerStepIndices(findBuildSteps(empty)), [0]);
+      assert.deepEqual(layerStepNumbers(findBuildSteps(empty)), [0]);
     });
     await t.test("negative steps", async (t) => {
       assert.deepEqual(
-        layerStepIndices(findBuildSteps(negativeBuildStepNumber)),
-        [0, 1, 2],
+        layerStepNumbers(findBuildSteps(negativeBuildStepNumber)),
+        [-1, 0, 1],
       );
     });
   });
