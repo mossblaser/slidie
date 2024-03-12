@@ -1,221 +1,143 @@
 /**
- * This module defines the `Stepper` class which is responsible for advancing
- * through a slide show by hiding/revealing SVGs (or parts within them).
+ * This module defines the `Stepper` class which defines the state machine for
+ * advancing through a slide show.
  */
 
-import { BuildStepVisibility } from "./buildSteps.ts";
-import { toUrlHash, parseUrlHash } from "./urlHashes.ts";
+import { layerStepNumbers } from "./buildSteps.ts";
 
 /**
- * Base type for Events dispatched on changes to the visible slide by
- * Stepper objects.
- *
- * The 'composed' argument can be set to false to prevent the event bubbling
- * out of the slide in which it was sent to.
+ * The a summary of the state of the Stepper.
  */
-export class StepperEvent extends Event {
-  // The <svg> root element of the slide
-  slideElem: SVGSVGElement;
-
+export interface StepperState {
   // The (zero-indexed) slide number
   slide: number;
 
   // The (zero-indexed) step index
   step: number;
 
-  // The step number (as used in the build spec, may start from
-  // a number other than zero.)
+  // The step number (as used in the build spec, may start from a number
+  // other than zero.)
   stepNumber: number;
 
-  // Tags assigned to currently visible build steps.
-  tags: string[];
-
-  constructor(type: string, stepper: Stepper, composed: boolean = true) {
-    super(type, { composed, cancelable: false, bubbles: true });
-    this.slideElem = stepper.curSlideElem;
-    this.slide = stepper.curSlide;
-    this.step = stepper.curStep;
-    this.stepNumber = stepper.curStepNumber;
-
-    this.tags = [];
-    const buildStepTags = stepper.slideTags[this.slide];
-    for (const [tag, steps] of buildStepTags.entries()) {
-      if (steps.indexOf(this.step) >= 0) {
-        this.tags.push(tag);
-      }
-    }
-  }
+  // Is the display blanked or not?
+  blanked: boolean;
 }
 
 /**
- * A class which steps through a slide show by showing/hiding SVGs and layers.
+ * Callback signature for Stepper state changes. The first argument gives the
+ * current state, the second gives the new state.
+ */
+type StepperStateChangeCallback = (
+  state: StepperState,
+  previousState: StepperState,
+) => void;
+
+/**
+ * State machine for advancing through a slide show.
  *
- * Also dispatches the following events to the SVG root of the current slide
- * (which will non-cancellably bubble all the way to the non-shaddow document
- * root):
+ * The 'state' attribute gives the current state of the stepper.
  *
- * * slideenter: When entering a slide (but not between steps)
- * * slideexit: When leaving a slide. NB: Contains the slide details of the
- *   slide which replaces it. NB: Unlike other events, this does not bubble out
- *   of the slide it is raised in.
- * * stepchange: When the visible build step changes OR the slide changes.
- * * slideblank: When the screen is blanked
- * * slideunblank: When the screen is unblanked
- *
- * All events include a 'slide' and 'step' attribute giving the current
- * slide/step
+ * Callbacks registered via onChangeCallbacks are called whenever the state
+ * changes.
  */
 export class Stepper {
-  // The following attributes broadly define the slides and their indices
-
-  // The slides in the show
-  slides: SVGSVGElement[];
-  // The elements which contain the slides in slides (a 1:1 mapping)
-  containers: Element[];
-  // Lookup from slide ID to slide index (where IDs are given)
-  slideIds: Map<string, number>;
-  // The elements to show/hide during slide builds
-  slideBuilds: BuildStepVisibility[];
-  // For each slide, gives the full list of (possibly-not-zero-indexed) step
-  // numbers
-  slideStepNumbers: number[][];
-  // For each slide, gives a lookup from tag to step indices.
-  slideTags: Map<string, number[]>[];
-
-  // The following attributes broadly define the current state of the show
-
-  // The current slide index (zero-indexed)
-  curSlide: number;
-  // The current step index (zero-indexed)
-  curStep: number;
-  // Is the screen currently blanked?
-  blanked: boolean;
-
   /**
-   * @param slides An array of SVG root elements, one per slide
-   * @param containers A corresponding array of elements to show/hide to cause
-   *                   that slide to be made visible/invisible.
+   * The slideBuilds parameter gives the build step numbers for each slide in
+   * the show. This parameter may come from buildSteps.ts/findBuildSteps.
+   *
+   * The initial slide and step (index) sets the initial slide/step to show.
    */
-  constructor(slides: SVGSVGElement[], containers: Element[]) {
-    this.slides = slides;
-    this.containers = containers;
-
-    // Extract IDs from slides which have them
-    this.slideIds = new Map();
-    for (const [slide, elem] of this.slides.entries()) {
-      if (elem.hasAttributeNS(ns("slidie"), "id")) {
-        const id = elem.getAttributeNS(ns("slidie"), "id");
-        this.slideIds.set(id, slide);
-      }
+  constructor(
+    slideBuilds: { stepNumbers: number[] }[][],
+    initialSlide: number = 0,
+    initialStep: number = 0,
+  ) {
+    if (slideBuilds.length < 1) {
+      throw new Error("Slide show must have at least one slide.");
     }
 
-    // Extract the build steps from all slides. NB: Build step numbers can
-    // start from < 0. To keep things simpler, in all public functions of this
-    // class we take build step indices (which are always zero based).
-    this.slideBuilds = this.slides.map((slide) => findBuildSteps(slide));
-    this.slideStepNumbers = this.slideBuilds.map((layerSteps) =>
-      layerStepIndices(layerSteps),
-    );
-    this.slideTags = this.slideBuilds.map((layerSteps) =>
-      layerStepTags(layerSteps),
-    );
+    this.slideStepNumbers = slideBuilds.map((build) => layerStepNumbers(build));
 
-    // Initially don't blank the screen
     this.blanked = false;
 
-    // Start on the slide specified in the URL hash
-    this.curSlide = -1;
-    this.curStep = -1;
-    if (!this.showFromHash()) {
-      // Fall back on the first slide if URL hash invalid/out of range
-      this.show(0, 0);
-    }
+    this.onChangeCallbacks = [];
 
-    // Move between slides based on URL changes
-    window.addEventListener("hashchange", () => this.showFromHash());
+    // Start on the specified slide
+    this.curSlide = 0;
+    this.curStep = 0;
+    this.show(initialSlide, initialStep);
   }
 
-  /** The current slide's <svg> element. */
-  get curSlideElem(): SVGSVGElement {
-    return this.slides[this.curSlide];
+  // For each slide, gives the full list of (possibly-not-zero-indexed) step
+  // numbers
+  protected slideStepNumbers: number[][];
+
+  // The current slide index (zero-indexed)
+  protected curSlide: number;
+  // The current step index (zero-indexed)
+  protected curStep: number;
+  // Is the screen currently blanked?
+  protected blanked: boolean;
+
+  // State change callbacks
+  protected onChangeCallbacks: StepperStateChangeCallback[];
+
+  /**
+   * The current state of the stepper.
+   */
+  get state(): StepperState {
+    return {
+      slide: this.curSlide,
+      step: this.curStep,
+      stepNumber: this.slideStepNumbers[this.curSlide][this.curStep],
+      blanked: this.blanked,
+    };
   }
 
-  /** The current slide's (maybe-non-zero-indexed) step number. */
-  get curStepNumber(): number {
-    return this.slideStepNumbers[this.curSlide][this.curStep];
+  /**
+   * Register a callback function to be called when the stepper's state
+   * changes.
+   */
+  onChange(callback: StepperStateChangeCallback) {
+    this.onChangeCallbacks.push(callback);
   }
 
   /**
    * Show a particular slide/step.
    *
-   * The updateHash argument is intended for internal use only by showFromHash
-   * and may be used to prevent the hash in the URL from being changed to match
-   * the current slide. This ensures that if the user uses a particular hash
-   * format to specify the slide/step we don't immediately replace that.
-   *
-   * Returns true iff the slide exists (and we're now showing it), false
-   * otherwise.
+   * Returns true iff the slide was valid and we've advanced to that point,
+   * false otherwise (we'll stay where we are).
    */
-  show(slide: number, step: number = 0, updateHash: boolean = true): boolean {
+  show(slide: number, step: number = 0): boolean {
+    const beforeState = this.state;
+
     // Check in range
     if (
-      slide >= this.slides.length ||
+      slide < 0 ||
+      slide >= this.slideStepNumbers.length ||
+      step < 0 ||
       step >= this.slideStepNumbers[slide].length
     ) {
       return false;
     }
 
-    // Unblank if currently blanked
-    if (this.blanked) {
-      this.toggleBlank();
-    }
-
-    // Do nothing if already on correct slide (avoids producing change events
-    // when nothing has actually changed)
-    const slideChanged = this.curSlide !== slide;
-    const stepChanged = this.curStep !== step;
-    if (!(slideChanged || stepChanged)) {
-      return true;
-    }
-
-    const lastSlide = this.curSlide;
-    const lastStep = this.curStep;
+    // Move to specified slide/step
     this.curSlide = slide;
     this.curStep = step;
 
-    // Show the slide (and hide the others)
-    for (const [index, container] of this.containers.entries()) {
-      container.style.display = index == slide ? "block" : "none";
-    }
+    // Unblank if currently blanked
+    this.blanked = false;
 
-    // Show the appropriate layers for the given build step
-    for (const build of this.slideBuilds[slide]) {
-      if (build.steps.indexOf(step) >= 0) {
-        build.elem.style.display = "block";
-      } else {
-        build.elem.style.display = "none";
+    // Only produce change event if we've actually changed state
+    const afterState = this.state;
+    const slideChanged = beforeState.slide !== afterState.slide;
+    const stepChanged = beforeState.step !== afterState.step;
+    const blankedChanged = beforeState.blanked !== afterState.blanked;
+    if (slideChanged || stepChanged || blankedChanged) {
+      for (const cb of this.onChangeCallbacks) {
+        cb(afterState, beforeState);
       }
     }
-
-    // Update the URL with the new offset
-    if (updateHash) {
-      window.location.hash = toUrlHash(this.curSlide, this.curStep);
-    }
-
-    // Fire change events
-    if (slideChanged) {
-      this.slides[this.curSlide].dispatchEvent(
-        new StepperEvent("slideenter", this),
-      );
-      if (lastSlide !== null) {
-        this.slides[lastSlide].dispatchEvent(
-          new StepperEvent("slideexit", this, false),
-        );
-      }
-    }
-    this.slides[this.curSlide].dispatchEvent(
-      new StepperEvent("stepchange", this),
-    );
 
     return true;
   }
@@ -223,45 +145,18 @@ export class Stepper {
   /**
    * Toggle blanking of the show. Returns true iff now blanked.
    *
-   * NB: Blanking is turned off when attempting to change slide.
+   * NB: Blanking is automatically disabled when the slide/step is changed.
    */
   toggleBlank(): boolean {
+    const beforeState = this.state;
     this.blanked = !this.blanked;
+    const afterState = this.state;
 
-    for (const container of this.containers) {
-      // NB: We set 'visibility' rather than 'disblay' partly to keep things
-      // easy and also to avoid triggering reflow or (over-zealous)
-      // re-rendering of the SVGs
-      container.style.visibility = this.blanked ? "hidden" : "visible";
+    for (const cb of this.onChangeCallbacks) {
+      cb(afterState, beforeState);
     }
-
-    // Fire blanking/unblanking event
-    const eventType = this.blanked ? "slideblank" : "slideunblank";
-    this.slides[this.curSlide].dispatchEvent(new StepperEvent(eventType, this));
 
     return this.blanked;
-  }
-
-  /**
-   * Show the slide specified in the current URL hash. Returns true iff the
-   * hash is valid and refers to an existing slide.
-   *
-   * There is no reason to call this method externally since it will already be
-   * called on instantiation and after a hashchange event anyway.
-   */
-  showFromHash(): boolean {
-    const match = parseUrlHash(
-      decodeURI(window.location.hash),
-      this.curSlide,
-      this.slideIds,
-      this.slideStepNumbers,
-      this.slideTags,
-    );
-    if (match !== null) {
-      return this.show(match[0], match[1], false);
-    } else {
-      return false;
-    }
   }
 
   /** Advance to the next step (and then slide). Returns true iff one exists. */
@@ -273,7 +168,7 @@ export class Stepper {
       // Don't advance if slide blanked, but do re-show the slide
     } else if (step + 1 < this.slideStepNumbers[slide].length) {
       step += 1;
-    } else if (slide + 1 < this.slides.length) {
+    } else if (slide + 1 < this.slideStepNumbers.length) {
       step = 0;
       slide += 1;
     } else {
@@ -294,7 +189,7 @@ export class Stepper {
 
     if (this.blanked) {
       // Don't advance if slide blanked, but do re-show the slide
-    } else if (slide + 1 < this.slides.length) {
+    } else if (slide + 1 < this.slideStepNumbers.length) {
       step = 0;
       slide += 1;
     } else {
@@ -361,7 +256,7 @@ export class Stepper {
    * Go to the last build step of the last slide.
    */
   end(): boolean {
-    const lastSlide = this.slides.length - 1;
+    const lastSlide = this.slideStepNumbers.length - 1;
     const lastStep = this.slideStepNumbers[lastSlide].length - 1;
     return this.show(lastSlide, lastStep);
   }
