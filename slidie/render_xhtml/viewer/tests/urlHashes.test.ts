@@ -31,6 +31,10 @@ test("urlHashes", async (t) => {
       "#@one@two",
       // Unknown ID
       "#who-knows",
+      // Out of range slide
+      "#99#0",
+      "#99<0>",
+      "#99@nope",
     ]) {
       await t.test(`Invalid hash '${hash}'`, (t) => {
         const currentSlide = 10;
@@ -60,9 +64,7 @@ test("urlHashes", async (t) => {
       ["Slide by ID", "#third-slide", 2, 0],
       ["Slide by ID with step", "#third-slide#2", 2, 1],
       ["Unknown tag", "#3@nope", 2, 0],
-      ["Tag on out of range slide", "#99@nope", 98, 0],
       ["Unknown step number", "#3<99>", 2, 0],
-      ["Step number on out of range slide", "#99<99>", 98, 0],
     ] as [string, string, number, number][]) {
       await t.test(`${name} ('${hash}')`, (t) => {
         const currentSlide = 1;
@@ -92,6 +94,27 @@ test("urlHashes", async (t) => {
         );
       });
     }
+
+    await t.test("currentSlide is not defined", (t) => {
+      const currentSlide = -1;
+      const slideIds = new Map();
+      const slideStepNumbers = [
+        [-1, 0, 1],
+        [-2, -1, 0],
+        [0, 1],
+      ];
+      const slideTags = [new Map(), new Map(), new Map()];
+      assert.deepEqual(
+        parseUrlHash(
+          "##1",
+          currentSlide,
+          slideIds,
+          slideStepNumbers,
+          slideTags,
+        ),
+        null,
+      );
+    });
   });
 
   await t.test("enumerateSlideHashes", async (t) => {

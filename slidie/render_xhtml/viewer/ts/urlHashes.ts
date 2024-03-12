@@ -56,7 +56,8 @@ const LINK_REGEX = new RegExp(
  * step tag or out-of-range build step number is given, the step is treated as
  * zero instead.
  *
- * @param currentSlide The current 0-indexed slide number.
+ * @param currentSlide The current 0-indexed slide number. Pass a negative
+ *        number to act as if no slide is currently selected.
  * @param slideIds A Map() from slide ID to slide index.
  * @param slideStepNumbers An array of arrays giving the
  *        (not-necessarily-zero-indexed) step numbers of each step for each
@@ -90,25 +91,25 @@ export function parseUrlHash(
       return null;
     }
   }
+  if (slide < 0 || slide >= slideStepNumbers.length) {
+    // Slide number out of range
+    return null;
+  }
 
   // Work out step index
   let step = 0;
   if (groups.step_index !== undefined) {
     step = parseInt(groups.step_index) - 1;
   } else if (groups.step_number !== undefined) {
-    if (slide < slideStepNumbers.length) {
-      step = slideStepNumbers[slide].indexOf(parseInt(groups.step_number));
-      if (step < 0) {
-        // Treat non-existant step number as zero
-        step = 0;
-      }
+    step = slideStepNumbers[slide].indexOf(parseInt(groups.step_number));
+    if (step < 0) {
+      // Treat non-existant step number as zero
+      step = 0;
     }
   } else if (groups.step_tag !== undefined) {
-    if (slide < slideTags.length) {
-      const tag = groups.step_tag;
-      if (slideTags[slide].has(tag)) {
-        step = slideTags[slide].get(tag)![0];
-      }
+    const tag = groups.step_tag;
+    if (slideTags[slide].has(tag)) {
+      step = slideTags[slide].get(tag)![0];
     }
   }
 
