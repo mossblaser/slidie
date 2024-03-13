@@ -15,10 +15,6 @@ export interface StepperState {
   // The (zero-indexed) step index
   step: number;
 
-  // The step number (as used in the build spec, may start from a number
-  // other than zero.)
-  stepNumber: number;
-
   // Is the display blanked or not?
   blanked: boolean;
 }
@@ -42,21 +38,21 @@ type StepperStateChangeCallback = (
  */
 export class Stepper {
   /**
-   * The slideBuilds parameter gives the build step numbers for each slide in
-   * the show. This parameter may come from buildSteps.ts/findBuildSteps.
+   * The slideStepCounts parameter gives the number of build steps for each
+   * slide.
    *
-   * The initial slide and step (index) sets the initial slide/step to show.
+   * The initial slide and step (indices) set the initial slide/step to show.
    */
   constructor(
-    slideBuilds: { stepNumbers: number[] }[][],
+    slideStepCounts: number[],
     initialSlide: number = 0,
     initialStep: number = 0,
   ) {
-    if (slideBuilds.length < 1) {
+    if (slideStepCounts.length < 1) {
       throw new Error("Slide show must have at least one slide.");
     }
 
-    this.slideStepNumbers = slideBuilds.map((build) => layerStepNumbers(build));
+    this.slideStepCounts = slideStepCounts;
 
     this.blanked = false;
 
@@ -70,7 +66,7 @@ export class Stepper {
 
   // For each slide, gives the full list of (possibly-not-zero-indexed) step
   // numbers
-  protected slideStepNumbers: number[][];
+  protected slideStepCounts: number[];
 
   // The current slide index (zero-indexed)
   protected curSlide: number;
@@ -89,7 +85,6 @@ export class Stepper {
     return {
       slide: this.curSlide,
       step: this.curStep,
-      stepNumber: this.slideStepNumbers[this.curSlide][this.curStep],
       blanked: this.blanked,
     };
   }
@@ -114,9 +109,9 @@ export class Stepper {
     // Check in range
     if (
       slide < 0 ||
-      slide >= this.slideStepNumbers.length ||
+      slide >= this.slideStepCounts.length ||
       step < 0 ||
-      step >= this.slideStepNumbers[slide].length
+      step >= this.slideStepCounts[slide]
     ) {
       return false;
     }
@@ -166,9 +161,9 @@ export class Stepper {
 
     if (this.blanked) {
       // Don't advance if slide blanked, but do re-show the slide
-    } else if (step + 1 < this.slideStepNumbers[slide].length) {
+    } else if (step + 1 < this.slideStepCounts[slide]) {
       step += 1;
-    } else if (slide + 1 < this.slideStepNumbers.length) {
+    } else if (slide + 1 < this.slideStepCounts.length) {
       step = 0;
       slide += 1;
     } else {
@@ -189,7 +184,7 @@ export class Stepper {
 
     if (this.blanked) {
       // Don't advance if slide blanked, but do re-show the slide
-    } else if (slide + 1 < this.slideStepNumbers.length) {
+    } else if (slide + 1 < this.slideStepCounts.length) {
       step = 0;
       slide += 1;
     } else {
@@ -211,7 +206,7 @@ export class Stepper {
       step -= 1;
     } else if (slide - 1 >= 0) {
       slide -= 1;
-      step = this.slideStepNumbers[slide].length - 1;
+      step = this.slideStepCounts[slide] - 1;
     } else {
       // Already at start, no-op
       return false;
@@ -256,8 +251,8 @@ export class Stepper {
    * Go to the last build step of the last slide.
    */
   end(): boolean {
-    const lastSlide = this.slideStepNumbers.length - 1;
-    const lastStep = this.slideStepNumbers[lastSlide].length - 1;
+    const lastSlide = this.slideStepCounts.length - 1;
+    const lastStep = this.slideStepCounts[lastSlide] - 1;
     return this.show(lastSlide, lastStep);
   }
 }
