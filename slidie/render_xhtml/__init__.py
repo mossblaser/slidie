@@ -11,9 +11,7 @@ from pathlib import Path
 
 from xml.etree import ElementTree as ET
 
-from uuid import uuid4
-
-from slidie.xml_namespaces import XHTML_NAMESPACE, SLIDIE_NAMESPACE
+from slidie.xml_namespaces import SLIDIE_NAMESPACE
 from slidie.inkscape import Inkscape
 from slidie.text_to_selectable_paths import text_to_selectable_paths
 from slidie.embed_thumbnails import embed_thumbnails
@@ -28,72 +26,10 @@ from slidie.magic import MagicText, extract_magic
 from slidie.links import annotate_slide_id_from_magic
 from slidie.metadata import annotate_metadata_from_magic
 from slidie.render_xhtml.browser_magic import embed_videos, embed_iframes
+from slidie.render_xhtml.template import get_template
 
 
 BASE_TEMPLATE_FILENAME = Path(__file__).parent / "base.xhtml"
-
-
-def inline_css_and_js_and_templates(root: ET.Element, path: Path) -> None:
-    """
-    Given an XHTML document, inline any external CSS and Javascript files
-    referenced by <link> and <script> tags in-place.
-    """
-    # Substitute <link rel="stylesheet" href="..." /> for <style>...</style>
-    for elem in root.iterfind(f".//{{{XHTML_NAMESPACE}}}link"):
-        if elem.attrib.get("rel") == "stylesheet":
-            del elem.attrib["rel"]
-
-            href = elem.attrib.pop("href")
-            if href is None:
-                raise ValueError("Template <link> missing 'http'")
-
-            elem.tag = f"{{{XHTML_NAMESPACE}}}style"
-            css_filename = path / Path(href)
-            elem.text = css_filename.read_text()
-
-    # Substitute <script src="..."> for <script>...</script>
-    for elem in root.iterfind(f".//{{{XHTML_NAMESPACE}}}script"):
-        if "src" in elem.attrib:
-            src = elem.attrib.pop("src")
-            assert src is not None
-
-            script_filename = path / Path(src)
-            elem.text = script_filename.read_text()
-
-    # Substitute <template src="..."> for <template>...</template>
-    for elem in root.iterfind(f".//{{{XHTML_NAMESPACE}}}template"):
-        if "src" in elem.attrib:
-            src = elem.attrib.pop("src")
-            assert src is not None
-
-            template_path = path / Path(src)
-            template = ET.parse(template_path).getroot()
-            inline_css_and_js_and_templates(template, template_path.parent)  # Recurse!
-            elem.append(template)
-
-
-def get_base_template() -> tuple[ET.Element, ET.Element]:
-    """
-    Get the basic template for a self-contained Slidie XHTML output.
-
-    Returns two elements: the root element for the XHTML document and the element
-    within that into which the SVGs for each slide should be inserted.
-    """
-    root = ET.parse(BASE_TEMPLATE_FILENAME).getroot()
-
-    # For ease of editing, the template has its CSS and Javascript stored in
-    # separate files with the base.xhtml file referencing them using <link> and
-    # <script src="..."> tags. We substitute those for inline <style> and
-    # <script> tags.
-    inline_css_and_js_and_templates(root, BASE_TEMPLATE_FILENAME.parent)
-
-    # To split the (text-based) document at an arbitrary point, we insert a
-    # unique string which we'll later split the file on.
-    split_string = str(uuid4())
-
-    (slides_elem,) = root.findall(f".//{{{XHTML_NAMESPACE}}}*[@id='slides']")
-
-    return (root, slides_elem)
 
 
 def render_slide(
@@ -157,11 +93,11 @@ def render_slide(
     return svg
 
 
-def render_xhtml(source_directory: Path, output: Path) -> None:
+def render_xhtml(source_directory: Path, output: Path, debug: bool = False) -> None:
     """
     Render a slidie show into a self-contained XHTML file.
     """
-    xhtml_root, slide_container = get_base_template()
+    xhtml_root, slide_container = get_template(BASE_TEMPLATE_FILENAME, debug)
 
     slide_filenames = sorted(
         source_directory.glob("*.svg"), key=extract_numerical_prefix

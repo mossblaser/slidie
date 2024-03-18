@@ -35,13 +35,22 @@ def main() -> None:
             determine the output format. Defaults to 'out.xhtml'.
         """,
     )
+    parser.add_argument(
+        "--debug",
+        default=False,
+        action="store_true",
+        help="""
+            Generate outputs in debug mode. This may produce output files which
+            will only work in the environment in which slidie was run.
+        """,
+    )
 
     args = parser.parse_args()
 
     # TODO: Make error reporting sensible
     match args.output.suffix:
         case ".xhtml":
-            render_xhtml(args.source, args.output)
+            render_xhtml(args.source, args.output, args.debug)
         case ".pdf":
             render_pdf(args.source, args.output)
         case suffix:
