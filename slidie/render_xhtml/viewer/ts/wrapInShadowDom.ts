@@ -21,7 +21,7 @@ export function wrapInShadowDom(
   mode: "open" | "closed" = "open",
 ): Element {
   // Create container
-  const container = elem.ownerDocument.createElement(tag);
+  const container = document.createElement(tag);
   container.setAttribute("class", className);
   elem.parentNode!.insertBefore(container, elem);
 
