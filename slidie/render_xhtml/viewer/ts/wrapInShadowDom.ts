@@ -19,6 +19,7 @@ export function wrapInShadowDom(
   className: string = "shadow-dom-wrapper",
   tag: string = "div",
   mode: "open" | "closed" = "open",
+  document: Document = window.document,
 ): Element {
   // Create container
   const container = document.createElement(tag);

@@ -25,8 +25,20 @@ test("wrapInShadowDom", async (t) => {
     "h1",
   );
 
-  const fooContainer = wrapInShadowDom(foo);
-  const barContainer = wrapInShadowDom(bar, "bar-container", "span");
+  const fooContainer = wrapInShadowDom(
+    foo,
+    "shadow-dom-wrapper",
+    "div",
+    "open",
+    jsdom.window.document,
+  );
+  const barContainer = wrapInShadowDom(
+    bar,
+    "bar-container",
+    "span",
+    "open",
+    jsdom.window.document,
+  );
 
   // Check container properties set
   assert.deepEqual(fooContainer.tagName, "div");
