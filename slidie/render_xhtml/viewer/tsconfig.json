@@ -8,8 +8,5 @@
     "allowImportingTsExtensions": true,
     "noEmitOnError": true
   },
-  "include": [
-    "./ts/**/*.ts",
-    "./test/**/*.ts"
-  ]
+  "include": ["./ts/**/*.ts", "./test/**/*.ts"]
 }
