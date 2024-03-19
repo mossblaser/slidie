@@ -7,5 +7,9 @@
     "forceConsistentCasingInFileNames": true,
     "allowImportingTsExtensions": true,
     "noEmitOnError": true
-  }
+  },
+  "include": [
+    "./ts/**/*.ts",
+    "./test/**/*.ts"
+  ]
 }
