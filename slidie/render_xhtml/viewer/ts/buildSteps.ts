@@ -5,7 +5,7 @@
 
 import ns from "./xmlNamespaces.ts";
 
-interface BuildStepVisibility {
+export interface BuildStepVisibility {
   // The SVG element whose visibility is controlled by the build step
   elem: SVGElement;
 
