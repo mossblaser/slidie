@@ -44,7 +44,7 @@ export class SlideLookups {
    * Takes the SVGs (one per slide) and their corresponding container elements,
    * e.g. as produced by loadSlidesIntoContainers.
    */
-  constructor(svgs: SVGSVGElement[], containers: HTMLDivElement[]) {
+  constructor(svgs: SVGSVGElement[], containers: HTMLElement[]) {
     this.svgs = svgs;
     this.containers = containers;
 
@@ -66,7 +66,7 @@ export class SlideLookups {
   svgs: SVGSVGElement[];
 
   // The container <div> hosting the shadow DOM for each slide
-  containers: HTMLDivElement[];
+  containers: HTMLElement[];
 
   // For each slide, gives the number of build steps (one or more).
   buildStepCounts: number[];
