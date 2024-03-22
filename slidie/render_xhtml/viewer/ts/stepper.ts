@@ -17,6 +17,11 @@ export interface StepperState {
 
   // Is the display blanked or not?
   blanked: boolean;
+
+  // If a user-provided URL hash was used to navigate to this slide, it is
+  // given here. Otherwise this will be null. This enables UI elements to show
+  // a consistent URL hash for the current slide/step.
+  userUrlHash: string | null;
 }
 
 /**
@@ -55,6 +60,7 @@ export class Stepper {
     this.slideStepCounts = slideStepCounts;
 
     this.blanked = false;
+    this.userUrlHash = null;
 
     this.onChangeCallbacks = [];
 
@@ -74,6 +80,8 @@ export class Stepper {
   protected curStep: number;
   // Is the screen currently blanked?
   protected blanked: boolean;
+  // The last URL hash provided (if any)
+  protected userUrlHash: string | null;
 
   // State change callbacks
   protected onChangeCallbacks: StepperStateChangeCallback[];
@@ -86,6 +94,7 @@ export class Stepper {
       slide: this.curSlide,
       step: this.curStep,
       blanked: this.blanked,
+      userUrlHash: this.userUrlHash,
     };
   }
 
@@ -100,10 +109,17 @@ export class Stepper {
   /**
    * Show a particular slide/step.
    *
+   * If a userUrlHash is given, it will be included in any reported states. Its
+   * validity is not verified and is not interpreted in any way.
+   *
    * Returns true iff the slide was valid and we've advanced to that point,
    * false otherwise (we'll stay where we are).
    */
-  show(slide: number, step: number = 0): boolean {
+  show(
+    slide: number,
+    step: number = 0,
+    userUrlHash: string | null = null,
+  ): boolean {
     const beforeState = this.state;
 
     // Check in range
@@ -116,6 +132,10 @@ export class Stepper {
       return false;
     }
 
+    const slideChanged = this.curSlide !== slide;
+    const stepChanged = this.curStep !== step;
+    const blankedChanged = this.blanked !== false;
+
     // Move to specified slide/step
     this.curSlide = slide;
     this.curStep = step;
@@ -123,14 +143,21 @@ export class Stepper {
     // Unblank if currently blanked
     this.blanked = false;
 
+    // Keep the userUrlHash until we change slide/step or set a new one.
+    //
+    // We intentionally don't clear the hash on a non-slide-change when
+    // userUrlHash is null because this will be the case for for blank/unblank
+    // events and clearing it would probably be surprising.
+    let userUrlHashChanged = false;
+    if (slideChanged || stepChanged || userUrlHash !== null) {
+      userUrlHashChanged = this.userUrlHash !== userUrlHash;
+      this.userUrlHash = userUrlHash;
+    }
+
     // Only produce change event if we've actually changed state
-    const afterState = this.state;
-    const slideChanged = beforeState.slide !== afterState.slide;
-    const stepChanged = beforeState.step !== afterState.step;
-    const blankedChanged = beforeState.blanked !== afterState.blanked;
-    if (slideChanged || stepChanged || blankedChanged) {
+    if (slideChanged || stepChanged || blankedChanged || userUrlHashChanged) {
       for (const cb of this.onChangeCallbacks) {
-        cb(afterState, beforeState);
+        cb(this.state, beforeState);
       }
     }
 

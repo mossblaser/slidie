@@ -17,6 +17,7 @@ test("stepper", async (t) => {
       slide: 0,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
   });
 
@@ -25,6 +26,7 @@ test("stepper", async (t) => {
       slide: 2,
       step: 1,
       blanked: false,
+      userUrlHash: null,
     });
   });
 
@@ -33,6 +35,7 @@ test("stepper", async (t) => {
       slide: 0,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
   });
 
@@ -41,6 +44,7 @@ test("stepper", async (t) => {
       slide: 0,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
   });
 
@@ -54,24 +58,24 @@ test("stepper", async (t) => {
     stepper.show(1, 0);
     assert.deepEqual(onChange.mock.calls.length, 1);
     assert.deepEqual(onChange.mock.calls[0].arguments, [
-      { slide: 1, step: 0, blanked: false },
-      { slide: 0, step: 0, blanked: false },
+      { slide: 1, step: 0, blanked: false, userUrlHash: null },
+      { slide: 0, step: 0, blanked: false, userUrlHash: null },
     ]);
 
     // Callback on blanking
     stepper.toggleBlank();
     assert.deepEqual(onChange.mock.calls.length, 2);
     assert.deepEqual(onChange.mock.calls[1].arguments, [
-      { slide: 1, step: 0, blanked: true },
-      { slide: 1, step: 0, blanked: false },
+      { slide: 1, step: 0, blanked: true, userUrlHash: null },
+      { slide: 1, step: 0, blanked: false, userUrlHash: null },
     ]);
 
     // Single callback on combined show/unblank
     stepper.show(2, 1);
     assert.deepEqual(onChange.mock.calls.length, 3);
     assert.deepEqual(onChange.mock.calls[2].arguments, [
-      { slide: 2, step: 1, blanked: false },
-      { slide: 1, step: 0, blanked: true },
+      { slide: 2, step: 1, blanked: false, userUrlHash: null },
+      { slide: 1, step: 0, blanked: true, userUrlHash: null },
     ]);
 
     // No extra callbacks if no state change
@@ -84,8 +88,8 @@ test("stepper", async (t) => {
     stepper.show(2, 1);
     assert.deepEqual(onChange.mock.calls.length, 5);
     assert.deepEqual(onChange.mock.calls[4].arguments, [
-      { slide: 2, step: 1, blanked: false },
-      { slide: 2, step: 1, blanked: true },
+      { slide: 2, step: 1, blanked: false, userUrlHash: null },
+      { slide: 2, step: 1, blanked: true, userUrlHash: null },
     ]);
   });
 
@@ -110,6 +114,80 @@ test("stepper", async (t) => {
     assert.deepEqual(onChange.mock.calls.length, 1);
   });
 
+  await t.test("show() userUrlHash handling", async (t) => {
+    const stepper = new Stepper(exampleSlideStepCounts);
+
+    const onChange = mock.fn();
+    stepper.onChange(onChange);
+
+    // Can set userUrlHash
+    stepper.show(1, 0, "#foo");
+    assert.deepEqual(stepper.show(1, 0, "#foo"), true);
+    assert.deepEqual(onChange.mock.calls.length, 1);
+    assert.deepEqual(onChange.mock.calls[0].arguments, [
+      { slide: 1, step: 0, blanked: false, userUrlHash: "#foo" },
+      { slide: 0, step: 0, blanked: false, userUrlHash: null },
+    ]);
+
+    // Is cleared on changing step
+    assert.deepEqual(stepper.show(1, 1), true);
+    assert.deepEqual(onChange.mock.calls.length, 2);
+    assert.deepEqual(onChange.mock.calls[1].arguments, [
+      { slide: 1, step: 1, blanked: false, userUrlHash: null },
+      { slide: 1, step: 0, blanked: false, userUrlHash: "#foo" },
+    ]);
+
+    // It is cleared on changing slide
+    assert.deepEqual(stepper.show(2, 0, "#bar"), true);
+    assert.deepEqual(onChange.mock.calls.length, 3);
+    assert.deepEqual(onChange.mock.calls[2].arguments, [
+      { slide: 2, step: 0, blanked: false, userUrlHash: "#bar" },
+      { slide: 1, step: 1, blanked: false, userUrlHash: null },
+    ]);
+    assert.deepEqual(stepper.show(1, 0), true);
+    assert.deepEqual(onChange.mock.calls.length, 4);
+    assert.deepEqual(onChange.mock.calls[3].arguments, [
+      { slide: 1, step: 0, blanked: false, userUrlHash: null },
+      { slide: 2, step: 0, blanked: false, userUrlHash: "#bar" },
+    ]);
+
+    // It is not cleared on banking toggles
+    assert.deepEqual(stepper.show(2, 0, "#bar"), true);
+    assert.deepEqual(onChange.mock.calls.length, 5);
+    assert.deepEqual(onChange.mock.calls[4].arguments, [
+      { slide: 2, step: 0, blanked: false, userUrlHash: "#bar" },
+      { slide: 1, step: 0, blanked: false, userUrlHash: null },
+    ]);
+    stepper.toggleBlank();
+    assert.deepEqual(onChange.mock.calls.length, 6);
+    assert.deepEqual(onChange.mock.calls[5].arguments, [
+      { slide: 2, step: 0, blanked: true, userUrlHash: "#bar" },
+      { slide: 2, step: 0, blanked: false, userUrlHash: "#bar" },
+    ]);
+
+    // It is not cleared when show used to unblank
+    assert.deepEqual(stepper.show(2, 0), true);
+    assert.deepEqual(onChange.mock.calls.length, 7);
+    assert.deepEqual(onChange.mock.calls[6].arguments, [
+      { slide: 2, step: 0, blanked: false, userUrlHash: "#bar" },
+      { slide: 2, step: 0, blanked: true, userUrlHash: "#bar" },
+    ]);
+
+    // No duplicate events produced if we don't change the hash
+    assert.deepEqual(stepper.show(2, 0), true);
+    assert.deepEqual(onChange.mock.calls.length, 7);
+    assert.deepEqual(stepper.show(2, 0, "#bar"), true);
+    assert.deepEqual(onChange.mock.calls.length, 7);
+
+    // We do get a new event if the hash changes
+    assert.deepEqual(stepper.show(2, 0, "#bar#1"), true);
+    assert.deepEqual(onChange.mock.calls.length, 8);
+    assert.deepEqual(onChange.mock.calls[7].arguments, [
+      { slide: 2, step: 0, blanked: false, userUrlHash: "#bar#1" },
+      { slide: 2, step: 0, blanked: false, userUrlHash: "#bar" },
+    ]);
+  });
+
   await t.test("nextStep()", async (t) => {
     const stepper = new Stepper(exampleSlideStepCounts);
 
@@ -117,6 +195,7 @@ test("stepper", async (t) => {
       slide: 0,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
 
     // Advance over slide boundary
@@ -125,6 +204,7 @@ test("stepper", async (t) => {
       slide: 1,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
 
     // Advance over steps within slide
@@ -133,6 +213,7 @@ test("stepper", async (t) => {
       slide: 1,
       step: 1,
       blanked: false,
+      userUrlHash: null,
     });
 
     // Don't advance when coming out of blanking
@@ -141,12 +222,14 @@ test("stepper", async (t) => {
       slide: 1,
       step: 1,
       blanked: true,
+      userUrlHash: null,
     });
     assert.deepEqual(stepper.nextStep(), true);
     assert.deepEqual(stepper.state, {
       slide: 1,
       step: 1,
       blanked: false,
+      userUrlHash: null,
     });
 
     // Don't advance past end
@@ -155,12 +238,14 @@ test("stepper", async (t) => {
       slide: 2,
       step: 2,
       blanked: false,
+      userUrlHash: null,
     });
     assert.deepEqual(stepper.nextStep(), false);
     assert.deepEqual(stepper.state, {
       slide: 2,
       step: 2,
       blanked: false,
+      userUrlHash: null,
     });
   });
 
@@ -171,6 +256,7 @@ test("stepper", async (t) => {
       slide: 0,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
 
     // Don't advance before start
@@ -179,6 +265,7 @@ test("stepper", async (t) => {
       slide: 0,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
 
     stepper.show(2, 0);
@@ -186,6 +273,7 @@ test("stepper", async (t) => {
       slide: 2,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
 
     // Advance over slide boundary
@@ -194,6 +282,7 @@ test("stepper", async (t) => {
       slide: 1,
       step: 1,
       blanked: false,
+      userUrlHash: null,
     });
 
     // Advance over steps within slide
@@ -202,6 +291,7 @@ test("stepper", async (t) => {
       slide: 1,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
 
     // Don't advance when coming out of blanking
@@ -210,12 +300,14 @@ test("stepper", async (t) => {
       slide: 1,
       step: 0,
       blanked: true,
+      userUrlHash: null,
     });
     assert.deepEqual(stepper.previousStep(), true);
     assert.deepEqual(stepper.state, {
       slide: 1,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
   });
 
@@ -226,6 +318,7 @@ test("stepper", async (t) => {
       slide: 0,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
 
     // Should always advance to first step of next slide
@@ -234,6 +327,7 @@ test("stepper", async (t) => {
       slide: 1,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
 
     assert.deepEqual(stepper.nextSlide(), true);
@@ -241,6 +335,7 @@ test("stepper", async (t) => {
       slide: 2,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
 
     // Don't advance past end
@@ -250,6 +345,7 @@ test("stepper", async (t) => {
       slide: 2,
       step: 1,
       blanked: false,
+      userUrlHash: null,
     });
 
     // Don't advance when coming out of blanking
@@ -259,12 +355,14 @@ test("stepper", async (t) => {
       slide: 1,
       step: 0,
       blanked: true,
+      userUrlHash: null,
     });
     assert.deepEqual(stepper.nextSlide(), true);
     assert.deepEqual(stepper.state, {
       slide: 1,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
   });
 
@@ -275,6 +373,7 @@ test("stepper", async (t) => {
       slide: 0,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
 
     // Should always advance to first step of previous slide, starting with the
@@ -285,6 +384,7 @@ test("stepper", async (t) => {
       slide: 2,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
 
     assert.deepEqual(stepper.previousSlide(), true);
@@ -292,6 +392,7 @@ test("stepper", async (t) => {
       slide: 1,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
 
     assert.deepEqual(stepper.previousSlide(), true);
@@ -299,6 +400,7 @@ test("stepper", async (t) => {
       slide: 0,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
 
     // Don't advance past start
@@ -307,6 +409,7 @@ test("stepper", async (t) => {
       slide: 0,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
 
     // Don't advance when coming out of blanking
@@ -316,12 +419,14 @@ test("stepper", async (t) => {
       slide: 2,
       step: 1,
       blanked: true,
+      userUrlHash: null,
     });
     assert.deepEqual(stepper.previousSlide(), true);
     assert.deepEqual(stepper.state, {
       slide: 2,
       step: 1,
       blanked: false,
+      userUrlHash: null,
     });
   });
 
@@ -335,6 +440,7 @@ test("stepper", async (t) => {
       slide: 0,
       step: 0,
       blanked: false,
+      userUrlHash: null,
     });
   });
 
@@ -348,6 +454,7 @@ test("stepper", async (t) => {
       slide: 2,
       step: 2,
       blanked: false,
+      userUrlHash: null,
     });
   });
 });
