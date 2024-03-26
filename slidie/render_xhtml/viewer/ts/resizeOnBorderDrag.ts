@@ -2,6 +2,11 @@
  * Make a HTML element resizable by dragging any visible CSS border.
  *
  * NB: Currently only top/right border dragging is implemented.
+ *
+ * Warning: WebKit based browsers have a bug which means that offsetX and
+ * offsetY have the wrong values (see
+ * https://bugs.webkit.org/show_bug.cgi?id=271694) which may prevent this
+ * function working as expected. I've not yet concocted a suitable workaround.
  */
 export function resizeOnBorderDrag(elem: HTMLElement) {
   // Show resize cursor when mouse over borders
