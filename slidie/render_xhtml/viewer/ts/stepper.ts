@@ -3,8 +3,6 @@
  * advancing through a slide show.
  */
 
-import { layerStepNumbers } from "./buildSteps.ts";
-
 /**
  * The a summary of the state of the Stepper.
  */

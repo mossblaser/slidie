@@ -8,7 +8,7 @@ export function setClassWhileMouseIdle(
   timeout: number = 2000,
 ) {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
-  elem.addEventListener("mousemove", (evt: MouseEvent) => {
+  elem.addEventListener("mousemove", () => {
     elem.classList.remove(className);
 
     if (timeoutId !== null) {
