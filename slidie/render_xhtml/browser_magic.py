@@ -14,21 +14,24 @@ from slidie.video import find_video_magic
 
 def substitute_foreign_object(
     magic_rectangle: MagicRectangle,
-    scale: float = 1.0,
+    scale: float | None = 1.0,
 ) -> ET.Element:
     """
     Substitute an <image> or <rect> for a <foreignObject> of equivalent size
     and identity.
 
     The scale argument indicates the scale at which the foreign object should
-    be scaled relative to its native size.
+    be scaled relative to its native size. If set to None, no scaling will be
+    performed and it will be shown at whatever size the <foreignObject> element
+    happens to be in its own local coordinate system.
     """
     magic_rectangle.container.remove(magic_rectangle.rectangle)
 
     foreign_object = ET.SubElement(
         magic_rectangle.container, f"{{{SVG_NAMESPACE}}}foreignObject"
     )
-    foreign_object.attrib[f"{{{SLIDIE_NAMESPACE}}}scale"] = json.dumps(scale)
+    if scale is not None:
+        foreign_object.attrib[f"{{{SLIDIE_NAMESPACE}}}scale"] = json.dumps(scale)
 
     for attrib in ["id", "x", "y", "width", "height", "transform"]:
         if attrib in magic_rectangle.rectangle.attrib:
@@ -72,6 +75,9 @@ def embed_iframes(magic: dict[str, list[MagicText]]) -> None:
 
     * url: The URL to display. Defaults to ``about:blank``.
     * scale: The scale factor to use for the displayed contents. Defaults to 1.
+      Set to 0 to disable scaling correction. This will result in the iframe
+      being rendered at a resolution determined by the local coordinate system
+      the iframe ends up in within the SVG.
     * name: The name attribute for the resultant <iframe>. This makes the
       iframe 'targetable' by links on the slide.
     * id: The ID to give to the <iframe> element.
@@ -93,12 +99,12 @@ def embed_iframes(magic: dict[str, list[MagicText]]) -> None:
             parameters = {"url": parameters}
 
         url = magic_text.parameters.get("url", "about:blank")
-        scale = magic_text.parameters.get("scale")
+        scale = magic_text.parameters.get("scale", 1.0)
         name = magic_text.parameters.get("name")
         id = magic_text.parameters.get("id")
 
         magic_rectangle = get_magic_rectangle(magic_text)
-        foreign_object = substitute_foreign_object(magic_rectangle, scale)
+        foreign_object = substitute_foreign_object(magic_rectangle, scale or None)
 
         iframe_elem = ET.SubElement(foreign_object, f"{{{XHTML_NAMESPACE}}}iframe")
         iframe_elem.attrib["style"] = "border: none; width: 100%; height: 100%;"
