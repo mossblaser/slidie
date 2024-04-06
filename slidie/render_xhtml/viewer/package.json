@@ -5,15 +5,18 @@
     "watch": "ts-node build.ts watch",
     "check-up-to-date": "ts-node build.ts check-up-to-date",
     "test": "node --require ts-node/register --test ./tests/*.test.ts",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "lint": "eslint ts/ tests/"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.6",
     "esbuild": "0.20.1",
+    "eslint": "^8.57.0",
     "jsdom": "^24.0.0",
     "prettier": "3.2.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.2",
+    "typescript-eslint": "^7.5.0"
   },
   "dependencies": {
     "marked": "^12.0.1"
