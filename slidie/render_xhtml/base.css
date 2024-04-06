@@ -23,7 +23,7 @@ body > #slides {
   grid-row: 2;
   grid-column: 2;
   
-  /* Allow the slides to shrink to fit into the grid */
+  /* Allow the slide to shrink to fit into the grid */
   min-width: 0;
   min-height: 0;
 }
@@ -108,6 +108,9 @@ body > #notes {
 #slide-selector input.slide-number:focus {
   width: 12em!important;  /* Override the custom resizing by JS */
 }
+#slide-selector input.slide-number.invalid {
+  border-color: red;
+}
 
 #title {
   flex-grow: 1;
@@ -152,11 +155,6 @@ button#presenter-view {
 
 
 
-/* Hide SVGs until javascript has moved them into the shadow DOM. */
-#slides > svg {
-  display: none;
-}
-
 #slides > .slide-container {
   /* Slides are hidden until explicitly displayed. */
   display: none;
@@ -198,7 +196,7 @@ button#presenter-view {
   min-width: 2em;
   flex-grow: 0;
 }
-.thumbnail-group > .slide-thumbnails {
+.thumbnail-group > .step-thumbnails {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -244,7 +242,7 @@ button#presenter-view {
     width: auto;
     height: 100%;
   }
-  .thumbnail-group > .slide-thumbnails {
+  .thumbnail-group > .step-thumbnails {
     flex-direction: row;
     width: auto;
     height: 100%;
