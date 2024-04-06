@@ -81,17 +81,6 @@ def embed_iframes(magic: dict[str, list[MagicText]]) -> None:
     * name: The name attribute for the resultant <iframe>. This makes the
       iframe 'targetable' by links on the slide.
     * id: The ID to give to the <iframe> element.
-
-    A message will be posted (via window.postMessage) to the iframe with an
-    object of the following form whenever the slide it resides is visible and
-    the step changes, and on leaving the slide::
-
-        {
-            visible: <bool>,
-            step: <int or null>,
-            stepNumber: <int or null>,
-            tags: <list[str] or null>,
-        }
     """
     for magic_text in magic.pop("iframe", []):
         parameters = magic_text.parameters
