@@ -41,6 +41,10 @@ export class Stopwatch {
     this.timerRunning = timerRunning;
   }
 
+  get running(): boolean {
+    return this.timerRunning;
+  }
+
   /** Pause the timer. */
   pause() {
     if (this.timerRunning) {
