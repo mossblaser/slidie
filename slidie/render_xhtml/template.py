@@ -144,12 +144,16 @@ def inline_or_replace_css_js_and_templates(
     inline_templates(root, path, debug)
 
 
-def get_template(template: Path, debug: bool) -> tuple[ET.Element, ET.Element]:
+def render_template(
+    template: Path,
+    slides: list[ET.Element],
+    debug: bool,
+) -> ET.Element:
     """
-    Get the basic template for a self-contained Slidie XHTML output.
+    Render the XHTML template, substituting in the provided series of SVG
+    slides.
 
-    Returns two elements: the root element for the XHTML document and the element
-    within that into which the SVGs for each slide should be inserted.
+    Returns the root element for the XHTML document.
     """
     root = ET.parse(template).getroot()
 
@@ -159,6 +163,34 @@ def get_template(template: Path, debug: bool) -> tuple[ET.Element, ET.Element]:
     # <script> tags.
     inline_or_replace_css_js_and_templates(root, template.parent, debug)
 
-    (slides_elem,) = root.findall(f".//{{{XHTML_NAMESPACE}}}*[@id='slides']")
+    (slides_container,) = root.findall(f".//{{{XHTML_NAMESPACE}}}*[@id='slides']")
 
-    return (root, slides_elem)
+    for slide in slides:
+        # The following slightly mysterious structure invokes the
+        # 'declarative shadow DOM' feature available in modern browsers.
+        # This effectively inserts each SVG inside a `<div
+        # class="slide-container">` element but with each SVG residing in a
+        # 'shadow DOM'. This has the effect of giving each SVG its own
+        # (mostly) isolated namespace and DOM for IDs, CSS and Javascript.
+        slide_container = ET.SubElement(
+            slides_container,
+            f"{{{XHTML_NAMESPACE}}}div",
+            {"class": "slide-container"},
+        )
+        template_elem = ET.SubElement(
+            slide_container,
+            f"{{{XHTML_NAMESPACE}}}template",
+            {"shadowrootmode": "open"},
+        )
+        template_elem.append(slide)
+
+        # Style the SVG to ensure it fills the available space.
+        #
+        # This must be done explicitly here (rather than in CSS) because the
+        # <svg> exists in its own isolated shadow DOM where the main document's
+        # CSS cannot reach it.
+        slide.attrib[
+            "style"
+        ] = f"display:block;width:100%;height:100%;{slide.attrib.get('style', '')}"
+
+    return root

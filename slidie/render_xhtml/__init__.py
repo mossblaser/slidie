@@ -26,7 +26,7 @@ from slidie.magic import MagicText, extract_magic
 from slidie.links import annotate_slide_id_from_magic
 from slidie.metadata import annotate_metadata_from_magic
 from slidie.render_xhtml.browser_magic import embed_videos, embed_iframes
-from slidie.render_xhtml.template import get_template
+from slidie.render_xhtml.template import render_template
 
 
 BASE_TEMPLATE_FILENAME = Path(__file__).parent / "base.xhtml"
@@ -97,18 +97,19 @@ def render_xhtml(source_directory: Path, output: Path, debug: bool = False) -> N
     """
     Render a slidie show into a self-contained XHTML file.
     """
-    xhtml_root, slide_container = get_template(BASE_TEMPLATE_FILENAME, debug)
 
     slide_filenames = sorted(
         source_directory.glob("*.svg"), key=extract_numerical_prefix
     )
 
+    slides = []
     with Inkscape() as inkscape:
         for filename in slide_filenames:
             svg = ET.parse(filename).getroot()
             svg.attrib[f"{{{SLIDIE_NAMESPACE}}}source"] = str(filename)
-            svg = render_slide(svg, inkscape)
-            slide_container.append(svg)
+            slides.append(render_slide(svg, inkscape))
+
+    xhtml_root = render_template(BASE_TEMPLATE_FILENAME, slides, debug)
 
     with output.open("wb") as f:
         ET.ElementTree(xhtml_root).write(f, encoding="utf-8")

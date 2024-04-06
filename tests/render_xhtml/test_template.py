@@ -11,7 +11,6 @@ from slidie.render_xhtml.template import (
     inline_templates,
     replace_css_paths_with_absolute_file_path,
     replace_js_paths_with_absolute_file_path,
-    get_template,
 )
 
 
@@ -126,6 +125,7 @@ def test_inline_template(tmp_path: Path) -> None:
     (style_elem,) = root.findall(f".//{{{XHTML_NAMESPACE}}}style")
     assert style_elem.text == nested_style_filename.read_text()
     (script_elem,) = root.findall(f".//{{{XHTML_NAMESPACE}}}script")
+    assert script_elem.text is not None
     assert script_elem.text.startswith(nested_script_filename.read_text())
 
 
