@@ -1,1 +1,3 @@
-console.log("Hello, world!");
+import app from "./app.ts";
+
+app();
