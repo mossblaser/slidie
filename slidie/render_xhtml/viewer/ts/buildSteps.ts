@@ -2,7 +2,6 @@
  * The following functions are used for extracting information slidie specific
  * information from SVGs (e.g. build steps, thumbnails etc.).
  */
-
 import ns from "./xmlNamespaces.ts";
 
 export interface BuildStepVisibility {

@@ -12,12 +12,10 @@
  *     $ # Check if the built files are up-to-date
  *     $ ts-node build.ts check-up-to-date
  */
-
 import * as esbuild from "esbuild";
-
+import { mkdtemp, readFile, readdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
-import { mkdtemp, readdir, readFile, writeFile } from "node:fs/promises";
 
 const buildOptions = {
   entryPoints: ["./ts/index.js"],

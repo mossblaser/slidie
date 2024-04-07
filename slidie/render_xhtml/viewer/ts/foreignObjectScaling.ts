@@ -2,7 +2,6 @@
  * This module implements scaling of <foreignObject> elements such that thier
  * contents are shown a native size (or some multiple thereof).
  */
-
 import ns from "./xmlNamespaces.ts";
 
 /**

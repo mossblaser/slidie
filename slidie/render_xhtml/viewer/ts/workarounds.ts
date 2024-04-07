@@ -1,7 +1,6 @@
 /**
  * Misc browser bug workarounds.
  */
-
 import ns from "./xmlNamespaces.ts";
 
 /**

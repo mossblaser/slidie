@@ -2,13 +2,12 @@
  * This module contains logic for encoding and decoding slide/step identifiers
  * in URL hashes following the scheme defined in `slidie/links.py`.
  */
-
-import ns from "./xmlNamespaces.ts";
 import {
   findBuildSteps,
   layerStepNumbers,
   layerStepTags,
 } from "./buildSteps.ts";
+import ns from "./xmlNamespaces.ts";
 
 /**
  * Given a zero-indexed slide number and zero-indexed step index, return a URL

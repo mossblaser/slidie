@@ -1,14 +1,12 @@
-import { test } from "node:test";
-import { strict as assert } from "node:assert";
-
 import { JSDOM } from "jsdom";
-
-import ns from "../ts/xmlNamespaces.ts";
+import { strict as assert } from "node:assert";
+import { test } from "node:test";
 
 import {
   eventInvolvesHyperlink,
   keyboardEventInterferesWithHyperlink,
 } from "../ts/eventFilters.ts";
+import ns from "../ts/xmlNamespaces.ts";
 
 /**
  * Run the provided function within an event handler for an event dispatched to

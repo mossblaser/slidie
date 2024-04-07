@@ -1,10 +1,10 @@
-import { test } from "node:test";
 import { strict as assert } from "node:assert";
-
-import ns from "../ts/xmlNamespaces.ts";
-import { getProcessedSvg } from "./svgs.ts";
+import { test } from "node:test";
 
 import { SlideLookups } from "../ts/slideLookups.ts";
+import ns from "../ts/xmlNamespaces.ts";
+
+import { getProcessedSvg } from "./svgs.ts";
 
 test("slideLookups", async (t) => {
   const empty = await getProcessedSvg("empty.svg");

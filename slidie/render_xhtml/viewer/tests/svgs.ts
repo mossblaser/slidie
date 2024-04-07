@@ -2,15 +2,13 @@
  * Test utility which provides access to SVG files in the main pytest suite's
  * `tests/svgs/` directory.
  */
-
-import { join, basename, resolve } from "node:path";
-import { tmpdir } from "node:os";
-import { readFile, mkdtemp, rm } from "node:fs/promises";
-import { spawn } from "node:child_process";
-import { Readable } from "node:stream";
-import * as readline from "node:readline/promises";
-
 import { JSDOM } from "jsdom";
+import { spawn } from "node:child_process";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { basename, join, resolve } from "node:path";
+import * as readline from "node:readline/promises";
+import { Readable } from "node:stream";
 
 /**
  * Return the path to a named SVG in the pytest tests/svg directory.

@@ -1,13 +1,13 @@
-import { test } from "node:test";
 import { strict as assert } from "node:assert";
-
-import { getProcessedSvg } from "./svgs.ts";
+import { test } from "node:test";
 
 import {
-  toUrlHash,
-  parseUrlHash,
   enumerateAbsoluteHashes,
+  parseUrlHash,
+  toUrlHash,
 } from "../ts/urlHashes.ts";
+
+import { getProcessedSvg } from "./svgs.ts";
 
 test("urlHashes", async (t) => {
   await t.test("toUrlHash", async (t) => {

@@ -1,15 +1,15 @@
-import { test } from "node:test";
 import { strict as assert } from "node:assert";
-
-import ns from "../ts/xmlNamespaces.ts";
-import { getProcessedSvg } from "./svgs.ts";
+import { test } from "node:test";
 
 import {
   findBuildSteps,
+  findElementBuildSteps,
   layerStepNumbers,
   layerStepTags,
-  findElementBuildSteps,
 } from "../ts/buildSteps.ts";
+import ns from "../ts/xmlNamespaces.ts";
+
+import { getProcessedSvg } from "./svgs.ts";
 
 test("buildSteps", async (t) => {
   const empty = await getProcessedSvg("empty.svg");

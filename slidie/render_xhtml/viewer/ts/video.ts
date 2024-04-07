@@ -1,6 +1,5 @@
-import ns from "./xmlNamespaces.ts";
-
 import { SlideChangeEvent } from "./slideChangeEvents.ts";
+import ns from "./xmlNamespaces.ts";
 
 /**
  * Setup automatic video play/pause on slide entry/exit for videos inserted

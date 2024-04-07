@@ -1,10 +1,10 @@
-import { test } from "node:test";
 import { strict as assert } from "node:assert";
-
 import { access } from "node:fs/promises";
+import { test } from "node:test";
 
 import ns from "../ts/xmlNamespaces.ts";
-import { getSvgFilename, getSvg, getProcessedSvg } from "./svgs.ts";
+
+import { getProcessedSvg, getSvg, getSvgFilename } from "./svgs.ts";
 
 test("svgs", async (t) => {
   await t.test("getSvgFilename", async (t) => {

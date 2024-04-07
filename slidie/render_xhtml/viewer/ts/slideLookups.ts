@@ -4,14 +4,13 @@
  * some combination of these, this singular object provides a conventient way
  * to pass these around and reuse them.
  */
-
-import ns from "./xmlNamespaces.ts";
 import {
   BuildStepVisibility,
   findBuildSteps,
   layerStepNumbers,
   layerStepTags,
 } from "./buildSteps.ts";
+import ns from "./xmlNamespaces.ts";
 
 /**
  * Extract the ID assigned to a slide.

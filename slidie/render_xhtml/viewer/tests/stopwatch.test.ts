@@ -1,7 +1,7 @@
-import { test } from "node:test";
 import { strict as assert } from "node:assert";
+import { test } from "node:test";
 
-import { formatDuration, Stopwatch } from "../ts/stopwatch.ts";
+import { Stopwatch, formatDuration } from "../ts/stopwatch.ts";
 
 test("stopwatch", async (t) => {
   await t.test("formatDuration", async (t) => {

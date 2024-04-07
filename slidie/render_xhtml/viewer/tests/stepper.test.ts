@@ -1,9 +1,9 @@
-import { test, mock } from "node:test";
 import { strict as assert } from "node:assert";
+import { mock, test } from "node:test";
+
+import { Stepper, StepperState } from "../ts/stepper.ts";
 
 import { getProcessedSvg } from "./svgs.ts";
-
-import { StepperState, Stepper } from "../ts/stepper.ts";
 
 test("stepper", async (t) => {
   const exampleSlideStepCounts = [1, 2, 3];

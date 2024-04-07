@@ -18,7 +18,6 @@
  * Where multiple events are arise from a single change, the events are
  * dispatched in the order listed above.
  */
-
 import { Stepper, StepperState } from "./stepper.ts";
 
 /**

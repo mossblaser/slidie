@@ -1,9 +1,9 @@
-import { test } from "node:test";
 import { strict as assert } from "node:assert";
-
-import { getProcessedSvg } from "./svgs.ts";
+import { test } from "node:test";
 
 import { getThumbnails } from "../ts/thumbnails.ts";
+
+import { getProcessedSvg } from "./svgs.ts";
 
 test("thumbnails", async (t) => {
   const negativeBuildStepNumber = await getProcessedSvg(

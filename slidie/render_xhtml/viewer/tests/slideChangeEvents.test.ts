@@ -1,11 +1,11 @@
-import { test, mock } from "node:test";
 import { strict as assert } from "node:assert";
+import { mock, test } from "node:test";
 
-import { Stepper } from "../ts/stepper.ts";
 import {
   SlideChangeEvent,
   connectStepperToSlideEvents,
 } from "../ts/slideChangeEvents.ts";
+import { Stepper } from "../ts/stepper.ts";
 
 test("slideChangeEvents", async (t) => {
   // A dummy setup roughly mimicing a show consisting of empty.svg followed by
