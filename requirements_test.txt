@@ -4,3 +4,4 @@ black
 pillow
 types-pillow
 numpy
+selenium
