@@ -43,10 +43,12 @@ Why XHTML (not HTML)?
 ---------------------
 
 Whilst HTML supports inline SVG, you lose XML namespace support which is
-absolutely essential for passing in Slidie metadata. Fortunately XHTML, the
-XML-embedding of HTML5, is almost indistinguishable from HTML and widely
-supported. SVGs can be embedded in an XHTML document in all of their namespaced
-glory whilst the rest of the document remains (almost) bog-standard HTML.
+absolutely essential for passing in Slidie metadata. Fortunately the XML syntax
+for HTML5 (informally, if ambiguously, referred to as XHTML), is almost
+indistinguishable from HTML and widely supported. SVGs can be embedded in an
+XHTML document in all of their namespaced glory whilst the rest of the document
+remains (almost) bog-standard HTML.
+
 
 
 Why is Javascript Required?
@@ -61,26 +63,29 @@ hide/reveal content on a slide as we progress.
 Shadow DOMs
 -----------
 
-When SVGs are inlined into an (X)HTML document they all resides in the same
-global identifier namespace. As a result, ID collisions will be rife causing
-all manner of things to break (e.g. gradients, clipping paths, ...).
+If SVGs are inlined drectly into an (X)HTML document they will all reside in
+the same global identifier namespace. As a result, ID collisions will be rife
+causing all manner of things to break (e.g. gradients, clipping paths, cloned
+objects ...).
 
 In principle we could pre-process the SVGs to uniquify their IDs but this is
 highly problematic. For example we would need to correctly locate all ID-based
 references and, in the case of any embedded Javascript, deal with that too.
 Essentially this would be a lot of work and won't work in all cases anyway.
 
-Instead we use Javascript to place every SVG into its own [shadow
+Instead we place every SVG into its own [shadow
 DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM).
 This gives each of them an isolated environment, including their own ID
 namespaces. (NB: 'open' shadow DOMs are used to allow Javascript to reach into
 slides, for example to advance through build steps.)
 
-NB: There is a [new
-mechanism](https://github.com/mfreed7/declarative-shadow-dom/blob/master/README.md#proposed-solution)
-for declaratively creating shadow DOMs in HTML directly. At the time of
-writing, however, this is still a bit [bleeding
-edge](https://github.com/mfreed7/declarative-shadow-dom/blob/master/README.md#proposed-solution).
+In the spirit of great optimism, the [declarative shadow
+DOM](https://github.com/mfreed7/declarative-shadow-dom/blob/master/README.md#proposed-solution)
+HTML syntax is used to do this in spite of the fact that it is [not supported
+for XHTML documents](https://github.com/whatwg/html/issues/10237). A Javascript
+polyfill is included instead but this choice hopefully makes the intent clearer
+to readers of the code and, just maybe, it may actually be natively supported
+one day.
 
 
 How is the Javascript built and tested?
@@ -141,3 +146,19 @@ Python test suite integration
 The viewer test suite will be invoked by the main pytest test suite. Likewise, it
 will verify that the TypeScript and built Javascript are in sync to minimise
 opportunity for mistakes.
+
+Note that browser-based testing (e.g. using selenium web driver) is performed
+in the Python test suite rather than the Javascript one. (I am not a masochist
+and so will go to great lengths to use pytest where possible...)
+
+
+XHTML Deprecation
+-----------------
+
+Unfortunately, [the XML syntax for HTML is effectively
+deprecated](https://html.spec.whatwg.org/multipage/xhtml.html#xml-syntax-not-recommended).
+This means that in the short to medium term, it will continue to exist but may
+not gain support for new HTML features (e.g. declarative shadow DOM). In the
+longer term, this may mean XHTML support could be dropped by browsers (though
+this is probably relatively unlikely). If this occurs, some re-thinking is
+required.
