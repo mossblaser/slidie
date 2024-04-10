@@ -2034,19 +2034,30 @@ ${content}</tr>
   }
 
   // ts/eventFilters.ts
-  function eventInvolvesHyperlink(evt) {
+  function eventInvolvesHyperlinkOrButton(evt) {
     for (const elem of evt.composedPath()) {
-      if ((elem.namespaceURI == ns("xhtml") || elem.namespaceURI == ns("svg")) && elem.localName == "a" || elem.namespaceURI == ns("xhtml") && (elem.localName == "button" || elem.localName == "input")) {
+      if ((elem.namespaceURI == ns("xhtml") || elem.namespaceURI == ns("svg")) && elem.localName == "a" || elem.namespaceURI == ns("xhtml") && elem.localName == "button") {
         return true;
       }
     }
     return false;
   }
-  function keyboardEventInterferesWithHyperlink(evt) {
+  function eventInvolvesInput(evt) {
+    for (const elem of evt.composedPath()) {
+      if (elem.namespaceURI == ns("xhtml") && elem.localName == "input") {
+        return true;
+      }
+    }
+    return false;
+  }
+  function keyboardEventInterferesWithElement(evt) {
+    if (eventInvolvesInput(evt)) {
+      return true;
+    }
     switch (evt.key) {
       case "Enter":
       case "Space":
-        return eventInvolvesHyperlink(evt);
+        return eventInvolvesHyperlinkOrButton(evt);
       default:
         return false;
     }
@@ -2469,7 +2480,7 @@ ${content}</tr>
   }
   function setupPresenterViewKeyboardShortcuts(presenterViewWindow, helpDialog) {
     presenterViewWindow.addEventListener("keydown", (evt) => {
-      if (keyboardEventInterferesWithHyperlink(evt)) {
+      if (keyboardEventInterferesWithElement(evt)) {
         return;
       }
       const match = matchKeypress(evt, PRESENTER_VIEW_KEYBOARD_SHORTCUTS);
@@ -3313,7 +3324,7 @@ ${content}</tr>
   ];
   function setupKeyboardShortcuts(stepper, slides, stopwatch) {
     window.addEventListener("keydown", (evt) => {
-      if (keyboardEventInterferesWithHyperlink(evt)) {
+      if (keyboardEventInterferesWithElement(evt)) {
         return;
       }
       const match = matchKeypress(evt, KEYBOARD_SHORTCUTS);
@@ -3326,7 +3337,7 @@ ${content}</tr>
   }
   function setupMouseClicks(stepper, element) {
     element.addEventListener("click", (evt) => {
-      if (!eventInvolvesHyperlink(evt)) {
+      if (!eventInvolvesHyperlinkOrButton(evt)) {
         stepper.nextStep();
         evt.preventDefault();
         evt.stopPropagation();

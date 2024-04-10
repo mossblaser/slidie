@@ -3,8 +3,9 @@ import { strict as assert } from "node:assert";
 import { test } from "node:test";
 
 import {
-  eventInvolvesHyperlink,
-  keyboardEventInterferesWithHyperlink,
+  eventInvolvesHyperlinkOrButton,
+  eventInvolvesInput,
+  keyboardEventInterferesWithElement,
 } from "../ts/eventFilters.ts";
 import ns from "../ts/xmlNamespaces.ts";
 
@@ -34,7 +35,7 @@ function runInEventHandler<T>(
 }
 
 test("eventFilters", async (t) => {
-  await t.test("eventInvolvesHyperlink", async (t) => {
+  await t.test("eventInvolvesHyperlinkOrButton", async (t) => {
     await t.test("xhtml", async (t) => {
       const jsdom = new JSDOM(
         `
@@ -44,7 +45,6 @@ test("eventFilters", async (t) => {
               <h1 id="not-link">Not a link</h1>
               <a href="#"><span id="is-link">Is a link</span></a>
               <button id="is-button">Is a button</button>
-              <input id="is-input" />
             </body>
           </html>
         `,
@@ -56,22 +56,21 @@ test("eventFilters", async (t) => {
       const notLink = jsdom.window.document.getElementById("not-link")!;
       const isLink = jsdom.window.document.getElementById("is-link")!;
       const isButton = jsdom.window.document.getElementById("is-button")!;
-      const isInput = jsdom.window.document.getElementById("is-input")!;
 
       assert.deepEqual(
-        await runInEventHandler(jsdom, notLink, eventInvolvesHyperlink),
+        await runInEventHandler(jsdom, notLink, eventInvolvesHyperlinkOrButton),
         false,
       );
       assert.deepEqual(
-        await runInEventHandler(jsdom, isLink, eventInvolvesHyperlink),
+        await runInEventHandler(jsdom, isLink, eventInvolvesHyperlinkOrButton),
         true,
       );
       assert.deepEqual(
-        await runInEventHandler(jsdom, isButton, eventInvolvesHyperlink),
-        true,
-      );
-      assert.deepEqual(
-        await runInEventHandler(jsdom, isInput, eventInvolvesHyperlink),
+        await runInEventHandler(
+          jsdom,
+          isButton,
+          eventInvolvesHyperlinkOrButton,
+        ),
         true,
       );
     });
@@ -96,23 +95,52 @@ test("eventFilters", async (t) => {
       const isLink = jsdom.window.document.getElementById("is-link")!;
 
       assert.deepEqual(
-        await runInEventHandler(jsdom, notLink, eventInvolvesHyperlink),
+        await runInEventHandler(jsdom, notLink, eventInvolvesHyperlinkOrButton),
         false,
       );
       assert.deepEqual(
-        await runInEventHandler(jsdom, isLink, eventInvolvesHyperlink),
+        await runInEventHandler(jsdom, isLink, eventInvolvesHyperlinkOrButton),
         true,
       );
     });
   });
+  await t.test("eventInvolvesInput", async (t) => {
+    const jsdom = new JSDOM(
+      `
+        <html xmlns="http://www.w3.org/1999/xhtml" lang="en" >
+          <head><meta charset="utf-8"/></head>
+          <body>
+            <h1 id="not-input">Not an input</h1>
+            <input id="is-input" />
+          </body>
+        </html>
+      `,
+      {
+        contentType: "application/xhtml+xml",
+      },
+    );
 
-  await t.test("keyboardEventInterferesWithHyperlink", async (t) => {
+    const notInput = jsdom.window.document.getElementById("not-input")!;
+    const isInput = jsdom.window.document.getElementById("is-input")!;
+
+    assert.deepEqual(
+      await runInEventHandler(jsdom, notInput, eventInvolvesInput),
+      false,
+    );
+    assert.deepEqual(
+      await runInEventHandler(jsdom, isInput, eventInvolvesInput),
+      true,
+    );
+  });
+
+  await t.test("keyboardEventInterferesWithElement", async (t) => {
     const jsdom = new JSDOM(
       `
         <html xmlns="http://www.w3.org/1999/xhtml" lang="en" >
           <head><meta charset="utf-8"/></head>
           <body>
             <h1 id="not-link">Not a link</h1>
+            <button id="is-button" />
             <input id="is-input" />
           </body>
         </html>
@@ -123,13 +151,14 @@ test("eventFilters", async (t) => {
     );
 
     const notLink = jsdom.window.document.getElementById("not-link")!;
+    const isButton = jsdom.window.document.getElementById("is-button")!;
     const isInput = jsdom.window.document.getElementById("is-input")!;
 
     assert.deepEqual(
       await runInEventHandler(
         jsdom,
         notLink,
-        (evt) => keyboardEventInterferesWithHyperlink(evt as KeyboardEvent),
+        (evt) => keyboardEventInterferesWithElement(evt as KeyboardEvent),
         (jsdom) => new jsdom.window.KeyboardEvent("keydown", { key: "Enter" }),
       ),
       false,
@@ -137,8 +166,8 @@ test("eventFilters", async (t) => {
     assert.deepEqual(
       await runInEventHandler(
         jsdom,
-        isInput,
-        (evt) => keyboardEventInterferesWithHyperlink(evt as KeyboardEvent),
+        isButton,
+        (evt) => keyboardEventInterferesWithElement(evt as KeyboardEvent),
         (jsdom) => new jsdom.window.KeyboardEvent("keydown", { key: "X" }),
       ),
       false,
@@ -146,8 +175,26 @@ test("eventFilters", async (t) => {
     assert.deepEqual(
       await runInEventHandler(
         jsdom,
+        isButton,
+        (evt) => keyboardEventInterferesWithElement(evt as KeyboardEvent),
+        (jsdom) => new jsdom.window.KeyboardEvent("keydown", { key: "Enter" }),
+      ),
+      true,
+    );
+    assert.deepEqual(
+      await runInEventHandler(
+        jsdom,
         isInput,
-        (evt) => keyboardEventInterferesWithHyperlink(evt as KeyboardEvent),
+        (evt) => keyboardEventInterferesWithElement(evt as KeyboardEvent),
+        (jsdom) => new jsdom.window.KeyboardEvent("keydown", { key: "X" }),
+      ),
+      true,
+    );
+    assert.deepEqual(
+      await runInEventHandler(
+        jsdom,
+        isInput,
+        (evt) => keyboardEventInterferesWithElement(evt as KeyboardEvent),
         (jsdom) => new jsdom.window.KeyboardEvent("keydown", { key: "Enter" }),
       ),
       true,

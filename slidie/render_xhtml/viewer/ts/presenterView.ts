@@ -6,7 +6,7 @@ import {
   setupMouseClicks,
   toggleDialog,
 } from "./app.ts";
-import { keyboardEventInterferesWithHyperlink } from "./eventFilters.ts";
+import { keyboardEventInterferesWithElement } from "./eventFilters.ts";
 import { KeyboardShortcut, matchKeypress } from "./keyboard.ts";
 import { Stepper, StepperState } from "./stepper.ts";
 import { Stopwatch, formatDuration } from "./stopwatch.ts";
@@ -195,7 +195,7 @@ function setupPresenterViewKeyboardShortcuts(
   helpDialog: HTMLDialogElement,
 ) {
   presenterViewWindow.addEventListener("keydown", (evt) => {
-    if (keyboardEventInterferesWithHyperlink(evt)) {
+    if (keyboardEventInterferesWithElement(evt)) {
       return;
     }
 

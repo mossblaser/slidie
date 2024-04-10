@@ -9,8 +9,10 @@
 import { marked } from "marked";
 
 import { BuildStepVisibility } from "./buildSteps.ts";
-import { keyboardEventInterferesWithHyperlink } from "./eventFilters.ts";
-import { eventInvolvesHyperlink } from "./eventFilters.ts";
+import {
+  eventInvolvesHyperlinkOrButton,
+  keyboardEventInterferesWithElement,
+} from "./eventFilters.ts";
 import { setupForeignObjectScaling } from "./foreignObjectScaling.ts";
 import { KeyboardShortcut, matchKeypress } from "./keyboard.ts";
 import { showPresenterView } from "./presenterView.ts";
@@ -551,7 +553,7 @@ function setupKeyboardShortcuts(
   stopwatch: Stopwatch,
 ) {
   window.addEventListener("keydown", (evt) => {
-    if (keyboardEventInterferesWithHyperlink(evt)) {
+    if (keyboardEventInterferesWithElement(evt)) {
       return;
     }
 
@@ -572,7 +574,7 @@ export function setupMouseClicks(
   element: HTMLElement | Window | WindowProxy,
 ) {
   element.addEventListener("click", (evt) => {
-    if (!eventInvolvesHyperlink(evt)) {
+    if (!eventInvolvesHyperlinkOrButton(evt)) {
       stepper.nextStep();
       evt.preventDefault();
       evt.stopPropagation();
