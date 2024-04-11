@@ -80,17 +80,15 @@ def embed_iframes(magic: dict[str, list[MagicText]]) -> None:
       the iframe ends up in within the SVG.
     * name: The name attribute for the resultant <iframe>. This makes the
       iframe 'targetable' by links on the slide.
-    * id: The ID to give to the <iframe> element.
     """
     for magic_text in magic.pop("iframe", []):
         parameters = magic_text.parameters
         if isinstance(parameters, str):
             parameters = {"url": parameters}
 
-        url = magic_text.parameters.get("url", "about:blank")
-        scale = magic_text.parameters.get("scale", 1.0)
-        name = magic_text.parameters.get("name")
-        id = magic_text.parameters.get("id")
+        url = parameters.get("url", "about:blank")
+        scale = parameters.get("scale", 1.0)
+        name = parameters.get("name")
 
         magic_rectangle = get_magic_rectangle(magic_text)
         foreign_object = substitute_foreign_object(magic_rectangle, scale or None)
@@ -100,5 +98,3 @@ def embed_iframes(magic: dict[str, list[MagicText]]) -> None:
         iframe_elem.attrib["src"] = url
         if name is not None:
             iframe_elem.attrib["name"] = name
-        if id is not None:
-            iframe_elem.attrib["id"] = id
