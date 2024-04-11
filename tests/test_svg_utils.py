@@ -221,6 +221,11 @@ class TestGetInkscapePages:
         # multiline text when only a single logical line is present. As such
         # this case is actually handled wrong but there isn't much we can do!
         ("oneline_text_bounded_wrapped.svg", "one two \nthree"),
+        # Test Inkscape's horizontal-only line wrapping feature
+        ("inline_multiline_text_wrapped.svg", "zero one two three"),
+        ("inline_multiline_text_trailing_whitespace.svg", "zero one  two   three    "),
+        ("inline_multiline_text_line_breaks.svg", "zero\none\ntwo\nthree"),
+        ("inline_multiline_text_trailing_newline.svg", "zero\none\ntwo\nthree\n"),
     ],
 )
 def test_extract_multiline_text(svg: str, exp: str) -> None:
