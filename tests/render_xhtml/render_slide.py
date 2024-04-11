@@ -18,5 +18,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     with Inkscape() as inkscape:
-        out = render_slide(ET.parse(args.input).getroot(), inkscape)
+        out = render_slide(args.input, inkscape)
         ET.ElementTree(out).write(args.output)

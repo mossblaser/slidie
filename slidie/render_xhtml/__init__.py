@@ -33,7 +33,7 @@ BASE_TEMPLATE_FILENAME = Path(__file__).parent / "base.xhtml"
 
 
 def render_slide(
-    svg: ET.Element,
+    filename: Path,
     inkscape: Inkscape,
 ) -> ET.Element:
     """
@@ -42,6 +42,8 @@ def render_slide(
     The passed SVG may (or may not) be mutated arbitrarily as a side effect of
     this function. The returned value should be used in any case.
     """
+    svg = ET.parse(filename).getroot()
+    svg.attrib[f"{{{SLIDIE_NAMESPACE}}}source"] = str(filename)
 
     # The Javascript presentation runner will use these annotations to step
     # through builds
@@ -105,9 +107,7 @@ def render_xhtml(source_directory: Path, output: Path, debug: bool = False) -> N
     slides = []
     with Inkscape() as inkscape:
         for filename in slide_filenames:
-            svg = ET.parse(filename).getroot()
-            svg.attrib[f"{{{SLIDIE_NAMESPACE}}}source"] = str(filename)
-            slides.append(render_slide(svg, inkscape))
+            slides.append(render_slide(filename, inkscape))
 
     xhtml_root = render_template(BASE_TEMPLATE_FILENAME, slides, debug)
 
