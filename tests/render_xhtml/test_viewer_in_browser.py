@@ -8,15 +8,19 @@ from contextlib import contextmanager
 import io
 
 from PIL import Image
+import numpy as np
+from numpy.typing import NDArray
 
 from svgs import get_svg_filename
 
 from selenium import webdriver
-from selenium.webdriver import Remote as WebDriver
 from selenium.webdriver import Keys, ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support.expected_conditions import element_to_be_clickable
 from selenium.common.exceptions import NoSuchDriverException
+from selenium.webdriver import Remote as WebDriver
+from selenium.webdriver.remote.webelement import WebElement
 
 from slidie.render_xhtml import render_xhtml
 
@@ -62,6 +66,7 @@ def viewer_path() -> Iterator[Path]:
                 "empty.svg",
                 "build_rgb.svg",
                 "negative_build_step_number.svg",
+                "iframes.svg",
             ]
         ):
             slide_name = tmp_path / f"{i}.svg"
@@ -80,9 +85,13 @@ def viewer(request: Any, driver: WebDriver, viewer_path: Path) -> WebDriver:
     return driver
 
 
+def viewer_screenshot(viewer: WebDriver) -> NDArray:
+    return np.array(Image.open(io.BytesIO(viewer.get_screenshot_as_png())))
+
+
 def viewer_fullscreen(viewer: WebDriver) -> None:
     """Make the viewer full screen."""
-    button = viewer.find_element(by=By.ID, value="full-screen")
+    button = viewer.find_element(By.ID, "full-screen")
     button.click()
 
 
@@ -105,6 +114,50 @@ def viewer_next_step(viewer: WebDriver) -> None:
         ActionChains(viewer).send_keys(Keys.DOWN).perform()
 
 
+def viewer_go_to_step(viewer: WebDriver, step: str) -> None:
+    slide_number_input = viewer.find_element(
+        By.CSS_SELECTOR, "#slide-selector .slide-number"
+    )
+    if slide_number_input.get_attribute("value") != step:
+        with wait_for_url_change(viewer):
+            slide_number_input.send_keys(step + Keys.ENTER)
+
+
+def viewer_current_svg(viewer: WebDriver) -> WebElement:
+    """
+    Get the <svg> element of the currently displayed slide (inside its shadow
+    DOM)
+    """
+    containers = viewer.find_elements(By.CSS_SELECTOR, "#slides .slide-container")
+    (current_slide_container,) = [c for c in containers if c.is_displayed()]
+    current_slide = current_slide_container.shadow_root.find_element(
+        By.CSS_SELECTOR, "svg"
+    )
+    return current_slide
+
+
+def viewer_svg_click(viewer: WebDriver, element: WebElement) -> None:
+    """
+    Emulate a 'click' on an SVG element. Only required due to Firefox not
+    supporting `.click()` on SVG elements.
+    """
+    viewer.execute_script('arguments[0].dispatchEvent(new Event("click"))', element)
+
+
+def colour_bbox(im: NDArray, r: int, g: int, b: int) -> tuple[int, int, int, int]:
+    """
+    Returns the (x, y, width, height) of the bbox of all pixels of the
+    specified colour in a (height, width, 4) image array.
+    """
+    matching_colours = np.all(im == [r, g, b, 255], axis=-1)
+    coords = np.argwhere(matching_colours)
+
+    y, x = np.min(coords, axis=0)
+    y2, x2 = np.max(coords, axis=0)
+
+    return (x, y, x2 - x, y2 - y)
+
+
 class TestViewer:
     def test_basic_slide_display(self, viewer: WebDriver) -> None:
         # Visually verify that slides and steps are displayed and stepped
@@ -118,8 +171,9 @@ class TestViewer:
             (0, 0, 255),  # build_rgb.svg#3
         ]:
             # Grab central pixel
-            im = Image.open(io.BytesIO(viewer.get_screenshot_as_png()))
-            colour = im.getpixel((im.width // 2, im.height // 2))[:3]
+            im = viewer_screenshot(viewer)
+            h, w, _ = im.shape
+            colour = tuple(im[h // 2, w // 2][:3])
 
             assert colour == exp_colour
 
@@ -129,7 +183,7 @@ class TestViewer:
         # Check non-default URL hashes are reflected in the UI and visa-versa
 
         slide_number_input = viewer.find_element(
-            by=By.CSS_SELECTOR, value="#slide-selector .slide-number"
+            By.CSS_SELECTOR, "#slide-selector .slide-number"
         )
 
         # Test UI -> URL hash
@@ -144,3 +198,55 @@ class TestViewer:
             slide_number_input.get_attribute("value")
             == "negative_build_step_number@foo"
         )
+
+    def test_foreign_element_scaling(self, viewer: WebDriver) -> None:
+        viewer_go_to_step(viewer, "iframes")
+        viewer_fullscreen(viewer)
+        im = viewer_screenshot(viewer)
+
+        sx, sy, sw, sh = colour_bbox(im, 255, 255, 255)
+        ss = 1920 / sw  # Scale factor
+
+        # Sanity check: slide has correct aspect ratio
+        assert sw * ss == pytest.approx(1920, abs=10)
+        assert sh * ss == pytest.approx(1080, abs=10)
+
+        # Check iframes shown at expected sizes
+        f1x, f1y, f1w, f1h = colour_bbox(im, 255, 0, 0)
+        assert f1w * ss == pytest.approx(700, abs=10)
+        assert f1h * ss == pytest.approx(600, abs=10)
+
+        f2x, f2y, f2w, f2h = colour_bbox(im, 0, 255, 0)
+        assert f2w * ss == pytest.approx(700, abs=10)
+        assert f2h * ss == pytest.approx(600, abs=10)
+
+        # Check scale=1 iframe's inner box has correct scaling and positioning
+        b1x, b1y, b1w, b1h = colour_bbox(im, 0, 255, 255)
+        assert (b1x - f1x) * ss == pytest.approx(100, abs=10)
+        assert (b1y - f1y) * ss == pytest.approx(50, abs=10)
+        assert b1w * ss == pytest.approx(100, abs=10)
+        assert b1h * ss == pytest.approx(50, abs=10)
+
+        # Check scale=2 iframe's inner box has correct scaling and positioning
+        b2x, b2y, b2w, b2h = colour_bbox(im, 255, 0, 255)
+        assert (b2x - f2x) * ss / 2 == pytest.approx(100, abs=10)
+        assert (b2y - f2y) * ss / 2 == pytest.approx(50, abs=10)
+        assert b2w * ss / 2 == pytest.approx(100, abs=10)
+        assert b2h * ss / 2 == pytest.approx(50, abs=10)
+
+    def test_iframe_link_target(self, viewer: WebDriver) -> None:
+        viewer_go_to_step(viewer, "iframes")
+        viewer_fullscreen(viewer)
+
+        # Find the (initially green) iframe
+        im = viewer_screenshot(viewer)
+        gx, gy, gw, gh = colour_bbox(im, 0, 255, 0)
+
+        # Click the link
+        link = viewer_current_svg(viewer).find_element(By.ID, "go-blue")
+        viewer_svg_click(viewer, link)
+
+        # Check our iframe has gone blue
+        im = viewer_screenshot(viewer)
+        bx, by, bw, bh = colour_bbox(im, 0, 0, 255)
+        assert (gx, gy, gw, gh) == pytest.approx((bx, by, bw, bh), abs=10)

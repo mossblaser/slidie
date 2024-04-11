@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="1920"
+   height="1080"
+   viewBox="0 0 507.99999 285.75"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   sodipodi:docname="iframes.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="0.50582719"
+     inkscape:cx="1250.4271"
+     inkscape:cy="700.83224"
+     inkscape:window-width="1339"
+     inkscape:window-height="1041"
+     inkscape:window-x="577"
+     inkscape:window-y="18"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g8" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g8"
+       transform="matrix(1.5,0,0,1.5,-67.358381,-57.666125)">
+      <g
+         id="g6">
+        <rect
+           style="fill:#73d216;stroke:#000000;stroke-width:0.76171;stroke-linecap:round;stroke-linejoin:round"
+           id="rect1"
+           width="122.71051"
+           height="105.07162"
+           x="63.612377"
+           y="56.718315" />
+        <text
+           xml:space="preserve"
+           style="font-size:9.9661px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:119.173;display:inline;stroke-width:0.622881"
+           x="76.747482"
+           y="76.053909"
+           id="text1"
+           transform="matrix(0.72670004,0,0,0.72670004,20.487549,16.120126)"><tspan
+             x="76.747482"
+             y="76.053909"
+             id="tspan4"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan2">@@@
+</tspan></tspan><tspan
+             x="76.747482"
+             y="89.418453"
+             id="tspan11"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan7">iframe = 'data:text/</tspan></tspan><tspan
+             x="76.747482"
+             y="102.78299"
+             id="tspan13"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan12">html,&lt;style&gt;body </tspan></tspan><tspan
+             x="76.747482"
+             y="116.14753"
+             id="tspan15"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan14">{ background: %23F00; </tspan></tspan><tspan
+             x="76.747482"
+             y="129.51207"
+             id="tspan17"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan16">margin: 50 100; }&lt;/</tspan></tspan><tspan
+             x="76.747482"
+             y="142.87661"
+             id="tspan19"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan18">style&gt;&lt;div </tspan></tspan><tspan
+             x="76.747482"
+             y="156.24115"
+             id="tspan21"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan20">style=&quot;background: </tspan></tspan><tspan
+             x="76.747482"
+             y="169.60568"
+             id="tspan23"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan22">%230FF; width: 100px; </tspan></tspan><tspan
+             x="76.747482"
+             y="182.97021"
+             id="tspan25"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan24">height: 50px;&quot;&gt;&lt;/div&gt;'</tspan></tspan></text>
+      </g>
+      <g
+         id="g7"
+         transform="translate(-41.911543)">
+        <rect
+           style="fill:#73d216;stroke:#000000;stroke-width:0.76171;stroke-linecap:round;stroke-linejoin:round"
+           id="rect5"
+           width="122.71051"
+           height="105.07162"
+           x="265.77081"
+           y="56.718315" />
+        <text
+           xml:space="preserve"
+           style="font-size:9.9661px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:164.662;display:inline;stroke-width:0.622881"
+           x="76.747482"
+           y="76.053909"
+           id="text6"
+           transform="matrix(0.72670004,0,0,0.72670004,211.70984,12.945124)"><tspan
+             x="76.747482"
+             y="76.053909"
+             id="tspan27"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan26">@@@
+</tspan></tspan><tspan
+             x="76.747482"
+             y="89.418453"
+             id="tspan30"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan28">[</tspan><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan29">iframe]
+</tspan></tspan><tspan
+             x="76.747482"
+             y="102.78299"
+             id="tspan32"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan31">scale = 2
+</tspan></tspan><tspan
+             x="76.747482"
+             y="116.14753"
+             id="tspan34"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan33">name = &quot;example&quot;
+</tspan></tspan><tspan
+             x="76.747482"
+             y="129.51207"
+             id="tspan36"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan35">url = 'data:text/html,&lt;style&gt;body </tspan></tspan><tspan
+             x="76.747482"
+             y="142.87661"
+             id="tspan38"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan37">{ background: %230F0; margin: 50 </tspan></tspan><tspan
+             x="76.747482"
+             y="156.24115"
+             id="tspan40"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan39">100; }&lt;/style&gt;&lt;div </tspan></tspan><tspan
+             x="76.747482"
+             y="169.60568"
+             id="tspan42"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan41">style=&quot;background: %23F0F; width: </tspan></tspan><tspan
+             x="76.747482"
+             y="182.97021"
+             id="tspan44"><tspan
+               style="font-family:Monospace;-inkscape-font-specification:Monospace"
+               id="tspan43">100px; height: 50px;&quot;&gt;&lt;/div&gt;'</tspan></tspan></text>
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-size:10.9678px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.685487"
+         x="120.11041"
+         y="191.87611"
+         id="text8"><tspan
+           sodipodi:role="line"
+           id="tspan8"
+           style="stroke-width:0.685487"
+           x="120.11041"
+           y="191.87611">@@@</tspan><tspan
+           sodipodi:role="line"
+           style="stroke-width:0.685487"
+           x="120.11041"
+           y="205.58586"
+           id="tspan9">id = &quot;iframes&quot;</tspan></text>
+      <a
+         id="go-blue"
+         xlink:href="data:text/html,&lt;style&gt;body { background: %2300F }&lt;/style&gt;"
+         target="example">
+        <g
+           id="g11">
+          <rect
+             style="fill:#729fcf;stroke:#000000;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round"
+             id="rect9"
+             width="78.103958"
+             height="18.52874"
+             x="243.92656"
+             y="183.95494" />
+          <text
+             xml:space="preserve"
+             style="font-size:14.5376px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.908603"
+             x="255.33676"
+             y="198.51826"
+             id="text10"><tspan
+               sodipodi:role="line"
+               id="tspan10"
+               style="stroke-width:0.908603"
+               x="255.33676"
+               y="198.51826">Go Blue</tspan></text>
+        </g>
+      </a>
+    </g>
+  </g>
+</svg>
