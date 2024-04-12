@@ -6,6 +6,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from contextlib import contextmanager
 import io
+import time
 
 from PIL import Image
 import numpy as np
@@ -23,6 +24,30 @@ from selenium.webdriver import Remote as WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 
 from slidie.render_xhtml import render_xhtml
+
+
+@pytest.fixture(scope="module")
+def viewer_path() -> Iterator[Path]:
+    """Path to a rendered viewer application."""
+    with TemporaryDirectory() as tmp_path_str:
+        tmp_path = Path(tmp_path_str)
+
+        for i, slide in enumerate(
+            [
+                "empty.svg",
+                "build_rgb.svg",
+                "negative_build_step_number.svg",
+                "iframes.svg",
+                "video.svg",
+            ]
+        ):
+            slide_name = tmp_path / f"{i}.svg"
+            slide_name.write_bytes(get_svg_filename(slide).read_bytes())
+
+        out_filename = tmp_path / "out.xhtml"
+        render_xhtml(tmp_path, out_filename)
+
+        yield out_filename
 
 
 # XXX: No cross platform webkit browser supported...
@@ -53,29 +78,6 @@ def driver(browser: str) -> Iterator[WebDriver]:
                 raise NotImplementedError(browser)
     except NoSuchDriverException:
         pytest.skip(f"{browser} not found by selenium")
-
-
-@pytest.fixture(scope="module")
-def viewer_path() -> Iterator[Path]:
-    """Path to a rendered viewer application."""
-    with TemporaryDirectory() as tmp_path_str:
-        tmp_path = Path(tmp_path_str)
-
-        for i, slide in enumerate(
-            [
-                "empty.svg",
-                "build_rgb.svg",
-                "negative_build_step_number.svg",
-                "iframes.svg",
-            ]
-        ):
-            slide_name = tmp_path / f"{i}.svg"
-            slide_name.write_bytes(get_svg_filename(slide).read_bytes())
-
-        out_filename = tmp_path / "out.xhtml"
-        render_xhtml(tmp_path, out_filename)
-
-        yield out_filename
 
 
 @pytest.fixture
@@ -250,3 +252,32 @@ class TestViewer:
         im = viewer_screenshot(viewer)
         bx, by, bw, bh = colour_bbox(im, 0, 0, 255)
         assert (gx, gy, gw, gh) == pytest.approx((bx, by, bw, bh), abs=10)
+
+    def test_video_pause_and_restart(self, viewer: WebDriver) -> None:
+        viewer_go_to_step(viewer, "video")
+        time.sleep(0.3)
+
+        # Capture within first second
+        im1 = viewer_screenshot(viewer)
+
+        # Capture next second (vide only changes once per second)
+        time.sleep(1.1)
+        im2 = viewer_screenshot(viewer)
+
+        # Check video is playing
+        assert not np.array_equal(im1, im2)
+
+        # Check switching slides takes us back to first frame
+        viewer_go_to_step(viewer, "iframes")
+        viewer_go_to_step(viewer, "video")
+        time.sleep(0.3)
+        im3 = viewer_screenshot(viewer)
+
+        assert np.array_equal(im1, im3)
+
+        # Capture next second (vide only changes once per second)
+        time.sleep(1.1)
+        im4 = viewer_screenshot(viewer)
+
+        # Check video is playing
+        assert not np.array_equal(im3, im4)
