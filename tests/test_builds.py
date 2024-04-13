@@ -20,6 +20,8 @@ from slidie.builds import (
     Stage2Atom,
     Stage3Step,
     LayerNameParseError,
+    UnexpectedTagSuffixError,
+    InvalidStepError,
     parse_build_specification_step,
     parse_build_specification,
     parse_tags,
@@ -82,6 +84,18 @@ class TestParseBuildSpecificationStep:
     def test_invalid(self, spec: str) -> None:
         with pytest.raises(LayerNameParseError):
             parse_build_specification_step(spec)
+
+    def test_invalid_suffix(self) -> None:
+        with pytest.raises(UnexpectedTagSuffixError) as excinfo:
+            parse_build_specification_step("@foo.bar")
+
+        assert str(excinfo.value) == "Unexpected suffix 'bar' in step '@foo.bar'."
+
+    def test_invalid_step(self) -> None:
+        with pytest.raises(InvalidStepError) as excinfo:
+            parse_build_specification_step("woah!")
+
+        assert str(excinfo.value) == "Invalid step specification 'woah!'."
 
 
 @pytest.mark.parametrize(
@@ -640,6 +654,9 @@ class TestEvaluateBuildSteps:
             evaluate_build_steps(["Who knows what <@foo> is?"])
 
         assert exc_info.value.layer_name == "Who knows what <@foo> is?"
+        assert str(exc_info.value) == (
+            "Undefined tag '@foo' used in 'Who knows what <@foo> is?'."
+        )
 
     def test_cyclic_dependency_error(self) -> None:
         with pytest.raises(CyclicDependencyError) as exc_info:
@@ -657,3 +674,7 @@ class TestEvaluateBuildSteps:
             "C <@a> @c",
             "A <@b> @a",
         ]
+        assert str(exc_info.value) == (
+            "Cyclic dependency in tag references: "
+            "'A <@b> @a' -> 'B <@c> @b' -> 'C <@a> @c' -> 'A <@b> @a'."
+        )

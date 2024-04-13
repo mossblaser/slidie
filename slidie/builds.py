@@ -325,22 +325,34 @@ Stage4Step = Stage4Atom  # Included for completeness
 ################################################################################
 
 
-class LayerNameParseError(ValueError):
+@dataclass
+class LayerNameParseError(Exception):
     """Thrown when an annotation in a layer name is not parsable."""
 
-    pass
 
-
+@dataclass
 class UnexpectedTagSuffixError(LayerNameParseError):
     """Thrown when an unrecognised tag suffix is used."""
 
-    pass
+    step: str
+    """The step definition."""
+
+    suffix: str
+    """The unrecognised suffix."""
+
+    def __str__(self) -> str:
+        return f"Unexpected suffix '{self.suffix}' in step '{self.step}'."
 
 
+@dataclass
 class InvalidStepError(LayerNameParseError):
     """Thrown when a step in a build specification is not valid."""
 
-    pass
+    step: str
+    """The invalid step definition."""
+
+    def __str__(self) -> str:
+        return f"Invalid step specification '{self.step}'."
 
 
 def parse_build_specification_step(
@@ -356,7 +368,7 @@ def parse_build_specification_step(
         name, dot, suffix = step_str[1:].partition(".")
         if dot:
             if suffix not in ("before", "start", "end", "after"):
-                raise UnexpectedTagSuffixError(step_str)
+                raise UnexpectedTagSuffixError(step_str, suffix)
             return (name, suffix)
         else:
             return name
@@ -528,6 +540,12 @@ class IdentifierNotFoundError(ValueError):
     # May be populated later
     layer_name: str | None = None
 
+    def __str__(self) -> str:
+        loc = ""
+        if self.layer_name is not None:
+            loc = f" used in '{self.layer_name}'"
+        return f"Undefined tag '@{self.identifier}'{loc}."
+
 
 @dataclass
 class CyclicDependencyError(ValueError):
@@ -539,6 +557,12 @@ class CyclicDependencyError(ValueError):
 
     # May be populated later
     layer_names: list[str] | None = None
+
+    def __str__(self) -> str:
+        layers = ""
+        if self.layer_names is not None:
+            layers = ": " + " -> ".join(f"'{n}'" for n in self.layer_names)
+        return f"Cyclic dependency in tag references{layers}."
 
 
 def compute_tag_resolution_order(
