@@ -13,6 +13,7 @@ from typing import Any, NamedTuple
 
 from xml.etree import ElementTree as ET
 from collections import defaultdict
+from dataclasses import dataclass
 import tomllib
 
 from slidie.xml_namespaces import SVG_NAMESPACE
@@ -39,20 +40,38 @@ class MagicText(NamedTuple):
     """
 
 
+@dataclass
 class MagicError(Exception):
     """Base class for errors resulting from parsing magic text."""
 
+    parents: tuple[ET.Element, ...]
+    """The parent elements of the magic text."""
 
+    text: str
+    """The literal text in the magic string."""
+
+
+@dataclass
 class MagicTOMLDecodeError(MagicError):
     """Thrown when a magic <text> element contains invalid TOML."""
 
+    error: tomllib.TOMLDecodeError
+    """The TOML decoding error which ocurred."""
 
+
+@dataclass
 class NotEnoughMagicError(MagicError):
     """Thrown when a magic <text> element defines no values."""
 
 
+@dataclass
 class TooMuchMagicError(MagicError):
     """Thrown when a magic <text> element defines more than one top-level value."""
+
+    keys: list[str]
+    """
+    List of keys defined simultaneously.
+    """
 
 
 def extract_magic(svg: ET.Element) -> dict[str, list[MagicText]]:
@@ -85,6 +104,7 @@ def extract_magic(svg: ET.Element) -> dict[str, list[MagicText]]:
     return out
 
 
+@dataclass
 class SingleRectOrImageExpectedError(MagicError):
     """
     Thrown if a magic text which applies some effect to a rectangular region

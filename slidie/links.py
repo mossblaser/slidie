@@ -63,21 +63,28 @@ Slides may then be referenced by ID in links like so:
 """
 
 import re
+from dataclasses import dataclass
 
 from slidie.xml_namespaces import SLIDIE_NAMESPACE
 from slidie.magic import MagicText, MagicError
 
 
+@dataclass
 class SlideIDMagicError(MagicError):
     """Base class for errors involving slide ID magics."""
 
 
+@dataclass
 class MultipleIdsError(SlideIDMagicError):
     """Thrown when more than one ID is specified."""
 
 
+@dataclass
 class InvalidIdError(SlideIDMagicError):
     """Thrown when an invalid ID is used."""
+
+    slide_id: str
+    """The (invalid) slide ID provided."""
 
 
 def annotate_slide_id_from_magic(magic: dict[str, list[MagicText]]) -> None:
