@@ -29,6 +29,14 @@ class InkscapeLayer(NamedTuple):
             return f"<InkscapeLayer {get_inkscape_layer_name(self.element)!r}>"
 
 
+def is_inkscape_layer(elem: ET.Element) -> bool:
+    """Test whether an element is an Inkscape layer."""
+    return (
+        elem.tag == f"{{{SVG_NAMESPACE}}}g"
+        and elem.attrib.get(f"{{{INKSCAPE_NAMESPACE}}}groupmode", None) == "layer"
+    )
+
+
 def enumerate_inkscape_layers(root: ET.Element) -> list[InkscapeLayer]:
     """
     Enumerate all of the layers in an Inkscape SVG, in the order (and nesting)
@@ -39,11 +47,7 @@ def enumerate_inkscape_layers(root: ET.Element) -> list[InkscapeLayer]:
 
     while to_visit:
         parent, element = to_visit.pop(0)
-        if (
-            element.tag == f"{{{SVG_NAMESPACE}}}g"
-            and element.attrib.get(f"{{{INKSCAPE_NAMESPACE}}}groupmode", None)
-            == "layer"
-        ):
+        if is_inkscape_layer(element):
             layer = InkscapeLayer(element, [])
             parent.insert(0, layer)
             for child in element:
