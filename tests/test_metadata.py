@@ -2,6 +2,8 @@ import pytest
 
 from svgs import get_svg
 
+from textwrap import dedent
+
 from slidie.xml_namespaces import SLIDIE_NAMESPACE
 from slidie.magic import MagicText, extract_magic
 from slidie.metadata import (
@@ -17,8 +19,19 @@ class TestAnnotateMetadataFromMagic:
 
     def test_too_many_ids(self) -> None:
         magic = extract_magic(get_svg("repeated_metadata_magic.svg"))
-        with pytest.raises(MultipleMetadataDefinitionsError):
+        with pytest.raises(MultipleMetadataDefinitionsError) as excinfo:
             annotate_metadata_from_magic(magic)
+
+        assert (
+            str(excinfo.value)
+            == dedent(
+                """
+                on Layer 1 in:
+                    title = "foo"
+                'title' redefined again elsewhere.
+            """
+            ).strip()
+        )
 
     def test_works(self) -> None:
         svg = get_svg("metadata_magic.svg")

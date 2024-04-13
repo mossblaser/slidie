@@ -2,16 +2,26 @@
 Utilities for extracting slide show metadata from magic variables in slides.
 """
 
+from dataclasses import dataclass
+
 from slidie.xml_namespaces import SLIDIE_NAMESPACE
 from slidie.magic import MagicText, MagicError
 
 
+@dataclass
 class MetadataMagicError(MagicError):
     """Base class for errors involving slide metadata magics."""
 
 
+@dataclass
 class MultipleMetadataDefinitionsError(MetadataMagicError):
     """Thrown when more than one value is given for a metadata field."""
+
+    field: str
+    """The field defined multiple times."""
+
+    def __str__(self) -> str:
+        return f"{super().__str__()}\n{self.field!r} redefined again elsewhere."
 
 
 def annotate_metadata_from_magic(magic: dict[str, list[MagicText]]) -> None:
@@ -31,7 +41,9 @@ def annotate_metadata_from_magic(magic: dict[str, list[MagicText]]) -> None:
         # Check for singular definition
         if len(field_magic) > 1:
             raise MultipleMetadataDefinitionsError(
-                field_magic[1].parents, field_magic[1].text
+                field_magic[0].parents,
+                field_magic[0].text,
+                field,
             )
 
         # Annotate SVG

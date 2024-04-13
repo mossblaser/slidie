@@ -2,6 +2,8 @@ import pytest
 
 from svgs import get_svg
 
+from textwrap import dedent
+
 from slidie.xml_namespaces import SLIDIE_NAMESPACE
 from slidie.magic import MagicText, extract_magic
 from slidie.links import (
@@ -19,8 +21,19 @@ class TestAnnotateSlideIdFromMagic:
 
     def test_too_many_ids(self) -> None:
         magic = extract_magic(get_svg("too_many_ids_magic.svg"))
-        with pytest.raises(MultipleIdsError):
+        with pytest.raises(MultipleIdsError) as excinfo:
             annotate_slide_id_from_magic(magic)
+
+        assert (
+            str(excinfo.value)
+            == dedent(
+                """
+                on Layer 1 in:
+                    id = "example"
+                'id' redefined again elsewhere.
+            """
+            ).strip()
+        )
 
     def test_works(self) -> None:
         svg = get_svg("id_magic.svg")
@@ -52,12 +65,23 @@ class TestAnnotateSlideIdFromMagic:
                 MagicText(
                     parameters=slide_id,
                     parents=(get_svg("id_magic.svg"),),
-                    text=f"id = {slide_id}",
+                    text=f'id = "{slide_id}"',
                 )
             ]
         }
-        with pytest.raises(InvalidIdError):
+        with pytest.raises(InvalidIdError) as excinfo:
             annotate_slide_id_from_magic(magic)
+
+        assert (
+            str(excinfo.value)
+            == dedent(
+                f"""
+                in:
+                    id = "{slide_id}"
+                '{slide_id}' is not a valid ID.
+            """
+            ).strip()
+        )
 
     @pytest.mark.parametrize(
         "slide_id",

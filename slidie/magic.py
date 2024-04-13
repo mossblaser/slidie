@@ -14,10 +14,15 @@ from typing import Any, NamedTuple
 from xml.etree import ElementTree as ET
 from collections import defaultdict
 from dataclasses import dataclass
+from textwrap import indent
 import tomllib
 
 from slidie.xml_namespaces import SVG_NAMESPACE
-from slidie.svg_utils import find_text_with_prefix
+from slidie.svg_utils import (
+    find_text_with_prefix,
+    is_inkscape_layer,
+    get_inkscape_layer_name,
+)
 
 
 class MagicText(NamedTuple):
@@ -50,6 +55,33 @@ class MagicError(Exception):
     text: str
     """The literal text in the magic string."""
 
+    def _str_configurable(self, number_lines: bool = False) -> str:
+        """
+        Version of the base ``__str__`` implementation with customisable
+        options. Intended for use by descendents who need greater control.
+        """
+        layer = " > ".join(
+            get_inkscape_layer_name(elem)
+            for elem in self.parents
+            if is_inkscape_layer(elem)
+        )
+
+        if number_lines:
+            text = "".join(
+                f"{i + 1:5d}| {line}"
+                for i, line in enumerate(self.text.rstrip().splitlines(keepends=True))
+            )
+        else:
+            text = indent(self.text.rstrip(), "    ")
+
+        if layer:
+            return f"on {layer} in:\n{text}"
+        else:
+            return f"in:\n{text}"
+
+    def __str__(self) -> str:
+        return self._str_configurable()
+
 
 @dataclass
 class MagicTOMLDecodeError(MagicError):
@@ -58,10 +90,17 @@ class MagicTOMLDecodeError(MagicError):
     error: tomllib.TOMLDecodeError
     """The TOML decoding error which ocurred."""
 
+    def __str__(self) -> str:
+        prefix = self._str_configurable(number_lines=True)
+        return f"{prefix}\n{self.error}"
+
 
 @dataclass
 class NotEnoughMagicError(MagicError):
     """Thrown when a magic <text> element defines no values."""
+
+    def __str__(self) -> str:
+        return f"{super().__str__()}\nExpected a value to be defined."
 
 
 @dataclass
@@ -72,6 +111,10 @@ class TooMuchMagicError(MagicError):
     """
     List of keys defined simultaneously.
     """
+
+    def __str__(self) -> str:
+        values = ", ".join(map(repr, self.keys))
+        return f"{super().__str__()}\nExactly one value must be defined (got {values})"
 
 
 def extract_magic(svg: ET.Element) -> dict[str, list[MagicText]]:
@@ -111,6 +154,23 @@ class SingleRectOrImageExpectedError(MagicError):
     was placed into a container with more than just a <rect> or <image> element
     in it.
     """
+
+    def __str__(self) -> str:
+        container = self.parents[-1]
+
+        if len(container) == 0:
+            got = "no elements present"
+        else:
+            tags = " and ".join(
+                "<" + elem.tag.removeprefix(f"{{{SVG_NAMESPACE}}}") + ">"
+                for elem in container
+            )
+            got = f"got {tags}"
+
+        return (
+            f"{super().__str__()}\n"
+            f"Expected text to be grouped with a single <rect> or <image> ({got})"
+        )
 
 
 class MagicRectangle(NamedTuple):

@@ -22,7 +22,7 @@ from xml.etree import ElementTree as ET
 import json
 
 from slidie.svg_utils import find_text_with_prefix, get_visible_build_steps
-from slidie.magic import MagicText, MagicError, get_magic_rectangle, MagicRectangle
+from slidie.magic import MagicText, get_magic_rectangle, MagicRectangle
 
 
 class VideoMagic(NamedTuple):

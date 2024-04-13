@@ -78,6 +78,9 @@ class SlideIDMagicError(MagicError):
 class MultipleIdsError(SlideIDMagicError):
     """Thrown when more than one ID is specified."""
 
+    def __str__(self) -> str:
+        return f"{super().__str__()}\n'id' redefined again elsewhere."
+
 
 @dataclass
 class InvalidIdError(SlideIDMagicError):
@@ -85,6 +88,9 @@ class InvalidIdError(SlideIDMagicError):
 
     slide_id: str
     """The (invalid) slide ID provided."""
+
+    def __str__(self) -> str:
+        return f"{super().__str__()}\n{self.slide_id!r} is not a valid ID."
 
 
 def annotate_slide_id_from_magic(magic: dict[str, list[MagicText]]) -> None:
@@ -99,7 +105,7 @@ def annotate_slide_id_from_magic(magic: dict[str, list[MagicText]]) -> None:
 
     # Check only one ID given
     if len(id_magic) > 1:
-        raise MultipleIdsError(id_magic[1].parents, id_magic[1].text)
+        raise MultipleIdsError(id_magic[0].parents, id_magic[0].text)
 
     slide_id = id_magic[0].parameters
 
