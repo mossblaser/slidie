@@ -30,12 +30,14 @@ renaming it like so:
     * 150_third_slide.svg (renumbered)
     * 200_second_slide.svg
 
-The :py:func:`insert_number` function implements the logic required to pick new
-numbers which place a slide at a desired position in the ordering. This
+The :py:func:`insert_numbers` function implements the logic required to pick new
+numbers which place slides at a desired positions in the ordering. This
 function also handles situations where no gap in the number sequence exists by
 renumbering other slides to create a suitable gap. It does this inteligently
 such that the number of renaming operations is minimised.
 """
+
+from typing import NamedTuple
 
 from pathlib import Path
 
@@ -72,6 +74,19 @@ def replace_numerical_prefix(filename: Path, number: int, digits: int = 5) -> Pa
         raise ValueError(filename.name)
 
 
+def evenly_spaced_numbers_between(start: int, end: int, count: int) -> list[int]:
+    """
+    Return `count` distinct, monotonically increasing integers strictly greater
+    than start and strictly less than end.
+    """
+    # Sanity check
+    assert end - start > count
+
+    return [
+        start + ((step * (end - start)) // (count + 1)) for step in range(1, count + 1)
+    ]
+
+
 class NoFreeNumberError(ValueError):
     """Thrown when try_insert_number fails to find a solution."""
 
@@ -83,17 +98,18 @@ class NegativeNumberError(ValueError):
     """
 
 
-def try_insert_number(
+def try_insert_numbers(
     existing_numbers: list[int],
     position: int,
+    count: int = 1,
     allow_negative: bool = False,
     preferred_step_size: int = 100,
-) -> int:
+) -> list[int]:
     """
-    Given a list of file numbers, return a new file number which would appear
-    at the specified position in the order.
+    Given a list of file numbers, return a list of 'count' new file numbers
+    which would appear at the specified position in the existing order.
 
-    If no such integral number exists, throws a NoFreeNumberError. This occurs
+    If no such integral numbers exist, throws a NoFreeNumberError. This occurs
     when no gap in the existing_numbers is available in which to insert a new
     number.
 
@@ -112,242 +128,161 @@ def try_insert_number(
 
     # Easy case: appending (or empty -- just another case of appending)
     if position == len(existing_numbers):
-        return max(existing_numbers, default=0) + preferred_step_size
+        first_new_number = max(existing_numbers, default=0) + preferred_step_size
+        return [first_new_number + (i * preferred_step_size) for i in range(count)]
 
     # Check numbers aren't already negative if allow_negative is False
     if not allow_negative and existing_numbers[0] < 0:
         raise NegativeNumberError(existing_numbers)
 
+    # Determine the numbers immediately before and after the gap we're hoping
+    # to insert into.
     if position == 0:
-        # Easy-ish case: inserting at start
+        # Special case: inserting at start
         after = existing_numbers[0]
-        if allow_negative or after < 0:
-            # If negative numbers are permitted (or the first number is already
-            # negative), generate a potentially negative number with impunity
-            return after - preferred_step_size
-        else:
-            before = -1
+        before = -1  # I.e. 0 is the first available number
+        if allow_negative:
+            # Even more special case: Negative numbers are permitted too: We
+            # should stretch out the range beyond zero if necessary to achieve
+            # the preferred_step_size spacing between the inserted values
+            before = min(before, after - (preferred_step_size * (count + 1)))
     else:
         # More general case: inserting inbetween existing values
         before = existing_numbers[position - 1]
         after = existing_numbers[position]
 
-    if after - before >= 2:
-        # Pick something half-way between the two
-        return before + ((after - before) // 2)
+    if after - before >= count + 1:
+        # Spread the new values evenly over the available space
+        return evenly_spaced_numbers_between(before, after, count)
     else:
         # No gap available!
         raise NoFreeNumberError()
 
 
-def evenly_spaced_numbers_between(start: int, end: int, count: int) -> list[int]:
+class Renumbering(NamedTuple):
+    """Defines a re-numbering for a file."""
+
+    old: int
+    new: int
+
+
+class Insertion(NamedTuple):
     """
-    Return `count` distinct, monotonically increasing integers strictly greater
-    than start and strictly less than end.
-    """
-    # Sanity check
-    assert end - start > count
-
-    return [
-        start + ((step * (end - start)) // (count + 1)) for step in range(1, count + 1)
-    ]
-
-
-def squeeze_in_leading_number(
-    numbers: list[int],
-    preferred_step_size: int = 100,
-) -> list[int]:
-    """
-    Given a list of file numbers, insert a new file number at the beginning
-    whose value is at least `numbers[0]`. (i.e. we make the assumption that
-    the number `numbers[0] - 1` is already in use).
-
-    This function is intended for use in situations where we need to
-    insert a value between two adjacent numbers and we need to renumber other
-    files to create a gap.
-
-    This will result in one or more of the input numbers having to be
-    incremented to make room for the new number.
-
-    As few numbers will be changed as possible.
-
-    Changed numbers will be spaced evenly within the available gap. (It is
-    assumed there is a number at numbers[0] - 1 so a gap is left at the start
-    accordingly).
-
-    If all numbers need to be changed, they will be re-numbered with a gap of
-    preferred_step_size.
-    """
-    # Sanity checks
-    assert len(numbers) > 0  # Non-empty
-    assert numbers == sorted(numbers)  # In order
-    assert len(set(numbers)) == len(numbers)  # No repeats
-
-    # Find first gap in the numbers (gap_index = index of element after the
-    # gap)
-    last_number = numbers[0] - 1
-    for gap_index, number in enumerate(numbers):
-        if number != last_number + 1:
-            break
-        last_number = number
-    else:
-        # Special case: All numbers need incrementing (no gaps)
-        return [
-            numbers[0] - 1 + (i * preferred_step_size)
-            for i in range(1, len(numbers) + 2)
-        ]
-
-    # More general case, evenly spread the numbers in the gap
-    start = numbers[0] - 1
-    end = numbers[gap_index]
-    return (
-        evenly_spaced_numbers_between(start, end, gap_index + 1) + numbers[gap_index:]
-    )
-
-
-def score_candidate_numbering(
-    previous_numbers: list[int],
-    position: int,
-    candidate_numbers: list[int],
-) -> tuple[int, float]:
-    """
-    Produce a disruptiveness score of a candidate renumbering solution. A
-    lower score is less disriptive.
-
-    The score is based on two key metrics (given in decreasing order of
-    priority):
-
-    * Number of renumberings (having to rename fewer files is less disriptive)
-    * Spacing score. The result of sum(1/gap for gap between
-      candidate_renumberings). This penalises solutions which leave smaller
-      gaps between files.
+    Description of how to insert a set of new file numbers into a sequence.
     """
 
-    num_renumberings = sum(
-        a != b
-        for a, b in zip(
-            (
-                previous_numbers[:position]
-                + [candidate_numbers[position]]
-                + previous_numbers[position:]
-            ),
-            candidate_numbers,
-        )
-    )
+    renumberings: list[Renumbering]
+    """
+    The renumbering operations to perform on existing numbered files. Note that
+    all files to be renumbered must be moved into a temporary location before
+    being moved into their final numberings to avoid accidentally overwriting
+    files.
+    """
 
-    spacing_score = sum(
-        1 / (b - a) for a, b in zip(candidate_numbers[:-1], candidate_numbers[1:])
-    )
-
-    return (num_renumberings, spacing_score)
+    new_numbers: list[int]
+    """
+    The new numbers to insert into the sequence (at the position requested).
+    """
 
 
-def insert_number(
+def insert_numbers(
     existing_numbers: list[int],
     position: int,
+    count: int = 1,
     allow_negative: bool = False,
     preferred_step_size: int = 100,
-) -> tuple[int, list[tuple[int, int]]]:
+) -> Insertion:
     """
-    Given a list of file numbers, pick a new file number which slots into the
-    numbering at the desired position.
+    Given a list of file numbers, return 'count' new file numbers which would
+    appear at the specified position in the existing order, along with any
+    renumberings needed to make room if necessary.
 
-    In the event that there is no gap in the numbers around that position, a
-    minimal number of neighbouring numbers will be renumbered to accomodate.
-
-    If allow_negative is False, will not generate negative file numbers (unless
-    necessary to fit between two already negative numbers).
-
-    Returns a tuple (new_number, renumberings) where new_number is the number
-    assigned to the newly inserted entry. renumberings is a list of
-    (old_number, new_number) pairs giving renumbering operations to perform.
-    The order of this list ensures changes won't collide.
+    This function will always return the solution which results in the minimum
+    number of files being renumbered (i.e. to minimise disruption). Where
+    multiple solutions requiring the same number of files to be renumbered
+    exist, the solution which results in the largest spaces between newly
+    inserted/renumbered entries is used.
     """
-
-    # First, try insertion without renumbering
+    # Special case: try and fit the new numbers in without renumbering anything
     try:
-        # NB: Sanity checks performed by try_insert_number so no need to repeat
-        # here.
-        new_number = try_insert_number(
-            existing_numbers,
-            position,
-            allow_negative,
-            preferred_step_size,
+        return Insertion(
+            renumberings=[],
+            new_numbers=try_insert_numbers(
+                existing_numbers=existing_numbers,
+                position=position,
+                count=count,
+                allow_negative=allow_negative,
+                preferred_step_size=preferred_step_size,
+            ),
         )
-        return (new_number, [])
     except NoFreeNumberError:
         pass
 
-    # If we couldn't find a space, we'll have to renumber things. We can either
-    # shove all of the higher numbered files up or shove the lower numbered
-    # files down to make room. Below we'll try both options and, assuming both
-    # are possible, choose the least disruptive.
-    candidate_renumberings = []
+    # Given there's an insufficient gap in the numbers, we'll repeatedly
+    # attempt to insert `count` new numbers whilst renumbering
+    # 'num_renumberings' neughbouring entries, going with a solution which uses
+    # the least possible renumberings.
+    for num_renumberings in range(1, len(existing_numbers) + 1):
+        # There are `num_renumberings + 1` ways to renumber `num_renumberings`
+        # existing entries centered on the target position (think of a sliding
+        # window). We'll try all of these and, if any produce valid solutions
+        # (i.e. create a large enough gap) we'll pick the best one.
+        #
+        # [(renumber_start, renumber_end, new_numbers), ...]
+        candidate_renumberings = []
+        for renumber_window_offset in range(num_renumberings + 1):
+            # The indices of the first and one-after-the-last entries in
+            # existing_numbers to be renumbered
+            renumber_start = position - num_renumberings + renumber_window_offset
+            renumber_end = renumber_start + num_renumberings
 
-    # Try renumbering numbers after the target position
-    candidate_renumberings.append(
-        existing_numbers[:position]
-        + squeeze_in_leading_number(existing_numbers[position:], preferred_step_size)
-    )
+            # Skip cases where window runs off the ends of the existing input
+            if renumber_start < 0 or renumber_end > len(existing_numbers):
+                continue
 
-    # Now try renumbering numbers before the target position.
-    #
-    # In the case of allow_negative=False (and the input doesn't have any
-    # negative numbers) we internally add dummy a -1 numbered file. If this
-    # ends up being renumbered we know the renumbering is not possible without
-    # negative numbers. Otherwise, it serves to keep numbers evenly spaced
-    # between 0 and subsequent file numbers.
-    leading_numbers = existing_numbers[:position]
-    if not allow_negative:
-        leading_numbers.insert(0, -1)
+            # Attempt to generate new numbers for both the renumbered values
+            # and the newly inserted values
+            fixed_existing_numbers = (
+                existing_numbers[:renumber_start] + existing_numbers[renumber_end:]
+            )
+            try:
+                new_numbers = try_insert_numbers(
+                    existing_numbers=fixed_existing_numbers,
+                    position=renumber_start,
+                    count=count + num_renumberings,
+                    allow_negative=allow_negative,
+                    preferred_step_size=preferred_step_size,
+                )
+                candidate_renumberings.append(
+                    (renumber_start, renumber_end, new_numbers)
+                )
+            except NoFreeNumberError:
+                continue
 
-    # To allow reuse of the squeeze_in_leading_number function, we flip the
-    # signs of the numbers to make it operate in the opposite direction.
-    inverted_leading_numbers = [-n for n in reversed(leading_numbers)]
-    inverted_candidate_leading_numbers = squeeze_in_leading_number(
-        inverted_leading_numbers, preferred_step_size
-    )
-    candidate_leading_numbers = [
-        -n for n in reversed(inverted_candidate_leading_numbers)
-    ]
+        # No solutions? Try renumbering more entries
+        if not candidate_renumberings:
+            continue
 
-    # Keep the candidate unless we went negative (and weren't allowed to)
-    if not (not allow_negative and candidate_leading_numbers.pop(0) != -1):
-        candidate_renumberings.append(
-            candidate_leading_numbers + existing_numbers[position:]
+        # Pick the solution which spreads the the numbers out over the largest
+        # range (thus leaving the largest spaces between them, improving the
+        # chances of future insertions not requiring renumbering)
+        renumber_start, renumber_end, new_numbers = max(
+            candidate_renumberings,
+            key=lambda candidate: candidate[2][-1] - candidate[2][0],
+        )
+        num_leading_renumberings = position - renumber_start
+
+        renumber_old = existing_numbers[renumber_start:renumber_end]
+        renumber_new = (
+            new_numbers[:num_leading_renumberings]
+            + new_numbers[num_leading_renumberings + count :]
         )
 
-    # Pick the least disruptive candidate
-    new_numbers = min(
-        candidate_renumberings,
-        key=lambda candidate_numbers: score_candidate_numbering(
-            existing_numbers,
-            position,
-            candidate_numbers,
-        ),
-    )
-
-    new_number = new_numbers[position]
-
-    # Produce a list of number changes
-    #
-    # Decreases are listed with loweest first to avoid collisions.
-    renumbering_decrease = [
-        (before, after)
-        for before, after in zip(
-            existing_numbers[:position],
-            new_numbers[:position],
+        return Insertion(
+            [Renumbering(old, new) for old, new in zip(renumber_old, renumber_new)],
+            new_numbers[num_leading_renumberings : num_leading_renumberings + count],
         )
-        if before != after
-    ]
-    # Increases are listed with largest first to avoid collisions.
-    renumbering_increase = [
-        (before, after)
-        for before, after in zip(
-            existing_numbers[position:],
-            new_numbers[position + 1 :],
-        )
-        if before != after
-    ][::-1]
 
-    return (new_number, (renumbering_decrease + renumbering_increase))
+    # Unreachable: We will have renumbered all values in the last iteration
+    # which should always succeed
+    assert False

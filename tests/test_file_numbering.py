@@ -7,13 +7,13 @@ from itertools import product, repeat
 from slidie.file_numbering import (
     extract_numerical_prefix,
     replace_numerical_prefix,
+    evenly_spaced_numbers_between,
     NoFreeNumberError,
     NegativeNumberError,
-    try_insert_number,
-    evenly_spaced_numbers_between,
-    squeeze_in_leading_number,
-    score_candidate_numbering,
-    insert_number,
+    try_insert_numbers,
+    Renumbering,
+    Insertion,
+    insert_numbers,
 )
 
 
@@ -62,81 +62,6 @@ def test_replace_numerical_prefix(filename: Path, number: int, exp: Path) -> Non
     assert replace_numerical_prefix(filename, number) == exp
 
 
-class TestTryInsertNumber:
-    @pytest.mark.parametrize("position", [-1, 4])
-    def test_invalid_position(self, position: int) -> None:
-        with pytest.raises(IndexError):
-            try_insert_number([100, 200, 300], position)
-
-    @pytest.mark.parametrize(
-        "existing_numbers, position, allow_negative, exp",
-        # Cases with negative numbers not required or used (i.e. allow_negative
-        # should have no effect)
-        [
-            (existing_numbers, position, allow_negative, exp)
-            for existing_numbers, position, exp in [
-                # Empty
-                ([], 0, 100),
-                # Append
-                ([500], 1, 600),
-                ([100, 500], 2, 600),
-                # Insert between (not tight)
-                ([10, 20], 1, 15),
-                ([10, 20, 30], 1, 15),
-                ([9, 10, 20, 30], 2, 15),
-                # Insert between (tight fit)
-                ([10, 12], 1, 11),
-                # Insert between (tightish fit)
-                ([10, 13], 1, 11),
-            ]
-            for allow_negative in [False, True]
-            # Cases where the specific negative number mode matters
-        ]
-        + [
-            # Insert at start (current start is already negative)
-            ([-1], 0, True, -101),
-            ([-1, 1], 0, True, -101),
-            # Insert at start, when +ve only split between 0 and number
-            ([500], 0, False, 249),
-            # Insert at start, only just room whilst positive
-            ([1], 0, False, 0),
-            # Insert at start near zero, negative allowed
-            ([1], 0, True, -99),
-        ],
-    )
-    def test_possible(
-        self,
-        existing_numbers: list[int],
-        position: int,
-        allow_negative: bool,
-        exp: int,
-    ) -> None:
-        assert try_insert_number(existing_numbers, position, allow_negative) == exp
-
-    @pytest.mark.parametrize(
-        "existing_numbers, position, allow_negative",
-        [
-            # No space between
-            ([10, 11], 1, True),
-            ([10, 11], 1, False),
-            # No space before (and negative numbers not allowed)
-            ([0], 0, False),
-        ],
-    )
-    def test_impossible(
-        self,
-        existing_numbers: list[int],
-        position: int,
-        allow_negative: bool,
-    ) -> None:
-        with pytest.raises(NoFreeNumberError):
-            try_insert_number(existing_numbers, position, allow_negative)
-
-    def test_negative_check(self) -> None:
-        with pytest.raises(NegativeNumberError):
-            try_insert_number([-1], 0, allow_negative=False)
-
-
 class TestEvenlySpacedNumbersBetween:
     @pytest.mark.parametrize(
         "start, end, count, exp",
@@ -164,106 +89,206 @@ class TestEvenlySpacedNumbersBetween:
                 assert len(out) == len(set(out))
 
 
-@pytest.mark.parametrize(
-    "numbers, exp",
-    [
-        # Singleton case (renumber from scratch)
-        ([11], [110, 210]),
-        # No gaps (renumber from scratch)
-        ([11, 12, 13], [110, 210, 310, 410]),
-        # Tight gap
-        ([10, 12], [10, 11, 12]),
-        ([10, 11, 12, 14, 20], [10, 11, 12, 13, 14, 20]),
-        # Loose gap
-        #  9  10  11  12  13  14  15  16  17  18
-        #  <          ##          ##          >
-        ([10, 18], [12, 15, 18]),
-        ([10, 18, 20], [12, 15, 18, 20]),
-    ],
-)
-def test_squeeze_in_leading_number(numbers: list[int], exp: list[int]) -> None:
-    assert squeeze_in_leading_number(numbers) == exp
+class TestTryInsertNumbers:
+    @pytest.mark.parametrize("position", [-1, 4])
+    def test_invalid_position(self, position: int) -> None:
+        with pytest.raises(IndexError):
+            try_insert_numbers([100, 200, 300], position, 1)
 
-
-class TestScoreCandidateNumbering:
     @pytest.mark.parametrize(
-        "previous_numbers, position, candidate_numbers, exp",
+        "existing_numbers, position, count, allow_negative, exp",
         [
-            # Push top number up (1 change)
-            ([1, 2, 3], 2, [1, 2, 3, 4], 1),
-            # Push bottom numbers down (2 changes)
-            ([1, 2, 3], 2, [0, 1, 2, 3], 2),
+            # Cases with negative numbers not required or used (i.e.
+            # allow_negative should have no effect)
+            (existing_numbers, position, count, allow_negative, exp)
+            for existing_numbers, position, count, exp in [
+                # Empty
+                ([], 0, 1, [100]),
+                ([], 0, 3, [100, 200, 300]),
+                # Append
+                ([500], 1, 1, [600]),
+                ([100, 500], 2, 1, [600]),
+                ([500], 1, 3, [600, 700, 800]),
+                # Insert between (not tight)
+                ([10, 20], 1, 1, [15]),
+                ([10, 20, 30], 1, 1, [15]),
+                ([9, 10, 20, 30], 2, 1, [15]),
+                ([10, 20], 1, 4, [12, 14, 16, 18]),
+                # Insert between (tight fit)
+                ([10, 12], 1, 1, [11]),
+                ([10, 15], 1, 4, [11, 12, 13, 14]),
+                # Insert between (tightish fit)
+                ([10, 13], 1, 1, [11]),
+                ([10, 15], 1, 3, [11, 12, 13]),
+            ]
+            for allow_negative in [False, True]
+        ]
+        + [
+            # Cases where the specific negative number mode matters
+            #
+            # Insert at start
+            ([-1], 0, 1, True, [-101]),
+            ([-1, 1], 0, 1, True, [-101]),
+            ([-1], 0, 3, True, [-301, -201, -101]),
+            # Insert at start, when +ve only split between 0 and number
+            ([500], 0, 1, False, [249]),
+            ([500], 0, 4, False, [99, 199, 299, 399]),
+            # Insert at start, only just room whilst positive
+            ([1], 0, 1, False, [0]),
+            ([2], 0, 2, False, [0, 1]),
+            # Insert at start near zero, negative allowed
+            ([1], 0, 1, True, [-99]),
+            ([1], 0, 3, True, [-299, -199, -99]),
         ],
     )
-    def test_num_renumberings(
+    def test_possible(
         self,
-        previous_numbers: list[int],
+        existing_numbers: list[int],
         position: int,
-        candidate_numbers: list[int],
-        exp: tuple[int, float],
+        count: int,
+        allow_negative: bool,
+        exp: list[int],
     ) -> None:
         assert (
-            score_candidate_numbering(previous_numbers, position, candidate_numbers)[0]
-            == exp
+            try_insert_numbers(existing_numbers, position, count, allow_negative) == exp
         )
 
-    def test_spacing_score(self) -> None:
-        tight_score = score_candidate_numbering([1, 2], 1, [1, 2, 3])[1]
-        loose_score = score_candidate_numbering([1, 2], 1, [1, 2, 102])[1]
-
-        assert tight_score > loose_score
-
-
-class TestInsertNumber:
     @pytest.mark.parametrize(
-        "existing_numbers, position, allow_negative, exp",
+        "existing_numbers, position, count, allow_negative",
+        [
+            # No space between
+            ([10, 11], 1, 1, True),
+            ([10, 11], 1, 1, False),
+            ([10, 11], 1, 3, True),
+            ([10, 11], 1, 3, False),
+            ([10, 13], 1, 3, True),
+            ([10, 13], 1, 3, False),
+            # No space before (and negative numbers not allowed)
+            ([0], 0, 1, False),
+            ([2], 0, 3, False),
+        ],
+    )
+    def test_impossible(
+        self,
+        existing_numbers: list[int],
+        position: int,
+        count: int,
+        allow_negative: bool,
+    ) -> None:
+        with pytest.raises(NoFreeNumberError):
+            try_insert_numbers(existing_numbers, position, count, allow_negative)
+
+    def test_negative_check(self) -> None:
+        with pytest.raises(NegativeNumberError):
+            try_insert_numbers([-1], 0, 1, allow_negative=False)
+
+
+class TestInsertNumbers:
+    @pytest.mark.parametrize(
+        "existing_numbers, position, count, allow_negative, exp",
         [
             # Empty
-            ([], 0, False, (100, [])),
-            ([], 0, True, (100, [])),
+            ([], 0, 1, False, ([], [100])),
+            ([], 0, 1, True, ([], [100])),
+            ([], 0, 3, True, ([], [100, 200, 300])),
             # Append
-            ([100], 1, False, (200, [])),
-            ([100], 1, True, (200, [])),
+            ([100], 1, 1, False, ([], [200])),
+            ([100], 1, 1, True, ([], [200])),
+            ([100], 1, 3, True, ([], [200, 300, 400])),
             # Insert (space available)
-            ([100, 200], 1, False, (150, [])),
-            ([100, 200], 1, True, (150, [])),
+            ([100, 200], 1, 1, False, ([], [150])),
+            ([100, 200], 1, 1, True, ([], [150])),
+            ([100, 200], 1, 3, False, ([], [125, 150, 175])),
+            ([100, 200], 1, 3, True, ([], [125, 150, 175])),
             # Insert below zero, negative allowed
-            ([0], 0, True, (-100, [])),
+            ([0], 0, 1, True, ([], [-100])),
+            ([0], 0, 3, True, ([], [-300, -200, -100])),
             # Dense, insert near end (should favour pushing to end)
             (
                 [1, 2, 3, 4, 5],
                 3,
+                1,
                 True,
-                (103, [(5, 303), (4, 203)]),
+                ([(5, 303), (4, 203)], [103]),
+            ),
+            (
+                [1, 2, 3, 4, 5],
+                3,
+                3,
+                True,
+                ([(5, 503), (4, 403)], [103, 203, 303]),
             ),
             # Dense, insert near start, negatives allowed (should favour pushing to start)
             (
                 [1, 2, 3, 4, 5],
                 1,
+                1,
                 True,
-                (-98, [(1, -198)]),
+                ([(1, -198)], [-98]),
+            ),
+            (
+                [1, 2, 3, 4, 5],
+                1,
+                3,
+                True,
+                ([(1, -398)], [-298, -198, -98]),
             ),
             # Dense, insert near start, negatives disallowed (should favour pushing to start)
             (
                 [1, 2, 3, 4, 5],
                 1,
+                1,
                 False,
-                (1, [(1, 0)]),
+                ([(1, 0)], [1]),
+            ),
+            (
+                [3, 4, 5, 6, 7],
+                1,
+                3,
+                False,
+                ([(3, 0)], [1, 2, 3]),
             ),
             # Dense, insert near start, negatives disallowed but no space at
             # start so forced to push everything up instead
             (
                 [0, 1, 2, 3, 4, 5],
                 1,
+                1,
                 False,
-                (100, [(5, 600), (4, 500), (3, 400), (2, 300), (1, 200)]),
+                ([(5, 600), (4, 500), (3, 400), (2, 300), (1, 200)], [100]),
+            ),
+            (
+                [0, 1, 2, 3, 4, 5],
+                1,
+                3,
+                False,
+                ([(5, 800), (4, 700), (3, 600), (2, 500), (1, 400)], [100, 200, 300]),
+            ),
+            # Dense, insert at start, negatives disallowed, push everything up
+            (
+                [0, 1, 2, 3, 4, 5],
+                0,
+                1,
+                False,
+                ([(5, 700), (4, 600), (3, 500), (2, 400), (1, 300), (0, 200)], [100]),
+            ),
+            (
+                [0, 1, 2, 3, 4, 5],
+                0,
+                3,
+                False,
+                (
+                    [(5, 900), (4, 800), (3, 700), (2, 600), (1, 500), (0, 400)],
+                    [100, 200, 300],
+                ),
             ),
             # Dense, insert near start, negatives allowed: should push down
             (
                 [0, 1, 2, 3, 4, 5],
                 1,
+                1,
                 True,
-                (-99, [(0, -199)]),
+                ([(0, -199)], [-99]),
             ),
             # When equal changes required on either side (in this case two
             # edits), pick option with largest gaps (which here is the
@@ -273,8 +298,16 @@ class TestInsertNumber:
             (
                 [998, 999, 1000, 1001],
                 2,
+                1,
                 False,
-                (750, [(998, 250), (999, 500)]),
+                ([(998, 249), (999, 499)], [749]),
+            ),
+            (
+                [998, 999, 1000, 1001],
+                2,
+                3,
+                False,
+                ([(998, 165), (999, 332)], [499, 666, 833]),
             ),
         ],
     )
@@ -282,64 +315,80 @@ class TestInsertNumber:
         self,
         existing_numbers: list[int],
         position: int,
+        count: int,
         allow_negative: bool,
-        exp: tuple[int, list[tuple[int, int]]],
+        exp: tuple[list[tuple[int, int]], list[int]],
     ) -> None:
-        assert (
-            insert_number(
-                existing_numbers,
-                position,
-                allow_negative,
-            )
-            == exp
+        result = insert_numbers(
+            existing_numbers,
+            position,
+            count,
+            allow_negative,
+        )
+        exp_insertion = Insertion(
+            renumberings=[Renumbering(old, new) for old, new in exp[0]],
+            new_numbers=exp[1],
         )
 
+        assert set(result.renumberings) == set(exp_insertion.renumberings)
+        assert len(result.renumberings) == len(exp_insertion.renumberings)
+
+        assert result.new_numbers == exp_insertion.new_numbers
+
     def test_exhaustive(self) -> None:
-        n = 0
-        for count in range(1, 6):
-            for start in [0, 1, 10, 1000]:
-                for gaps in product(*repeat([1, 10, 500], count - 1)):
-                    existing_numbers = [start]
-                    for gap in gaps:
-                        existing_numbers.append(existing_numbers[-1] + gap)
-                    assert len(existing_numbers) == count
+        # A relatively exhaustive test of modest length numberings and
+        # insertion combinations. Just sanity checks the output meets all of
+        # the supposed requirements. (Does not check for optimality of
+        # solution, however!)
+        for existing_count in range(1, 6):
+            for count in range(1, 3):
+                for start in [0, 1, 10, 1000]:
+                    for gaps in product(*repeat([1, 10, 500], existing_count - 1)):
+                        existing_numbers = [start]
+                        for gap in gaps:
+                            existing_numbers.append(existing_numbers[-1] + gap)
+                        assert len(existing_numbers) == existing_count
 
-                    for position in range(count + 1):
-                        for allow_negative in [False, True]:
-                            n += 1
+                        for position in range(existing_count + 1):
+                            for allow_negative in [False, True]:
+                                result = insert_numbers(
+                                    existing_numbers,
+                                    position,
+                                    count,
+                                    allow_negative,
+                                )
 
-                            new_number, renumberings = insert_number(
-                                existing_numbers,
-                                position,
-                                allow_negative,
-                            )
+                                assert len(result.new_numbers) == count
 
-                            # Make the suggested edits don't result in any
-                            # collisions
-                            order = {
-                                n: float(i) for i, n in enumerate(existing_numbers)
-                            }
-                            for before, after in renumberings:
-                                order[after] = order.pop(before)
-                            order[new_number] = position - 0.5
-                            resulting_order = [order[n] for n in sorted(order)]
+                                # Check renumberings don't mess up the order
+                                order = {
+                                    n: float(i) for i, n in enumerate(existing_numbers)
+                                }
+                                to_reinsert = [
+                                    (new, order.pop(old))
+                                    for old, new in result.renumberings
+                                ]
+                                for new, n in to_reinsert:
+                                    order[new] = n
+                                for i, new_number in enumerate(result.new_numbers):
+                                    order[new_number] = (
+                                        position - 1 + ((i + 1) / (count + 1))
+                                    )
+                                resulting_order = [order[n] for n in sorted(order)]
 
-                            # No negatives (if reuqired)
-                            if not allow_negative:
-                                assert all(n >= 0 for n in order)
+                                # No negatives (if reuqired)
+                                if not allow_negative:
+                                    assert all(n >= 0 for n in order)
 
-                            # Check resulting sequence is in-order
-                            assert resulting_order == sorted(resulting_order)
+                                # Check resulting sequence is in-order
+                                assert resulting_order == sorted(resulting_order)
 
-                            # Check no collisions caused an entry to go missing
-                            assert len(resulting_order) == count + 1
+                                # Check no collisions caused an entry to go missing
+                                assert len(resulting_order) == existing_count + count
 
-                            # Our new insertion should be in the correct
-                            # position in the ordering
-                            assert resulting_order[position] == position - 0.5
-
-                            # Sanity check the ordering doesn't have any
-                            # extras/missing entries
-                            assert set(resulting_order) == (
-                                set(range(count)) | {position - 0.5}
-                            )
+                                # Our new insertions should be in the correct
+                                # position in the ordering
+                                assert resulting_order[position : position + count] == [
+                                    position - 1 + ((i + 1) / (count + 1))
+                                    for i in range(count)
+                                ]
