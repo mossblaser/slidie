@@ -46,17 +46,27 @@ import re
 from fractions import Fraction
 
 
+def extract_numerical_prefix_str(filename: Path) -> str:
+    """
+    Return the numerical prefix as a string, as it is formatted in the
+    filename.
+
+    Raises a ValueError if no valid prefix is found.
+    """
+
+    if match := re.match(r"^[-+]?[0-9]+", filename.name):
+        return match.group(0)
+    else:
+        raise ValueError(filename.name)
+
+
 def extract_numerical_prefix(filename: Path) -> int:
     """
     Return the value of the numerical prefix in a filename.
 
     Raises a ValueError if no valid prefix is found.
     """
-
-    if match := re.match(r"^[-+]?[0-9]+", filename.name):
-        return int(match.group(0))
-    else:
-        raise ValueError(filename.name)
+    return int(extract_numerical_prefix_str(filename))
 
 
 def replace_numerical_prefix(filename: Path, number: int, digits: int = 5) -> Path:

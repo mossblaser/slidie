@@ -6,6 +6,7 @@ from itertools import product, repeat
 
 from slidie.file_numbering import (
     extract_numerical_prefix,
+    extract_numerical_prefix_str,
     replace_numerical_prefix,
     evenly_spaced_numbers_between,
     NoFreeNumberError,
@@ -45,6 +46,28 @@ def test_extract_numerical_prefix(filename: Path, exp: int | None) -> None:
     else:
         with pytest.raises(ValueError):
             extract_numerical_prefix(filename)
+
+
+@pytest.mark.parametrize(
+    "filename, exp",
+    [
+        # No number (NB: more thoroughly tested via
+        # test_extract_numerical_prefix)
+        (Path("foo"), None),
+        # Plain numbers
+        (Path("123-foo.svg"), "123"),
+        (Path("-321-foo.svg"), "-321"),
+        (Path("00100-foo.svg"), "00100"),
+        (Path("-00100-foo.svg"), "-00100"),
+        (Path("+00100-foo.svg"), "+00100"),
+    ],
+)
+def test_extract_numerical_prefix_str(filename: Path, exp: str | None) -> None:
+    if exp is not None:
+        assert extract_numerical_prefix_str(filename) == exp
+    else:
+        with pytest.raises(ValueError):
+            extract_numerical_prefix_str(filename)
 
 
 @pytest.mark.parametrize(
