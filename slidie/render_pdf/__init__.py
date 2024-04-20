@@ -15,7 +15,7 @@ from slidie.svg_utils import (
     get_build_step_range,
     get_build_tags,
 )
-from slidie.file_numbering import extract_numerical_prefix
+from slidie.file_numbering import enumerate_slides
 from slidie.speaker_notes import extract_speaker_notes
 from slidie.magic import extract_magic
 from slidie.links import annotate_slide_id_from_magic, resolve_link
@@ -165,9 +165,7 @@ def render_pdf(source_directory: Path, output: Path) -> None:
     """
     Render a slidie show into a PDF.
     """
-    slide_filenames = sorted(
-        source_directory.glob("*.svg"), key=extract_numerical_prefix
-    )
+    slide_filenames = enumerate_slides(source_directory)
 
     with Pdf.new() as out_pdf:
         with TemporaryDirectory() as tmp_dir_str:

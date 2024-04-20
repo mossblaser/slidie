@@ -46,25 +46,31 @@ import re
 from fractions import Fraction
 
 
+class InvalidNumericalPrefixError(ValueError):
+    """
+    Thrown when a filename does not have a valid numerical prefix.
+    """
+
+
 def extract_numerical_prefix_str(filename: Path) -> str:
     """
     Return the numerical prefix as a string, as it is formatted in the
     filename.
 
-    Raises a ValueError if no valid prefix is found.
+    Raises an InvalidNumericalPrefixError if no valid prefix is found.
     """
 
     if match := re.match(r"^[-+]?[0-9]+", filename.name):
         return match.group(0)
     else:
-        raise ValueError(filename.name)
+        raise InvalidNumericalPrefixError(filename.name)
 
 
 def extract_numerical_prefix(filename: Path) -> int:
     """
     Return the value of the numerical prefix in a filename.
 
-    Raises a ValueError if no valid prefix is found.
+    Raises an InvalidNumericalPrefixError if no valid prefix is found.
     """
     return int(extract_numerical_prefix_str(filename))
 
@@ -74,14 +80,40 @@ def replace_numerical_prefix(filename: Path, number: int, digits: int = 5) -> Pa
     Replace the numerical prefix of a file with the specified value. Zero-pads the
     number to the specified number of digits.
 
-    Raises a ValueError if no existing prefix is found.
+    Raises an InvalidNumericalPrefixError if no existing prefix is found.
+    """
+    suffix = filename.name.removeprefix(extract_numerical_prefix_str(filename))
+    return filename.parent / f"{number:0{digits}d}{suffix}"
+
+
+class DuplicateSlideNumberError(ValueError):
+    """
+    Thrown when two slides have the same numerical prefix.
     """
 
-    if match := re.match(r"^[-+]?[0-9]+(.*)$", filename.name):
-        suffix = match.group(1)
-        return filename.parent / f"{number:0{digits}d}{suffix}"
-    else:
-        raise ValueError(filename.name)
+
+def enumerate_slides(directory: Path) -> list[Path]:
+    """
+    Enumerate the slides in a given directory, returning them in presentation
+    order.
+
+    If any SVG files without numerical prefixes are present, an
+    InvalidNumericalPrefixError is thrown.
+
+    If any numerical prefix is reused, a DuplicateSlideNumberError is thrown.
+    """
+    slides = sorted(directory.glob("*.svg"), key=extract_numerical_prefix)
+
+    # Check for duplicate numbers
+    slides_by_number: dict[int, Path] = {}
+    for slide in slides:
+        number = extract_numerical_prefix(slide)
+        if number in slides_by_number:
+            raise DuplicateSlideNumberError(slides_by_number[number], slide)
+
+        slides_by_number[number] = slide
+
+    return slides
 
 
 def evenly_spaced_numbers_between(start: int, end: int, count: int) -> list[int]:

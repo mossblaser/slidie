@@ -5,9 +5,12 @@ from pathlib import Path
 from itertools import product, repeat
 
 from slidie.file_numbering import (
+    InvalidNumericalPrefixError,
     extract_numerical_prefix,
     extract_numerical_prefix_str,
     replace_numerical_prefix,
+    DuplicateSlideNumberError,
+    enumerate_slides,
     evenly_spaced_numbers_between,
     NoFreeNumberError,
     NegativeNumberError,
@@ -44,7 +47,7 @@ def test_extract_numerical_prefix(filename: Path, exp: int | None) -> None:
     if exp is not None:
         assert extract_numerical_prefix(filename) == exp
     else:
-        with pytest.raises(ValueError):
+        with pytest.raises(InvalidNumericalPrefixError):
             extract_numerical_prefix(filename)
 
 
@@ -66,7 +69,7 @@ def test_extract_numerical_prefix_str(filename: Path, exp: str | None) -> None:
     if exp is not None:
         assert extract_numerical_prefix_str(filename) == exp
     else:
-        with pytest.raises(ValueError):
+        with pytest.raises(InvalidNumericalPrefixError):
             extract_numerical_prefix_str(filename)
 
 
@@ -83,6 +86,36 @@ def test_extract_numerical_prefix_str(filename: Path, exp: str | None) -> None:
 )
 def test_replace_numerical_prefix(filename: Path, number: int, exp: Path) -> None:
     assert replace_numerical_prefix(filename, number) == exp
+
+
+@pytest.mark.parametrize(
+    "filenames, exp",
+    [
+        # Empty directory
+        ([], []),
+        # Single file
+        (["0.svg"], ["0.svg"]),
+        # Verify ordering is numerical
+        (["1.svg", "11.svg", "2.svg"], ["1.svg", "2.svg", "11.svg"]),
+        # Should ignore non-SVGs
+        (["0.svg", "foo.txt"], ["0.svg"]),
+        # Reject files without numbers
+        (["0.svg", "foo.svg"], InvalidNumericalPrefixError),
+        # Reject files with duplicate numbers
+        (["0.svg", "00-foo.svg"], DuplicateSlideNumberError),
+    ],
+)
+def test_enumerate_slides(
+    filenames: list[str], exp: list[str] | type[Exception], tmp_path: Path
+) -> None:
+    for filename in filenames:
+        (tmp_path / filename).touch()
+
+    if isinstance(exp, list):
+        assert [f.name for f in enumerate_slides(tmp_path)] == exp
+    else:
+        with pytest.raises(exp):
+            enumerate_slides(tmp_path)
 
 
 class TestEvenlySpacedNumbersBetween:
