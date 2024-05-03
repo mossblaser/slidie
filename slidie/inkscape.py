@@ -175,6 +175,8 @@ class Inkscape:
         text_to_path: bool = False,
         width: int | None = None,
         height: int | None = None,
+        dpi: float | None = None,
+        background_opacity: float | None = None,
     ) -> None:
         if text_to_path:
             if out := self._run_cmd("export-text-to-path"):
@@ -185,6 +187,12 @@ class Inkscape:
                 InkscapeError(out)
         if height is not None:
             if out := self._run_cmd(f"export-height: {height}"):
+                InkscapeError(out)
+        if dpi is not None:
+            if out := self._run_cmd(f"export-dpi: {dpi}"):
+                InkscapeError(out)
+        if background_opacity is not None:
+            if out := self._run_cmd(f"export-background-opacity: {background_opacity}"):
                 InkscapeError(out)
 
         if out := self._run_cmd(f"export-area-page"):

@@ -8,6 +8,7 @@ from pathlib import Path
 
 from slidie.render_xhtml import render_xhtml
 from slidie.render_pdf import render_pdf
+from slidie.render_png import render_png
 
 
 def main() -> None:
@@ -51,8 +52,14 @@ def main() -> None:
     match args.output.suffix:
         case ".xhtml":
             render_xhtml(args.source, args.output, args.debug)
+        case ".html" | ".htm":
+            raise NotImplementedError(
+                f"Did you mean {args.output.with_suffix('.xhtml')}?"
+            )
         case ".pdf":
             render_pdf(args.source, args.output)
+        case ".png":
+            render_png(args.source, args.output)
         case suffix:
             raise NotImplementedError(suffix)
 
