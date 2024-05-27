@@ -329,7 +329,7 @@ class TestCLIApp:
         (tmp_path / "bar" / "0200.svg").touch()
 
         with chdir(tmp_path):
-            with pytest.raises(FilesNotInSameDirectoryError):
+            with pytest.raises(SystemExit):
                 main(["foo/0100.svg", "--after", "bar/0200.svg"])
 
     def test_no_source(self, example_dir: Path) -> None:

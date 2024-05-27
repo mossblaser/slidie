@@ -24,6 +24,8 @@ from slidie.file_numbering import (
     insert_numbers,
 )
 
+from slidie.scripts.exception_formatting import slidie_exception_formatting
+
 
 class FilesNotInSameDirectoryError(Exception):
     pass
@@ -199,103 +201,107 @@ def main(cli_args: list[str] | None = None) -> None:
 
     args = parser.parse_args(cli_args)
 
-    if args.slide and args.insert:
-        parser.error("either slides to move or --insert may be used, but not both")
+    with slidie_exception_formatting():
+        if args.slide and args.insert:
+            parser.error("either slides to move or --insert may be used, but not both")
 
-    if not args.slide and not args.insert:
-        parser.error("either slides to move or --insert must be specified")
+        if not args.slide and not args.insert:
+            parser.error("either slides to move or --insert must be specified")
 
-    try:
-        source_directory = common_parent_directory(
-            args.slide
-            + ([args.before] if args.before else [])
-            + ([args.after] if args.after else [])
-        )
-    except ValueError:
-        # Empty list provided: assume current working directory
-        source_directory = Path(".")
-
-    slides = {
-        extract_numerical_prefix(f): f for f in enumerate_slides(source_directory)
-    }
-
-    # Remove the slides to be moved from the list
-    moved_slides = {extract_numerical_prefix(f): f for f in args.slide}
-    static_slides = slides.copy()
-    for num in moved_slides:
-        del static_slides[num]
-    static_slide_numbers = sorted(static_slides)
-
-    # Determine the pivot point
-    if args.before or args.after:
-        pivot_slide = args.before or args.after
         try:
-            pivot_slide_number = static_slide_numbers.index(
-                extract_numerical_prefix(pivot_slide)
+            source_directory = common_parent_directory(
+                args.slide
+                + ([args.before] if args.before else [])
+                + ([args.after] if args.after else [])
             )
         except ValueError:
-            parser.error(
-                "--before/--after must refer to a slide which isn't being moved"
-            )
-        if args.after is not None:
-            pivot_slide_number += 1
-    elif args.start:
-        pivot_slide_number = 0
-    elif args.end:
-        pivot_slide_number = len(static_slide_numbers)
-    else:
-        assert False  # Unreachable
+            # Empty list provided: assume current working directory
+            source_directory = Path(".")
 
-    # Work out numbering
-    numbering_params = infer_numbering_parameters(list(static_slides.values()))
-    replacements, new_numbers = insert_numbers(
-        existing_numbers=static_slide_numbers,
-        position=pivot_slide_number,
-        count=len(moved_slides) or args.insert,
-        allow_negative=args.allow_negative or numbering_params.allow_negative,
-        preferred_step_size=numbering_params.preferred_step_size,
-    )
+        slides = {
+            extract_numerical_prefix(f): f for f in enumerate_slides(source_directory)
+        }
 
-    if moved_slides:
-        replacements.extend(
-            Renumbering(old, new) for old, new in zip(sorted(moved_slides), new_numbers)
+        # Remove the slides to be moved from the list
+        moved_slides = {extract_numerical_prefix(f): f for f in args.slide}
+        static_slides = slides.copy()
+        for num in moved_slides:
+            del static_slides[num]
+        static_slide_numbers = sorted(static_slides)
+
+        # Determine the pivot point
+        if args.before or args.after:
+            pivot_slide = args.before or args.after
+            try:
+                pivot_slide_number = static_slide_numbers.index(
+                    extract_numerical_prefix(pivot_slide)
+                )
+            except ValueError:
+                parser.error(
+                    "--before/--after must refer to a slide which isn't being moved"
+                )
+            if args.after is not None:
+                pivot_slide_number += 1
+        elif args.start:
+            pivot_slide_number = 0
+        elif args.end:
+            pivot_slide_number = len(static_slide_numbers)
+        else:
+            assert False  # Unreachable
+
+        # Work out numbering
+        numbering_params = infer_numbering_parameters(list(static_slides.values()))
+        replacements, new_numbers = insert_numbers(
+            existing_numbers=static_slide_numbers,
+            position=pivot_slide_number,
+            count=len(moved_slides) or args.insert,
+            allow_negative=args.allow_negative or numbering_params.allow_negative,
+            preferred_step_size=numbering_params.preferred_step_size,
         )
 
-    # Print changes on dry run
-    if args.dry_run:
-        for old, new in replacements:
-            old_name = slides[old].relative_to(source_directory)
-            new_name = replace_numerical_prefix(
-                old_name,
-                new,
-                numbering_params.num_digits,
+        if moved_slides:
+            replacements.extend(
+                Renumbering(old, new)
+                for old, new in zip(sorted(moved_slides), new_numbers)
             )
-            print(f"{old_name} -> {new_name}")
 
-    # Print new numbers to insert
-    if args.insert:
-        for number in new_numbers:
-            print(
-                replace_numerical_prefix(
-                    Path("0"),
-                    number,
+        # Print changes on dry run
+        if args.dry_run:
+            for old, new in replacements:
+                old_name = slides[old].relative_to(source_directory)
+                new_name = replace_numerical_prefix(
+                    old_name,
+                    new,
                     numbering_params.num_digits,
                 )
-            )
+                print(f"{old_name} -> {new_name}")
 
-    # Rename all files to be moved with a 'temp_' prefix before moving them
-    # into their final destinations. This avoids us accidentally overwriting
-    # them when moving them to their final destinations.
-    if not args.dry_run:
-        for old, _ in replacements:
-            move_file(
-                slides[old],
-                slides[old].parent / f"temp_{slides[old].name}",
-                not args.no_git_mv,
-            )
-        for old, new in replacements:
-            move_file(
-                slides[old].parent / f"temp_{slides[old].name}",
-                replace_numerical_prefix(slides[old], new, numbering_params.num_digits),
-                not args.no_git_mv,
-            )
+        # Print new numbers to insert
+        if args.insert:
+            for number in new_numbers:
+                print(
+                    replace_numerical_prefix(
+                        Path("0"),
+                        number,
+                        numbering_params.num_digits,
+                    )
+                )
+
+        # Rename all files to be moved with a 'temp_' prefix before moving them
+        # into their final destinations. This avoids us accidentally overwriting
+        # them when moving them to their final destinations.
+        if not args.dry_run:
+            for old, _ in replacements:
+                move_file(
+                    slides[old],
+                    slides[old].parent / f"temp_{slides[old].name}",
+                    not args.no_git_mv,
+                )
+            for old, new in replacements:
+                move_file(
+                    slides[old].parent / f"temp_{slides[old].name}",
+                    replace_numerical_prefix(
+                        slides[old], new, numbering_params.num_digits
+                    ),
+                    not args.no_git_mv,
+                )

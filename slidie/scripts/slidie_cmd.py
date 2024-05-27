@@ -6,6 +6,8 @@ supported output formats.
 from argparse import ArgumentParser
 from pathlib import Path
 
+from slidie.scripts.exception_formatting import slidie_exception_formatting
+
 from slidie.render_xhtml import render_xhtml
 from slidie.render_pdf import render_pdf
 from slidie.render_png import render_png
@@ -48,20 +50,20 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    # TODO: Make error reporting sensible
-    match args.output.suffix:
-        case ".xhtml":
-            render_xhtml(args.source, args.output, args.debug)
-        case ".html" | ".htm":
-            raise NotImplementedError(
-                f"Did you mean {args.output.with_suffix('.xhtml')}?"
-            )
-        case ".pdf":
-            render_pdf(args.source, args.output)
-        case ".png":
-            render_png(args.source, args.output)
-        case suffix:
-            raise NotImplementedError(suffix)
+    with slidie_exception_formatting():
+        match args.output.suffix:
+            case ".xhtml":
+                render_xhtml(args.source, args.output, args.debug)
+            case ".html" | ".htm":
+                raise NotImplementedError(
+                    f"Did you mean {args.output.with_suffix('.xhtml')}?"
+                )
+            case ".pdf":
+                render_pdf(args.source, args.output)
+            case ".png":
+                render_png(args.source, args.output)
+            case suffix:
+                raise NotImplementedError(suffix)
 
 
 if __name__ == "__main__":
