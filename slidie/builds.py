@@ -393,31 +393,35 @@ def parse_build_specification(layer_name: str) -> list[InputStep] | None:
 
     If none are present, returns None.
     """
-    build_specification: list[InputStep] = []
+    try:
+        build_specification: list[InputStep] = []
 
-    contains_build_specification = False
-    for match in re.findall(r"<[^>]*>", layer_name):
-        contains_build_specification = True
+        contains_build_specification = False
+        for match in re.findall(r"<[^>]*>", layer_name):
+            contains_build_specification = True
 
-        if steps_str := match[1:-1].strip():
-            for step_or_range_str in steps_str.split(","):
-                if "-" in step_or_range_str:
-                    start_str, _, end_str = step_or_range_str.partition("-")
-                    build_specification.append(
-                        Range(
-                            parse_build_specification_step(start_str, Start()),
-                            parse_build_specification_step(end_str, End()),
+            if steps_str := match[1:-1].strip():
+                for step_or_range_str in steps_str.split(","):
+                    if "-" in step_or_range_str:
+                        start_str, _, end_str = step_or_range_str.partition("-")
+                        build_specification.append(
+                            Range(
+                                parse_build_specification_step(start_str, Start()),
+                                parse_build_specification_step(end_str, End()),
+                            )
                         )
-                    )
-                else:
-                    build_specification.append(
-                        parse_build_specification_step(step_or_range_str)
-                    )
+                    else:
+                        build_specification.append(
+                            parse_build_specification_step(step_or_range_str)
+                        )
 
-    if contains_build_specification:
-        return build_specification
-    else:
-        return None
+        if contains_build_specification:
+            return build_specification
+        else:
+            return None
+    except Exception as exc:
+        exc.add_note(f"While parsing layer named '{layer_name}'")
+        raise
 
 
 def parse_tags(layer_name: str) -> set[str]:
@@ -561,7 +565,7 @@ class CyclicDependencyError(ValueError):
     def __str__(self) -> str:
         layers = ""
         if self.layer_names is not None:
-            layers = ": " + " -> ".join(f"'{n}'" for n in self.layer_names)
+            layers = ":\n   " + "\n-> ".join(f"'{n}'" for n in self.layer_names)
         return f"Cyclic dependency in tag references{layers}."
 
 

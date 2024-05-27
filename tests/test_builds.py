@@ -675,6 +675,9 @@ class TestEvaluateBuildSteps:
             "A <@b> @a",
         ]
         assert str(exc_info.value) == (
-            "Cyclic dependency in tag references: "
-            "'A <@b> @a' -> 'B <@c> @b' -> 'C <@a> @c' -> 'A <@b> @a'."
+            "Cyclic dependency in tag references:\n"
+            "   'A <@b> @a'\n"
+            "-> 'B <@c> @b'\n"
+            "-> 'C <@a> @c'\n"
+            "-> 'A <@b> @a'."
         )
