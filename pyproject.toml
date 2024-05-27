@@ -4,8 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "slidie"
-version = "0.0.1"
-dependencies = []
+dependencies = ["pikepdf"]
+dynamic = ["version"]
+
+[tool.setuptools.dynamic]
+version = {attr = "slidie.__version__"}
 
 [project.scripts]
 slidie = "slidie.scripts.slidie_cmd:main"
