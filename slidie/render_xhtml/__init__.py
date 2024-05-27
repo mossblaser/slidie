@@ -105,7 +105,13 @@ def render_xhtml(source_directory: Path, output: Path, debug: bool = False) -> N
     slides = []
     with Inkscape() as inkscape:
         for filename in slide_filenames:
-            slides.append(render_slide(filename, inkscape))
+            try:
+                slides.append(render_slide(filename, inkscape))
+            except Exception as exc:
+                exc.add_note(
+                    f"While processing {filename.relative_to(source_directory)}"
+                )
+                raise
 
     xhtml_root = render_template(BASE_TEMPLATE_FILENAME, slides, debug)
 

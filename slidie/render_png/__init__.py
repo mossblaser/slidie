@@ -64,7 +64,6 @@ def render_slide(
     with open_etree_in_inkscape(inkscape, svg):
         for step_number, filename in zip(get_build_step_range(svg), filenames):
             set_visible_step(inkscape, build_elements, step_number)
-            print(filename)
             inkscape.export(filename, dpi=dpi, background_opacity=background_opacity)
             yield filename
 
@@ -86,8 +85,16 @@ def render_png(
     with Inkscape() as inkscape:
         for slide_index, svg_filename in enumerate(slide_filenames):
             svg = ET.parse(svg_filename).getroot()
-            output_filenames.extend(
-                render_slide(svg, inkscape, filename_generator, dpi, background_opacity)
-            )
+            try:
+                output_filenames.extend(
+                    render_slide(
+                        svg, inkscape, filename_generator, dpi, background_opacity
+                    )
+                )
+            except Exception as exc:
+                exc.add_note(
+                    f"While processing {svg_filename.relative_to(source_directory)}"
+                )
+                raise
 
     return output_filenames

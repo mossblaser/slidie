@@ -175,10 +175,16 @@ def render_pdf(source_directory: Path, output: Path) -> None:
             slides = []
             with Inkscape() as inkscape:
                 for slide_index, svg_filename in enumerate(slide_filenames):
-                    svg = ET.parse(svg_filename).getroot()
-                    slide_tmp_dir = tmp_dir / str(slide_index)
-                    slide_tmp_dir.mkdir()
-                    slides.append(render_slide(svg, inkscape, slide_tmp_dir))
+                    try:
+                        svg = ET.parse(svg_filename).getroot()
+                        slide_tmp_dir = tmp_dir / str(slide_index)
+                        slide_tmp_dir.mkdir()
+                        slides.append(render_slide(svg, inkscape, slide_tmp_dir))
+                    except Exception as exc:
+                        exc.add_note(
+                            f"While processing {svg_filename.relative_to(source_directory)}"
+                        )
+                        raise
 
             # Concatenate into single PDF
             version = out_pdf.pdf_version
