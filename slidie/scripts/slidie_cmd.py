@@ -35,7 +35,8 @@ def main() -> None:
         default=Path("out.xhtml"),
         help="""
             The output file name to generate. The extension will be used to
-            determine the output format. Defaults to 'out.xhtml'.
+            determine the output format. Supported extensions are '.xhtml',
+            '.pdf' and '.png'. Defaults to 'out.xhtml'.
         """,
     )
     parser.add_argument(
@@ -54,16 +55,16 @@ def main() -> None:
         match args.output.suffix:
             case ".xhtml":
                 render_xhtml(args.source, args.output, args.debug)
-            case ".html" | ".htm":
-                raise NotImplementedError(
-                    f"Did you mean {args.output.with_suffix('.xhtml')}?"
-                )
             case ".pdf":
                 render_pdf(args.source, args.output)
             case ".png":
                 render_png(args.source, args.output)
+            case ".html" | ".htm" as suffix:
+                parser.error(
+                    f"Unsupported --output suffix: {suffix} (did you mean .xhtml?)"
+                )
             case suffix:
-                raise NotImplementedError(suffix)
+                parser.error(f"Unsupported --output suffix: {suffix}")
 
 
 if __name__ == "__main__":
