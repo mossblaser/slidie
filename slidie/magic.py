@@ -132,7 +132,7 @@ def extract_magic(svg: ET.Element) -> dict[str, list[MagicText]]:
         try:
             parsed = tomllib.loads(text)
         except tomllib.TOMLDecodeError as e:
-            raise MagicTOMLDecodeError(parents, text, e)
+            raise MagicTOMLDecodeError(parents, text, e) from None
 
         if len(parsed) == 0:
             raise NotEnoughMagicError(parents, text)
