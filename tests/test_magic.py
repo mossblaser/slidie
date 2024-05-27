@@ -25,6 +25,7 @@ class TestExtractMagic:
             == dedent(
                 """
                 on Layer 1 in:
+                    0| @@@
                     1| I am not valid TOML...
                     2| Oopsie!
                 Expected '=' after a key in a key/value pair (at line 1, column 3)
@@ -42,6 +43,7 @@ class TestExtractMagic:
             == dedent(
                 """
                 on Layer 1 in:
+                    @@@
                     # No magic to see here!
                 Expected a value to be defined.
             """
@@ -58,6 +60,7 @@ class TestExtractMagic:
             == dedent(
                 """
                 on Layer 1 in:
+                    @@@
                     # Two values defined in one magic (one too many!)
                     foo = 123
                     bar = 321
@@ -97,6 +100,7 @@ class TestGetMagicRectangle:
             == dedent(
                 """
                 on Layer 1 in:
+                    @@@
                     foo = "bar"
                 Expected text to be grouped with a single <rect> or <image> (no elements present)
             """
@@ -114,6 +118,7 @@ class TestGetMagicRectangle:
             == dedent(
                 """
                 on Layer 1 in:
+                    @@@
                     # XXX: Too many placeholders
                     video = "video.mp4"
                 Expected text to be grouped with a single <rect> or <image> (got <rect> and <rect>)
@@ -132,6 +137,7 @@ class TestGetMagicRectangle:
             == dedent(
                 """
                 on Layer 1 in:
+                    @@@
                     # XXX: Wrong placeholder type
                     video = "video.mp4"
                 Expected text to be grouped with a single <rect> or <image> (got <circle>)

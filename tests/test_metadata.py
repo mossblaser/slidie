@@ -27,6 +27,7 @@ class TestAnnotateMetadataFromMagic:
             == dedent(
                 """
                 on Layer 1 in:
+                    @@@
                     title = "foo"
                 'title' redefined again elsewhere.
             """

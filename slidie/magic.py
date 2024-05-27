@@ -67,12 +67,13 @@ class MagicError(Exception):
         )
 
         if number_lines:
-            text = "".join(
+            text = "    0| @@@\n"
+            text += "".join(
                 f"{i + 1:5d}| {line}"
                 for i, line in enumerate(self.text.rstrip().splitlines(keepends=True))
             )
         else:
-            text = indent(self.text.rstrip(), "    ")
+            text = "    @@@\n" + indent(self.text.rstrip(), "    ")
 
         if layer:
             return f"on {layer} in:\n{text}"

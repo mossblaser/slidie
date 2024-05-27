@@ -29,6 +29,7 @@ class TestAnnotateSlideIdFromMagic:
             == dedent(
                 """
                 on Layer 1 in:
+                    @@@
                     id = "example"
                 'id' redefined again elsewhere.
             """
@@ -77,6 +78,7 @@ class TestAnnotateSlideIdFromMagic:
             == dedent(
                 f"""
                 in:
+                    @@@
                     id = "{slide_id}"
                 '{slide_id}' is not a valid ID.
             """
