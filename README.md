@@ -1,6 +1,8 @@
 Slidie: An Inkscape-centered slide preparation tool
 ===================================================
 
+![Hero image](./docs/source/_static/hero.png)
+
 *"A a slide preparation system which makes illustrations easy and bullet points
 hard."*
 
