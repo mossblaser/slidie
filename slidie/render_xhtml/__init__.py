@@ -24,7 +24,7 @@ from slidie.file_numbering import enumerate_slides
 from slidie.speaker_notes import embed_speaker_notes
 from slidie.magic import MagicText, extract_magic
 from slidie.links import annotate_slide_id_from_magic
-from slidie.metadata import annotate_metadata_from_magic
+from slidie.metadata import annotate_metadata
 from slidie.render_xhtml.browser_magic import embed_videos, embed_iframes
 from slidie.render_xhtml.template import render_template
 
@@ -66,7 +66,7 @@ def render_slide(
     magic = extract_magic(svg)
 
     annotate_slide_id_from_magic(magic)
-    annotate_metadata_from_magic(magic)
+    annotate_metadata(svg, magic)
 
     # We (probably) want the background displayed in Inkscape to back the SVG
     # since otherwise you'll just get a transparent background onto the black

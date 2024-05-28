@@ -19,7 +19,7 @@ from slidie.file_numbering import enumerate_slides
 from slidie.speaker_notes import extract_speaker_notes
 from slidie.magic import extract_magic
 from slidie.links import annotate_slide_id_from_magic, resolve_link
-from slidie.metadata import annotate_metadata_from_magic
+from slidie.metadata import annotate_metadata
 
 from slidie.render_pdf.pdf import (
     rewrite_internal_links,
@@ -84,7 +84,7 @@ def render_slide(svg: ET.Element, inkscape: Inkscape, tmp_dir: Path) -> Rendered
 
     magic = extract_magic(svg)
     annotate_slide_id_from_magic(magic)
-    annotate_metadata_from_magic(magic)
+    annotate_metadata(svg, magic)
 
     slide_id = svg.get(f"{{{SLIDIE_NAMESPACE}}}id", None)
     slide_title = svg.get(f"{{{SLIDIE_NAMESPACE}}}title", None)

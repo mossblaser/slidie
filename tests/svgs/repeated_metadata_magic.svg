@@ -24,8 +24,8 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="0.42333333"
-     inkscape:cx="401.5748"
-     inkscape:cy="561.02362"
+     inkscape:cx="401.57481"
+     inkscape:cy="561.02363"
      inkscape:window-width="1340"
      inkscape:window-height="1041"
      inkscape:window-x="576"
@@ -70,5 +70,16 @@
          x="12.560509"
          y="129.76711"
          id="tspan4">title = &quot;foo&quot;  # Again, whoops!</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:13.7283px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="12.560509"
+       y="166.41232"
+       id="title"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="12.560509"
+         y="166.41232"
+         id="tspan6">I have id &quot;title&quot;</tspan></text>
   </g>
 </svg>
