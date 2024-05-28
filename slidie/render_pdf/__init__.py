@@ -11,6 +11,7 @@ from slidie.xml_namespaces import SLIDIE_NAMESPACE
 from slidie.inkscape import Inkscape, open_etree_in_inkscape, set_visible_step
 from slidie.svg_utils import (
     annotate_build_steps,
+    fill_inkscape_page_background,
     find_build_elements,
     get_build_step_range,
     get_build_tags,
@@ -90,6 +91,8 @@ def render_slide(svg: ET.Element, inkscape: Inkscape, tmp_dir: Path) -> Rendered
     slide_title = svg.get(f"{{{SLIDIE_NAMESPACE}}}title", None)
     slide_author = svg.get(f"{{{SLIDIE_NAMESPACE}}}author", None)
     slide_date = svg.get(f"{{{SLIDIE_NAMESPACE}}}date", None)
+
+    fill_inkscape_page_background(svg)
 
     steps = []
     with open_etree_in_inkscape(inkscape, svg):
