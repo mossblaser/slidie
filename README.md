@@ -9,6 +9,8 @@ into a slide show to accompany a presentation.
 
 Noteworthy features include:
 
+* Slides are just ordinary (numbered) Inkscape SVG files
+* No plugins etc. are required
 * Reveal complex diagrams step-by-step by adding
   [Beamer](https://en.wikipedia.org/wiki/Beamer_(LaTeX))-inspired annotations
   to Inkscape layer names.
