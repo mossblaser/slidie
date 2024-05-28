@@ -89,7 +89,7 @@ dynamic features such as embedded videos only available in the XHTML output.
 
 If you want to make a slide reveal certain layers to build up step-by-step, you
 can add build step annotations in angle brackets to the layer name in Inkscape
-[like so:
+like so:
 
 ![Specially labelled layers](./docs/source/_static/build_steps_screenshot.png)
 
@@ -123,7 +123,7 @@ they will be replaced with a video player:
 
 ![A video playing with the XHTML viewer](./docs/source/_static/video_viewer_screenshot.png)
 
-*Tip: Magic text elements starting with `@@@'`can do a few other neat things
+*Tip: Magic text elements starting with `@@@` can do a few other neat things
 which are covered in the documentation.*
 
 For a lot more detail, see the manual.
