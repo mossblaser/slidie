@@ -78,6 +78,39 @@ def get_inkscape_layer_name(layer: ET.Element) -> str:
     return name
 
 
+def enumerate_elem_parents(root: ET.Element, target: ET.Element) -> list[ET.Element]:
+    """
+    Given an element, return a list [root, ..., target] giving the complete
+    hiearchy of elements.
+    """
+
+    def find(elem: ET.Element, parents: list[ET.Element]) -> list[ET.Element] | None:
+        elem_path = parents + [elem]
+        if elem is target:
+            return elem_path
+        else:
+            for child in elem:
+                if result := find(child, elem_path):
+                    return result
+            return None
+
+    parents = find(root, [])
+    assert parents is not None
+    return parents
+
+
+def get_elem_inksape_layers(svg: ET.Element, elem: ET.Element) -> tuple[str, ...]:
+    """
+    Given an element, return the hierarchy of layer names that element resides
+    in.
+    """
+    return tuple(
+        get_inkscape_layer_name(elem)
+        for elem in enumerate_elem_parents(svg, elem)
+        if is_inkscape_layer(elem)
+    )
+
+
 def annotate_build_steps(svg: ET.Element) -> None:
     """
     Evaluate the build steps defined on layers in an Inkscape SVG and add the

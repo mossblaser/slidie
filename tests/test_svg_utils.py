@@ -11,6 +11,8 @@ from slidie.svg_utils import (
     enumerate_inkscape_layers,
     iter_layers,
     get_inkscape_layer_name,
+    enumerate_elem_parents,
+    get_elem_inksape_layers,
     annotate_build_steps,
     find_build_elements,
     get_build_step_range,
@@ -64,6 +66,29 @@ def test_iter_layers() -> None:
         "Middle layer, bottom sublayer",
         "Bottom layer",
     ]
+
+
+def test_enumerate_elem_parents() -> None:
+    root = get_svg("nested_element.svg")
+
+    elem = root.find(f".//*[@id='elem']")
+    assert elem is not None
+
+    parents = enumerate_elem_parents(root, elem)
+    assert parents[0] is root
+    assert parents[-1] is elem
+
+    for parent, child in zip(parents, parents[1:]):
+        assert child in parent
+
+
+def test_elem_inkscape_layers() -> None:
+    root = get_svg("nested_element.svg")
+
+    elem = root.find(f".//*[@id='elem']")
+    assert elem is not None
+
+    assert get_elem_inksape_layers(root, elem) == ("outer", "inner")
 
 
 def test_annotate_build_steps() -> None:
