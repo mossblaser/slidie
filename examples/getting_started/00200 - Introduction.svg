@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="1920"
+   height="1080"
+   viewBox="0 0 1920 1080"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   sodipodi:docname="00200 - Introduction.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#d6d6d6"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="0.33854167"
+     inkscape:cx="960"
+     inkscape:cy="539.07692"
+     inkscape:window-width="1340"
+     inkscape:window-height="1041"
+     inkscape:window-x="576"
+     inkscape:window-y="18"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer6" />
+  <defs
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="Triangle"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+    <linearGradient
+       id="linearGradient1"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop1" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop2" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1"
+       id="linearGradient2"
+       x1="1059.7616"
+       y1="1080"
+       x2="1059.7616"
+       y2="-5.3290705e-15"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     inkscape:label="Background"
+     inkscape:groupmode="layer"
+     id="layer1"
+     sodipodi:insensitive="true">
+    <rect
+       style="opacity:0.205904;fill:url(#linearGradient2);fill-opacity:1;stroke:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round"
+       id="rect1"
+       width="1920"
+       height="1080"
+       x="0"
+       y="0" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer7"
+     inkscape:label="Highlight square-to-triangle &lt;3&gt;"
+     style="display:none">
+    <ellipse
+       style="opacity:1;fill:none;stroke:#000000;stroke-width:10.9165;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"
+       id="path6"
+       cx="1267.4409"
+       cy="538.94891"
+       rx="553.45215"
+       ry="210.95613" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer6"
+     inkscape:label="Highlight cirlce-to-square &lt;2&gt;"
+     style="display:none">
+    <ellipse
+       style="display:inline;opacity:1;fill:none;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"
+       id="ellipse6"
+       cx="708.53052"
+       cy="538.94891"
+       rx="463.41861"
+       ry="211.41437" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer5"
+     inkscape:label="Arrows &lt;1-&gt;">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Triangle)"
+       d="M 558.03874,538.94893 H 783.51159"
+       id="path4"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Triangle)"
+       d="m 1100.9776,534.62814 h 225.4729"
+       id="path5"
+       sodipodi:nodetypes="cc" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="Shapes">
+    <circle
+       style="fill:#4e9a06;stroke:none;stroke-width:6.18692;stroke-linecap:round;stroke-linejoin:round"
+       id="path2"
+       cx="417.06119"
+       cy="540.7428"
+       r="108.5049" />
+    <rect
+       style="fill:#3465a4;stroke:none;stroke-width:5.46137;stroke-linecap:round;stroke-linejoin:round"
+       id="rect2"
+       width="217.00999"
+       height="217.00999"
+       x="851.495"
+       y="428.0076" />
+    <path
+       sodipodi:type="star"
+       style="fill:#cc0000;stroke:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round"
+       id="path3"
+       inkscape:flatsided="true"
+       sodipodi:sides="3"
+       sodipodi:cx="1330.2014"
+       sodipodi:cy="581.08069"
+       sodipodi:r1="133.44452"
+       sodipodi:r2="66.72226"
+       sodipodi:arg1="0.52359878"
+       sodipodi:arg2="1.5707963"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m 1445.7678,647.80295 -231.1327,0 115.5663,-200.16678 z"
+       inkscape:transform-center-y="-36.168354"
+       transform="matrix(1.0841459,0,0,1.0841459,77.592265,-50.320512)"
+       inkscape:transform-center-x="5.4184575e-05" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Slide title">
+    <text
+       xml:space="preserve"
+       style="font-size:109.627px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;stroke-width:6.85171"
+       x="956.43146"
+       y="176.60684"
+       id="text1"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         x="956.43146"
+         y="176.60684"
+         style="font-weight:bold;text-align:center;text-anchor:middle;fill:#000000;stroke-width:6.85171">Introduction</tspan></text>
+  </g>
+</svg>
