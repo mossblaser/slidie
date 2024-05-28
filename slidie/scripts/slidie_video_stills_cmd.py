@@ -16,6 +16,7 @@ from slidie.magic import extract_magic
 from slidie.video import find_video_magic
 from slidie.ffmpeg import extract_video_frame
 from slidie.xml_namespaces import SVG_NAMESPACE
+from slidie.scripts.placeholders import placeholder_to_image
 from slidie.scripts.exception_formatting import slidie_exception_formatting
 
 
@@ -30,29 +31,6 @@ def video_to_data_url(url: str, time: float, cwd: Path | None) -> str:
         base64 = b64encode(tmp_png.read_bytes()).decode("ascii")
         return f"data:image/png;base64,{base64}"
 
-
-def placeholder_to_image(svg: ET.Element, placeholder_id: str, data_url: str) -> None:
-    """
-    Given an SVG containing a magic video specification whose placeholder
-    <rect> or <image> has the ID placeholder_id, replace that placeholder with
-    an <image> showing the image in the provided data URL.
-    """
-    # Find placeholder
-    (placeholder_elem,) = svg.findall(f".//*[@id={placeholder_id!r}]")
-
-    # Turn into an <image>
-    placeholder_elem.tag = f"{{{SVG_NAMESPACE}}}image"
-    placeholder_elem.attrib["href"] = data_url
-
-    # Remove any <image> preserveAspectRatio attribute to
-    # ensure image is centered and scaled within the defined
-    # area.
-    placeholder_elem.attrib.pop("preserveAspectRatio", None)
-
-    # Remove <rect>-specific attributes
-    placeholder_elem.attrib.pop("rx", None)
-    placeholder_elem.attrib.pop("ry", None)
-    placeholder_elem.attrib.pop("pathLength", None)
 
 
 def main(test_args: list[str] | None = None):
