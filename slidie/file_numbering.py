@@ -100,6 +100,15 @@ class DuplicateSlideNumberError(ValueError):
         return f"'{f1}' and '{f2}' have the same number"
 
 
+class NoSlidesFoundError(Exception):
+    """
+    Thrown when no slides are found in a directory.
+    """
+
+    def __str__(self) -> str:
+        return f"No SVG files found in {self.args[0]}"
+
+
 def enumerate_slides(directory: Path) -> list[Path]:
     """
     Enumerate the slides in a given directory, returning them in presentation
@@ -109,8 +118,14 @@ def enumerate_slides(directory: Path) -> list[Path]:
     InvalidNumericalPrefixError is thrown.
 
     If any numerical prefix is reused, a DuplicateSlideNumberError is thrown.
+
+    If no slides are found, throws a NoSlidesFoundError.
     """
     slides = sorted(directory.glob("*.svg"), key=extract_numerical_prefix)
+
+    # Check not empty
+    if not slides:
+        raise NoSlidesFoundError(directory)
 
     # Check for duplicate numbers
     slides_by_number: dict[int, Path] = {}

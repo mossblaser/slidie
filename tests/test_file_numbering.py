@@ -10,6 +10,7 @@ from slidie.file_numbering import (
     extract_numerical_prefix_str,
     replace_numerical_prefix,
     DuplicateSlideNumberError,
+    NoSlidesFoundError,
     enumerate_slides,
     evenly_spaced_numbers_between,
     NoFreeNumberError,
@@ -92,7 +93,7 @@ def test_replace_numerical_prefix(filename: Path, number: int, exp: Path) -> Non
     "filenames, exp",
     [
         # Empty directory
-        ([], []),
+        ([], NoSlidesFoundError),
         # Single file
         (["0.svg"], ["0.svg"]),
         # Verify ordering is numerical
