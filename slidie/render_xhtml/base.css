@@ -13,6 +13,23 @@ body {
   grid-template-rows: min-content 1fr min-content;
 }
 
+body > #not-xhtml-warning {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100dvw;
+  height: 100dvh;
+  
+  z-index: 999;
+  
+  background: black;
+  text-align: center;
+}
+
+body.is-xhtml > #not-xhtml-warning {
+  display: none;
+}
+
 body > #toolbar {
   grid-row: 1;
   grid-column: 1/-1;

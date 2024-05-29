@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" >
   <head>
     <meta charset="utf-8"/>
@@ -8,6 +7,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
   </head>
   <body>
+    <script>
+      // Detect if this file was correctly loaded as XHTML.
+      //
+      // NB: XHTML files never use quirks mode, but if loaded as HTML won't
+      // have the necessary doctype.
+      if (document. compatMode == "CSS1Compat") {
+        document.body.classList.add("is-xhtml")
+      }
+    </script>
+    <div id="not-xhtml-warning" open="true">
+      <h1>Slidie files must be loaded as XHTML with Javascript enabled</h1>
+      <p>
+        <strong>Hint:</strong> Make sure the filename ends with <code>.xhtml</code>.
+      </p>
+      <p>
+        <strong>Hint:</strong> If using a web server, make sure it is setting
+        the mimetype to <code>application/xhtml+xml</code>.
+      </p>
+      <p>
+        <strong>Hint:</strong> Make sure Javascript is enabled.
+      </p>
+    </div>
     <nav id="toolbar">
       <div id="slide-selector">
         <input class="slide-number" type="text" list="slide-list" />
