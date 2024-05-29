@@ -1,5 +1,7 @@
 from xml.etree import ElementTree as ET
 
+from slidie.xml_namespaces import SVG_NAMESPACE
+
 
 def placeholder_to_image(svg: ET.Element, placeholder_id: str, data_url: str) -> None:
     """
