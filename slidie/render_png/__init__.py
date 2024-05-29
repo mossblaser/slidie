@@ -16,7 +16,6 @@ from slidie.svg_utils import (
     find_build_elements,
     get_build_step_range,
 )
-from slidie.file_numbering import enumerate_slides
 from slidie.speaker_notes import extract_speaker_notes
 from slidie.magic import extract_magic
 
@@ -69,7 +68,7 @@ def render_slide(
 
 
 def render_png(
-    source_directory: Path,
+    slide_filenames: list[Path],
     output: Path,
     dpi: float = 96.0,
     background_opacity: float | None = 1.0,
@@ -78,7 +77,6 @@ def render_png(
     Render a slidie show into a series of PNGs. Returns the filenames of the
     generated slides.
     """
-    slide_filenames = enumerate_slides(source_directory)
     filename_generator = iter_output_filenames(output)
 
     output_filenames: list[Path] = []
@@ -92,9 +90,7 @@ def render_png(
                     )
                 )
             except Exception as exc:
-                exc.add_note(
-                    f"While processing {svg_filename.relative_to(source_directory)}"
-                )
+                exc.add_note(f"While processing {svg_filename}")
                 raise
 
     return output_filenames

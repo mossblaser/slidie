@@ -43,9 +43,14 @@ def test_render_pdf(tmp_path: Path) -> None:
     shutil.copy(
         get_svg_filename("links_test_slide_020.svg"), src_dir / "020 - second.svg"
     )
-    (src_dir / "015 - decoy.txt").write_text("I am a decoy! >.<")
 
-    render_pdf(src_dir, tmp_path / "out.pdf")
+    render_pdf(
+        [
+            src_dir / "010 - first.svg",
+            src_dir / "020 - second.svg",
+        ],
+        tmp_path / "out.pdf",
+    )
 
     with Pdf.open(tmp_path / "out.pdf") as pdf:
         # Should have a page per step

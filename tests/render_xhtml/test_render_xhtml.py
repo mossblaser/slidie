@@ -15,9 +15,14 @@ def test_render_xhtml(tmp_path: Path) -> None:
 
     shutil.copy(get_svg_filename("simple_text.svg"), src_dir / "010 - first.svg")
     shutil.copy(get_svg_filename("simple_build.svg"), src_dir / "020 - second.svg")
-    (src_dir / "015 - decoy.txt").write_text("I am a decoy! >.<")
 
     # XXX: Basically just sanity check this doesn't crash -- can't really
     # verify what we get is a useful slideshow without running a browser and
     # poking it...
-    render_xhtml(src_dir, tmp_path / "out.xhtml")
+    render_xhtml(
+        [
+            src_dir / "010 - first.svg",
+            src_dir / "020 - second.svg",
+        ],
+        tmp_path / "out.xhtml",
+    )

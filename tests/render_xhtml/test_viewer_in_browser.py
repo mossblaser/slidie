@@ -32,6 +32,7 @@ def viewer_path() -> Iterator[Path]:
     with TemporaryDirectory() as tmp_path_str:
         tmp_path = Path(tmp_path_str)
 
+        slide_filenames = []
         for i, slide in enumerate(
             [
                 "empty.svg",
@@ -42,10 +43,11 @@ def viewer_path() -> Iterator[Path]:
             ]
         ):
             slide_name = tmp_path / f"{i}.svg"
+            slide_filenames.append(slide_name)
             slide_name.write_bytes(get_svg_filename(slide).read_bytes())
 
         out_filename = tmp_path / "out.xhtml"
-        render_xhtml(tmp_path, out_filename)
+        render_xhtml(slide_filenames, out_filename)
 
         yield out_filename
 

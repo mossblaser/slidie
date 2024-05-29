@@ -43,9 +43,11 @@ def test_render_png(tmp_path: Path) -> None:
     out.mkdir()
 
     # Copy source files
+    slide_filenames = []
     for i, filename in enumerate(["empty.svg", "build_rgb.svg"]):
         svg_bytes = get_svg_filename(filename).read_bytes()
         (src / f"{i}.svg").write_bytes(svg_bytes)
+        slide_filenames.append(src / f"{i}.svg")
 
     dpmm = 1
     dpi = dpmm * 25.4
@@ -53,7 +55,7 @@ def test_render_png(tmp_path: Path) -> None:
 
     # Render
     out_files = render_png(
-        src,
+        slide_filenames,
         out / "out.png",
         dpi=dpi,
         background_opacity=background_opacity,

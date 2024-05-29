@@ -16,7 +16,6 @@ from slidie.svg_utils import (
     get_build_step_range,
     get_build_tags,
 )
-from slidie.file_numbering import enumerate_slides
 from slidie.speaker_notes import extract_speaker_notes
 from slidie.magic import extract_magic
 from slidie.links import annotate_slide_id_from_magic, resolve_link
@@ -164,12 +163,10 @@ def resolve_internal_links(pdf: Pdf, slides: list[RenderedSlide]) -> None:
     rewrite_internal_links(pdf, resolve)
 
 
-def render_pdf(source_directory: Path, output: Path) -> None:
+def render_pdf(slide_filenames: list[Path], output: Path) -> None:
     """
     Render a slidie show into a PDF.
     """
-    slide_filenames = enumerate_slides(source_directory)
-
     with Pdf.new() as out_pdf:
         with TemporaryDirectory() as tmp_dir_str:
             tmp_dir = Path(tmp_dir_str)
@@ -184,9 +181,7 @@ def render_pdf(source_directory: Path, output: Path) -> None:
                         slide_tmp_dir.mkdir()
                         slides.append(render_slide(svg, inkscape, slide_tmp_dir))
                     except Exception as exc:
-                        exc.add_note(
-                            f"While processing {svg_filename.relative_to(source_directory)}"
-                        )
+                        exc.add_note(f"While processing {svg_filename}")
                         raise
 
             # Concatenate into single PDF

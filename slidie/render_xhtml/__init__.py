@@ -20,7 +20,6 @@ from slidie.svg_utils import (
     fill_inkscape_page_background,
     clip_to_inkscape_pages,
 )
-from slidie.file_numbering import enumerate_slides
 from slidie.speaker_notes import embed_speaker_notes
 from slidie.magic import MagicText, extract_magic
 from slidie.links import annotate_slide_id_from_magic
@@ -95,22 +94,19 @@ def render_slide(
     return svg
 
 
-def render_xhtml(source_directory: Path, output: Path, debug: bool = False) -> None:
+def render_xhtml(
+    slide_filenames: list[Path], output: Path, debug: bool = False
+) -> None:
     """
     Render a slidie show into a self-contained XHTML file.
     """
-
-    slide_filenames = enumerate_slides(source_directory)
-
     slides = []
     with Inkscape() as inkscape:
         for filename in slide_filenames:
             try:
                 slides.append(render_slide(filename, inkscape))
             except Exception as exc:
-                exc.add_note(
-                    f"While processing {filename.relative_to(source_directory)}"
-                )
+                exc.add_note(f"While processing {filename}")
                 raise
 
     xhtml_root = render_template(BASE_TEMPLATE_FILENAME, slides, debug)
