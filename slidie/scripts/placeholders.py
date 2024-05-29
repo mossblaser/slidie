@@ -23,4 +23,3 @@ def placeholder_to_image(svg: ET.Element, placeholder_id: str, data_url: str) ->
     placeholder_elem.attrib.pop("rx", None)
     placeholder_elem.attrib.pop("ry", None)
     placeholder_elem.attrib.pop("pathLength", None)
-

@@ -32,7 +32,6 @@ def video_to_data_url(url: str, time: float, cwd: Path | None) -> str:
         return f"data:image/png;base64,{base64}"
 
 
-
 def main(test_args: list[str] | None = None):
     parser = ArgumentParser(
         description="""
