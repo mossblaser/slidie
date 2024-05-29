@@ -125,6 +125,10 @@ def viewer_go_to_step(viewer: WebDriver, step: str) -> None:
     )
     if slide_number_input.get_attribute("value") != step:
         with wait_for_url_change(viewer):
+            # XXX: Workaround for chrome webdriver bug which fails to
+            # select-on-focus when XHTML namespace is the default namespace.
+            # (Yep.)
+            slide_number_input.send_keys(Keys.BACKSPACE * 100)
             slide_number_input.send_keys(step + Keys.ENTER)
 
 
@@ -193,6 +197,10 @@ class TestViewer:
 
         # Test UI -> URL hash
         with wait_for_url_change(viewer):
+            # XXX: Workaround for chrome webdriver bug which fails to
+            # select-on-focus when XHTML namespace is the default namespace.
+            # (Yep.)
+            slide_number_input.send_keys(Keys.BACKSPACE * 100)
             slide_number_input.send_keys("negative_build_step_number#1" + Keys.ENTER)
         base_url, _, url_hash = viewer.current_url.partition("#")
         assert url_hash == "negative_build_step_number#1"

@@ -25,3 +25,6 @@ xml_namespaces = {
 # Default to using the names above in exported documents
 for name, uri in xml_namespaces.items():
     ET.register_namespace(name, uri)
+
+# Use XHTML as the default namespace in output files
+ET.register_namespace("", XHTML_NAMESPACE)
