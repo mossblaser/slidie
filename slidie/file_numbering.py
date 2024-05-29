@@ -51,6 +51,9 @@ class InvalidNumericalPrefixError(ValueError):
     Thrown when a filename does not have a valid numerical prefix.
     """
 
+    def __str__(self) -> str:
+        return f"Filename '{self.args[0]}' does not start with a number"
+
 
 def extract_numerical_prefix_str(filename: Path) -> str:
     """
@@ -90,6 +93,11 @@ class DuplicateSlideNumberError(ValueError):
     """
     Thrown when two slides have the same numerical prefix.
     """
+
+    def __str__(self) -> str:
+        f1, f2 = self.args
+        num = int(extract_numerical_prefix(f1))
+        return f"'{f1}' and '{f2}' have the same number"
 
 
 def enumerate_slides(directory: Path) -> list[Path]:
