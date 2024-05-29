@@ -60,18 +60,21 @@ def browser(request: Any) -> str:
 
 
 @pytest.fixture(scope="module")
-def driver(browser: str) -> Iterator[WebDriver]:
+def driver(browser: str, request: Any) -> Iterator[WebDriver]:
     """An single instance of each browser driver."""
+    headless = not request.config.getoption("no_headless_browser")
     try:
         match browser:
             case "chrome":
                 chrome_options = webdriver.ChromeOptions()
-                chrome_options.add_argument("--headless=new")
+                if headless:
+                    chrome_options.add_argument("--headless=new")
                 with webdriver.Chrome(options=chrome_options) as driver:
                     yield driver
             case "firefox":
                 firefox_options = webdriver.FirefoxOptions()
-                firefox_options.add_argument("-headless")
+                if headless:
+                    firefox_options.add_argument("-headless")
                 with webdriver.Firefox(options=firefox_options) as driver:
                     yield driver
             case _:

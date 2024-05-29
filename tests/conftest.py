@@ -11,6 +11,14 @@ from pathlib import Path
 from slidie.inkscape import Inkscape
 
 
+def pytest_addoption(parser):
+    parser.addoption(
+        "--no-headless-browser",
+        action="store_true",
+        default=False,
+    )
+
+
 @pytest.fixture(scope="module")
 def inkscape() -> Iterator[Inkscape]:
     """A running Inkscape instance."""
