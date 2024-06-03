@@ -7,6 +7,8 @@ Example usage::
     $ slidie-mv 100-foo.svg 200-bar.svg --after 300-bar.baz
     $ slidie-mv 400-qux.svg 500-quo.svg --before 300-bar.baz
 
+See :ref:`slidie-mv` for more detailed usage info.
+
 """
 
 from typing import NamedTuple, Iterable
@@ -250,7 +252,7 @@ def main(cli_args: list[str] | None = None) -> None:
             assert False  # Unreachable
 
         # Work out numbering
-        numbering_params = infer_numbering_parameters(list(static_slides.values()))
+        numbering_params = infer_numbering_parameters(list(slides.values()))
         replacements, new_numbers = insert_numbers(
             existing_numbers=static_slide_numbers,
             position=pivot_slide_number,

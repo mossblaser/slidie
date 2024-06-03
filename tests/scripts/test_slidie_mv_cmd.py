@@ -242,6 +242,16 @@ class TestCLIApp:
         out, _ = capsys.readouterr()
         assert out.strip() == "0501"
 
+    def test_renumber_all(self, example_dir: Path) -> None:
+        main(["0100.svg", "0200.svg", "0300.svg", "0400.svg", "0401.svg", "--start"])
+        assert {f.name: f.read_text() for f in example_dir.glob("*.svg")} == {
+            "0100.svg": "0100",
+            "0200.svg": "0200",
+            "0300.svg": "0300",
+            "0400.svg": "0400",
+            "0500.svg": "0401",
+        }
+
     def test_git_mv(self, example_dir: Path) -> None:
         main(["0100.svg", "--after", "0200.svg"])
 
