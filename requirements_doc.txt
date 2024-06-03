@@ -1,0 +1,4 @@
+sphinx
+sphinx-readable-theme
+sphinxcontrib-programoutput
+numpydoc
