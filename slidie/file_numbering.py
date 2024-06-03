@@ -1,40 +1,18 @@
 """
 Utilities for working with files with numerically-prefixed names.
 
-
-Filename parsing/editing
-========================
-
-The order in which slides are included is determined by numerical prefixes in
-their filenames. For example:
-
-    * 100_first_slide.svg
-    * 200_second_slide.svg
-    * 300_third_slide.svg
-
 The :py:func:`extract_numerical_prefix` and :py:func:`replace_numerical_prefix`
 functions are provided for extracting (or updating) these prefixes in
 filenames.
-
-
-Number assignment
-=================
-
-By using BASIC-line-number-style numbering, it becomes possible to insert and
-reorder slides in many situations without having to rename other files. This
-may help minimise noise in version control systems. For example, we could move
-the third slide in the example above between the first and second slides by
-renaming it like so:
-
-    * 100_first_slide.svg
-    * 150_third_slide.svg (renumbered)
-    * 200_second_slide.svg
 
 The :py:func:`insert_numbers` function implements the logic required to pick new
 numbers which place slides at a desired positions in the ordering. This
 function also handles situations where no gap in the number sequence exists by
 renumbering other slides to create a suitable gap. It does this inteligently
 such that the number of renaming operations is minimised.
+
+See :ref:`file-numbering` for more information on naming and numbering slides.
+
 """
 
 from typing import NamedTuple
