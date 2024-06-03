@@ -107,6 +107,13 @@ function toggleHelp(document: HTMLDocument = window.document) {
 }
 
 /**
+ * Toggle hiding the viewier UI.
+ */
+function toggleHideUI() {
+  document.body.classList.toggle("hide-ui");
+}
+
+/**
  * Toggle full screen state of viewer (starts the stopwatch when entering full
  * screen mode).
  */
@@ -118,6 +125,16 @@ function toggleFullScreen(stopwatch: Stopwatch) {
   } else {
     document.exitFullscreen();
   }
+}
+
+/**
+ * Exit fullscreen and show the UI
+ */
+function exitFullScreenAndShowUI() {
+  if (document.fullscreenElement !== null) {
+    document.exitFullscreen();
+  }
+  document.body.classList.remove("hide-ui");
 }
 
 /**
@@ -135,6 +152,9 @@ function setupToolbarButtons(
   presenterViewButton.addEventListener("click", () =>
     showPresenterView(stepper, slides, stopwatch),
   );
+
+  const hideUIButton = document.getElementById("hide-ui")!;
+  hideUIButton.addEventListener("click", () => toggleHideUI());
 
   const fullScreenButton = document.getElementById("full-screen")!;
   fullScreenButton.addEventListener("click", () => toggleFullScreen(stopwatch));
@@ -527,9 +547,19 @@ const KEYBOARD_SHORTCUTS: ViewerKeyboardShortcut[] = [
     action: (stepper) => stepper.toggleBlank(),
   },
   {
+    description: "Toggle user interface",
+    keys: ["U"],
+    action: (_stepper, _slides, _stopwatch) => toggleHideUI(),
+  },
+  {
     description: "Toggle full screen",
     keys: ["F"],
     action: (_stepper, _slides, stopwatch) => toggleFullScreen(stopwatch),
+  },
+  {
+    description: "Exit full screen and show UI",
+    keys: ["Escape"],
+    action: (_stepper, _slides, _stopwatch) => exitFullScreenAndShowUI(),
   },
   {
     description: "Open presenter view",

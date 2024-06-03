@@ -3041,6 +3041,9 @@ ${content}</tr>
     const dialog = document2.getElementById("help");
     toggleDialog(dialog);
   }
+  function toggleHideUI() {
+    document.body.classList.toggle("hide-ui");
+  }
   function toggleFullScreen(stopwatch) {
     const slidePane = document.getElementById("slides");
     if (document.fullscreenElement === null) {
@@ -3050,6 +3053,12 @@ ${content}</tr>
       document.exitFullscreen();
     }
   }
+  function exitFullScreenAndShowUI() {
+    if (document.fullscreenElement !== null) {
+      document.exitFullscreen();
+    }
+    document.body.classList.remove("hide-ui");
+  }
   function setupToolbarButtons(stepper, slides, stopwatch) {
     const helpButton = document.getElementById("show-help");
     helpButton.addEventListener("click", () => toggleHelp());
@@ -3058,6 +3067,8 @@ ${content}</tr>
       "click",
       () => showPresenterView(stepper, slides, stopwatch)
     );
+    const hideUIButton = document.getElementById("hide-ui");
+    hideUIButton.addEventListener("click", () => toggleHideUI());
     const fullScreenButton = document.getElementById("full-screen");
     fullScreenButton.addEventListener("click", () => toggleFullScreen(stopwatch));
   }
@@ -3307,9 +3318,19 @@ ${content}</tr>
       action: (stepper) => stepper.toggleBlank()
     },
     {
+      description: "Toggle user interface",
+      keys: ["U"],
+      action: (_stepper, _slides, _stopwatch) => toggleHideUI()
+    },
+    {
       description: "Toggle full screen",
       keys: ["F"],
       action: (_stepper, _slides, stopwatch) => toggleFullScreen(stopwatch)
+    },
+    {
+      description: "Exit full screen and show UI",
+      keys: ["Escape"],
+      action: (_stepper, _slides, _stopwatch) => exitFullScreenAndShowUI()
     },
     {
       description: "Open presenter view",
