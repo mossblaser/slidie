@@ -4,6 +4,7 @@ Slidie output formats
 =====================
 
 .. _rendering-xhtml:
+
 XHTML
 -----
 
