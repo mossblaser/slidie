@@ -1,10 +1,11 @@
 Slidie: An Inkscape-centered slide preparation tool
 ===================================================
 
+*Slidie is a slide preparation system which makes illustrations easy and bullet
+points hard.*
+
 ![Hero image](./docs/source/_static/hero.png)
 
-*"A a slide preparation system which makes illustrations easy and bullet points
-hard."*
 
 Slidie is a light-touch tool for converting a directory full of Inkscape SVGs
 into a slide show to accompany a presentation.
