@@ -62,7 +62,7 @@ A Slidie presentation is just a bunch of numbered SVGs in a directory.
 
 Create some slides, one per SVG, and save them into a directory with names
 beginning with a number. Make sure to set your page size to a suitable aspect
-ratio. [For example](./examples/getting_started):
+ratio. [For example](./docs/source/_static/examples/getting_started):
 
     examples/getting_started/
      |- 00100 - Title.svg
@@ -81,8 +81,8 @@ using:
     $ slidie examples/getting_started/ -o examples/getting_started.pdf
     $ slidie examples/getting_started/ -o examples/getting_started.xhtml
 
-See [`examples/getting_started.pdf`](./examples/getting_started.pdf) and
-[`examples/getting_started.xhtml`](./examples/getting_started.xhtml).
+See [`getting_started.pdf`](./docs/source/_static/examples/getting_started.pdf) and
+[`getting_started.xhtml`](./docs/source/_static/examples/getting_started.xhtml).
 
 *Tip: The standalone web page files must have the `.xhtml` extension and not
 just `.html`.*
