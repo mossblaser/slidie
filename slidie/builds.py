@@ -7,199 +7,34 @@ The :py:func:`evaluate_build_steps` function in this module takes a list of
 layer names and returns selected step numbers during which each slide is
 visible.
 
+See :ref:`builds` for an introduction to the syntax and user-facing concepts.
 
-Basic syntax
-============
+At a high level, build specifications are parsed and then resolved from their
+initial, more abstract form (containing things like ranges, '+' and '@tag'
+references) into a concrete list of step numbers.
 
-Builds are controlled using special annotations added to Inkscape layer names
-with a beamer-inspired syntax.
+Before getting started, lets define a few extra terms:
 
-Build *specifications* are given in angle brackets (`<` and `>`) anywhere
-within the layer name and consist of a comma separated list of *steps* during
-which that layer is visible.
+* A *spec* (build specification) consists of a list of steps
+* A *step* may be one of the following:
+  * A *numeric* value
+  * An *auto* (automatically numbered) value, i.e. '+' or '.'.
+  * A *tag* (a reference to a tag with no suffix added)
+  * A *tag-and-suffix* (a reference to a tag with some suffix)
+  * A *bound* referencing either the very first or very last step
+  * A *range* which references all of the steps between a start and end,
+    inclusively.
+* An *atom* is any kind of step except a range (whose start and end steps are
+  always defined by an atom).
 
-For example if you have a slide with four layers named like so:
+The spec resolution process is performed in a series of distinct (numbered)
+stages:
 
-* A
-* B <1>
-* C <2>
-* D <1, 2>
-
-This describes a slide which builds in three steps (numbered 0, 1 and 2):
-
-* In step 0 (the initial state of the slide), only layer A is visible.
-* In step 1 (after the first click), layers A, B and D are visible.
-* In step 2 (after the second click), layers A, C and D are visible.
-
-
-Ranges
-======
-
-You can also specify ranges of steps, for example, given the following layers:
-
-* A <1>
-* B <2>
-* C <3>
-* D <0-2>
-
-This slide will build in four steps like so:
-
-* In step 0 (the initial state of the slide), only layer D is visible.
-* In step 1 (after the first click), layers A, D are visible.
-* In step 2 (after the second click), layers B and D are visible.
-* In step 3 (after the third click), only layers C is visible.
-
-If the start or end of a range is omitted, this defines a range from the first
-step or to last step respectively. For example `<2->` means from the second
-click onward.
-
-
-Automatic step numbering
-========================
-
-For the common case where consecutive layers are revealed in consecutive steps
-the `+` shorthand means the step after the first step in the previous layer
-with a specification. For example:
-
-* A
-* B <+>
-* C <+>
-
-Here, layer A is always visible whilst layers B C appear (then disappear) after
-the first and second clicks respectively.
-
-A '+' can be used as part of a range specification. In addition the `.`
-shorthand works like `+` but without incrementing the step number. Used
-together this allows you to something like follows:
-
-* Title
-* First bullet <+->
-* First bullet highlight <.>
-* Second bullet <+->
-* Second bullet highlight <.>
-* Third bullet <+->
-* Third bullet highlight <.>
-
-This slide has four steps with (for example) a bullet being reveled after each
-click. The most recently shown bullet might be highlighted in some way in the
-'highlight' layers.
-
-
-Tags
-====
-
-For advanced (or fiddly) usecases, it is possible to add one or more tags to a
-layer by including `@tag_name_here` to their name. These tags may be referenced
-in build specifications to make layers appear in sync with eachother.
-
-A typical use of this feature is for cases where graphics are split between
-foreground and background layers and need to be built in sync. For example,
-consider the following layers:
-
-* Foreground
-  * Foreground A <+-> @a
-  * Foreground B <+-> @b
-  * Foreground C <+-> @c
-* Background
-  * Background A <@a>
-  * Background B <@b>
-  * Background C <@c>
-
-This slide builds in four steps with foreground layers A, B and C being
-revealed after each click. The corresponding background layers are revealed in
-sync with their foreground counterparts.
-
-
-Tag suffixes
-------------
-
-By default, when you use a tag in a build specification, all of the steps of
-layers with that tag are effectively copied into your specification.
-
-By adding a `.start`, `.end`, `.before`, or `.after` suffix, you can instead
-reference the first or last steps layers with that tag are visible. For
-example, given the following layers:
-
-* Foo <1, 2, 3> @foo
-* A <@foo.before>
-* B <@foo.start>
-* C <@foo.start>
-* D <@foo.after>
-
-This defines a slide with five build steps:
-
-* In step 0, just layer A is visible
-* In step 1, layers Foo and B are visible
-* In step 2, just layer Foo is visible
-* In step 3, layers Foo and C are visible
-* In step 4, just layer D is visible
-
-
-Tags in ranges
---------------
-
-When a tag is used in a range specification without a suffix, the `.start` and
-`.end` suffixes are implied for the start end end of the range. That is,
-`<@foo-@bar>` is treated as `<@foo.start-@bar.end>`.
-
-
-Sharing tags
-------------
-
-Many layers may be labelled with the same tag. In this case, referencing that
-tag refers to the union of all steps those layers are visible. For example,
-given the layers:
-
-* A <1> @foo
-* B <2> @foo
-* C <@foo>
-
-Layer 'C' will be visible after both the first and second clicks.
-
-
-Limitations of tags
--------------------
-
-There are two major limitations to the use of tags in build specifications:
-
-Firstly, circular dependencies between layers via tags are not permitted.
-
-Secondly, automatic step numbering (i.e. `+` and `.`) ignores tag references
-when computing the number to use. For example given the layers:
-
-* A <1> @foo
-* B <@foo, 2>
-* C <.>
-
-Here the `.` layer C resolves to 2 and not 1 because 2 is the first non-tag
-step in the layer B's build specification.
+1. First, automatic step numbers (i.e. '+' and '.') are resolved
+2. Next references to tags (e.g. '@foo' or '@foo.start') are resolved
+3. Then the bounds (i.e. first/last step number) are resolved
+4. Finally, ranges are expanded into concrete lists of step numbers
 """
-
-# At a high level, build specifications are parsed and then resolved from their
-# initial, more abstract form (containing things like ranges, '+' and '@tag'
-# references) into a concrete list of step numbers.
-#
-# Before getting started, lets define a few extra terms:
-#
-# * A *spec* (build specification) consists of a list of steps
-# * A *step* may be one of the following:
-#   * A *numeric* value
-#   * An *auto* (automatically numbered) value, i.e. '+' or '.'.
-#   * A *tag* (a reference to a tag with no suffix added)
-#   * A *tag-and-suffix* (a reference to a tag with some suffix)
-#   * A *bound* referencing either the very first or very last step
-#   * A *range* which references all of the steps between a start and end,
-#     inclusively.
-# * An *atom* is any kind of step except a range (whose start and end steps are
-#   always defined by an atom).
-#
-# The spec resolution process is performed in a series of distinct (numbered)
-# stages:
-#
-# 1. First, automatic step numbers (i.e. '+' and '.') are resolved
-# 2. Next references to tags (e.g. '@foo' or '@foo.start') are resolved
-# 3. Then the bounds (i.e. first/last step number) are resolved
-# 4. Finally, ranges are expanded into concrete lists of step numbers
 
 
 from typing import cast, overload, TypeVar, Generic, Iterator, Any, Sequence
