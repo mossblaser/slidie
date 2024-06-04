@@ -43,12 +43,30 @@ def main() -> None:
         """,
     )
     parser.add_argument(
+        "--png-dpi",
+        default=96.0,
+        type=float,
+        help="""
+            The DPI to use when rendering slides to PNG images. (Ignored for
+            other formats). Default: %(default)s.
+        """,
+    )
+    parser.add_argument(
+        "--png-background-opacity",
+        default=1.0,
+        type=float,
+        help="""
+            The background opacity (0.0 - 1.0) for rendering slides to PNG
+            images. (Ignored for other formats). Default: %(default)s.
+        """,
+    )
+    parser.add_argument(
         "--debug",
         default=False,
         action="store_true",
         help="""
-            Generate outputs in debug mode. This may produce output files which
-            will only work in the environment in which slidie was run.
+            For slidie development use only. Generate outputs in development
+            debug mode.
         """,
     )
 
@@ -68,7 +86,12 @@ def main() -> None:
             case ".pdf":
                 render_pdf(sources, args.output)
             case ".png":
-                render_png(sources, args.output)
+                render_png(
+                    sources,
+                    args.output,
+                    dpi=args.png_dpi,
+                    background_opacity=args.png_background_opacity,
+                )
             case ".html" | ".htm" as suffix:
                 parser.error(
                     f"Unsupported --output suffix: {suffix} (did you mean .xhtml?)"
