@@ -25,8 +25,8 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
      inkscape:zoom="0.19010417"
-     inkscape:cx="2072.5479"
-     inkscape:cy="539.17808"
+     inkscape:cx="2075.178"
+     inkscape:cy="544.43835"
      inkscape:window-width="1340"
      inkscape:window-height="1041"
      inkscape:window-x="576"
@@ -79,7 +79,7 @@
        style="font-size:109.627px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;stroke-width:6.85171"
        x="956.43146"
        y="176.60684"
-       id="text1"><tspan
+       id="title"><tspan
          sodipodi:role="line"
          id="tspan1"
          x="956.43146"
@@ -94,14 +94,14 @@
        transform="translate(-88.661756,49.816384)"><tspan
          x="2130.0784"
          y="88.343132"
-         id="tspan2">###
+         id="tspan5">###
 </tspan><tspan
          x="2130.0784"
          y="208.46138"
-         id="tspan3">Make sure *not* to accidentally </tspan><tspan
+         id="tspan6">Make sure *not* to accidentally </tspan><tspan
          x="2130.0784"
          y="328.57962"
-         id="tspan4">reveal the secret ingredient!</tspan></text>
+         id="tspan7">reveal the secret ingredient!</tspan></text>
     <path
        id="path6"
        style="opacity:0.86730021;fill:#ffffff;stroke:none;stroke-width:7.68374;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"
