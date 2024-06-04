@@ -116,6 +116,7 @@ click. The most recently shown bullet might be highlighted in some way in the
     :alt: 
         The four slides, side by side.
 
+.. _builds-tags:
 
 Tags
 ----
@@ -180,6 +181,8 @@ This defines a slide with five build steps:
 .. image:: _static/examples/simple_tag_suffixes.png
     :alt: 
         The five slides, side by side.
+
+.. _negative_step_numbers:
 
 .. note::
 
