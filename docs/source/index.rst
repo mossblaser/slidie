@@ -93,14 +93,15 @@ also be associated with specific build steps.
     speaker-notes.rst
 
 
-Magic ``<text>``
-````````````````
+Magic text
+``````````
 
 Slidie provides a convenient mechanism for embedding non-SVG-native content
 such as :ref:`videos <video>` and :ref:`iframes <iframe>`, as well as certain
-:ref:`metadata <metadata>`, based on 'magic' ``<text>`` elements. Magic
-``<text>`` elements are ordinary ``<text>`` elements which begin with ``@@@``
-and contain TOML.
+:ref:`metadata <metadata>`, based on 'magic' text boxes. Magic text boxes are
+ordinary text boxes whose contents begin with ``@@@`` and contain TOML_ data.
+
+.. _TOML: https://toml.io/en/
 
 .. toctree::
     :maxdepth: 2
