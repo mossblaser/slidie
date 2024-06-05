@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Slidie file numbering/naming rules &#8212; Slidie 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d7e2fa82" />
+    <link rel="stylesheet" type="text/css" href="_static/readable.css?v=e058d051" />
+    <script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="slidie-mv: Slide renumbering tool" href="slidie-mv.html" />
+    <link rel="prev" title="Slidie Guided Tour" href="tour.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="slidie-mv.html" title="slidie-mv: Slide renumbering tool"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tour.html" title="Slidie Guided Tour"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Slidie 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Slidie file numbering/naming rules</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="slidie-file-numbering-naming-rules">
+<span id="file-numbering"></span><h1>Slidie file numbering/naming rules<a class="headerlink" href="#slidie-file-numbering-naming-rules" title="Link to this heading">¶</a></h1>
+<p>The order in which slides are included is determined by numerical prefixes in
+their filenames. For example:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>100_first_slide.svg</p></li>
+<li><p>200_second_slide.svg</p></li>
+<li><p>300_third_slide.svg</p></li>
+</ul>
+</div></blockquote>
+<p>Slides <em>must</em> have an integer prefix and end with <code class="docutils literal notranslate"><span class="pre">.svg</span></code>.</p>
+<p>Slides are sorted in numerical rather than lexicographic order.</p>
+<p>No two slides may start with the same number (even if formatted differently).</p>
+<p>Slidie treats all leading digits (and optional <code class="docutils literal notranslate"><span class="pre">-</span></code> or <code class="docutils literal notranslate"><span class="pre">+</span></code>) as the file’s
+number. Slide numbers may be negative (start with <code class="docutils literal notranslate"><span class="pre">-</span></code>). They may also have
+explicit leading <code class="docutils literal notranslate"><span class="pre">+</span></code>. Leading zeros are ignored.</p>
+<section id="practical-tips">
+<span id="file-numbering-tips"></span><h2>Practical tips<a class="headerlink" href="#practical-tips" title="Link to this heading">¶</a></h2>
+<section id="naming">
+<h3>Naming<a class="headerlink" href="#naming" title="Link to this heading">¶</a></h3>
+<p>Whilst it is completely valid to name your slides with <em>only</em> a number (e.g.
+<code class="docutils literal notranslate"><span class="pre">1234.svg</span></code>), doing so makes it difficult to find the right one, especially as
+you reorganise them. Using the slide title is often a helpful choice.</p>
+<p>Feel free to use spaces, underscores, hyphens or anything else in your file
+names according to taste. For example <code class="docutils literal notranslate"><span class="pre">100</span> <span class="pre">-</span> <span class="pre">Foo.svg</span></code> and <code class="docutils literal notranslate"><span class="pre">100_foo.svg</span></code> are
+equally valid.</p>
+</section>
+<section id="basic-style-numbering">
+<h3>BASIC-style numbering<a class="headerlink" href="#basic-style-numbering" title="Link to this heading">¶</a></h3>
+<p>Using BASIC-line-number-style numbering makes it easier to reorganise slides at
+a later point in time. Slidie also provides a utility (<a class="reference internal" href="slidie-mv.html#slidie-mv"><span class="std std-ref">slidie-mv</span></a>) for doing this. For example, given the following:</p>
+<ul class="simple">
+<li><p>100 - a.svg</p></li>
+<li><p>200 - b.svg</p></li>
+<li><p>300 - c.svg</p></li>
+</ul>
+<p>You can move the slide ‘C’ between ‘A’ and ‘B’ by renumbering it to 150.</p>
+<p>The gap you leave between numbers is a matter of taste. Larger gaps make it
+less likely you’ll have to rename extra files when reorganising your slides
+whilst smaller gaps lead to smaller numbers. You could try 100 (as in the
+example above) as a starting point if unsure.</p>
+</section>
+<section id="zero-padding">
+<h3>Zero padding<a class="headerlink" href="#zero-padding" title="Link to this heading">¶</a></h3>
+<p>Most file management utilities do not sort files lexicographically. As a
+result, zero padding your file numbers to the same number of digits ensures
+correctly sorted display.</p>
+<p>Make sure to start out with at least one leading zero unless you’re sure you’ll
+have fewer than ten slides!</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Slidie file numbering/naming rules</a><ul>
+<li><a class="reference internal" href="#practical-tips">Practical tips</a><ul>
+<li><a class="reference internal" href="#naming">Naming</a></li>
+<li><a class="reference internal" href="#basic-style-numbering">BASIC-style numbering</a></li>
+<li><a class="reference internal" href="#zero-padding">Zero padding</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div><h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation index</a><ul>
+      <li>Previous: <a href="tour.html" title="previous chapter">Slidie Guided Tour</a></li>
+      <li>Next: <a href="slidie-mv.html" title="next chapter"><code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code>: Slide renumbering tool</a></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/file-numbering.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2024, Jonathan Heathcote.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.3.7.
+  </div>
+  
+  </body>
+</html>

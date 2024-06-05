@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Video &#8212; Slidie 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d7e2fa82" />
+    <link rel="stylesheet" type="text/css" href="_static/readable.css?v=e058d051" />
+    <script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Creating &lt;iframe&gt; elements" href="iframe.html" />
+    <link rel="prev" title="Magic text" href="magic-text.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="iframe.html" title="Creating &lt;iframe&gt; elements"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="magic-text.html" title="Magic text"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Slidie 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Video</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="video">
+<span id="id1"></span><h1>Video<a class="headerlink" href="#video" title="Link to this heading">¶</a></h1>
+<p>Basic support for adding videos to slides is included in slidie via the
+<code class="docutils literal notranslate"><span class="pre">video</span></code> <a class="reference internal" href="magic-text.html#magic-text"><span class="std std-ref">magic text</span></a> value.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Video support in slidie is relatively limited and comes with far more
+caveats than other features.</p>
+<p>The author would feel worse about this if not for the fact that every other
+presentation tool seems to fumble video handling in their own unique ways.</p>
+</div>
+<p>Embedded videos are only supported in the <a class="reference internal" href="rendering.html#rendering-xhtml"><span class="std std-ref">XHTML viewer</span></a>. A user-defined placeholder will be output for other
+output formats.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Whilst PDF <em>technically</em> includes support for embedding videos, it is not
+usable in practice. For example, viewer support is extremely limited and
+often very unreliable. Implementing video embeddings which happen to be
+compatible with the already-small pool of capable viewers is also
+horrendous and involves terms like “Flash” and “undocumented Javascript
+API”. In short, I’m afraid the author eventually concluded that they did
+not want to go there, despite serious efforts to do so.</p>
+</div>
+<img alt="A screenshot of a video defined in Inkscape using Slidie's magic text feature." src="_images/video_inkscape_screenshot.png" />
+<img alt="A screenshot of a video playing on a slide." src="_images/video_viewer_screenshot.png" />
+<section id="inserting-a-video">
+<h2>Inserting a video<a class="headerlink" href="#inserting-a-video" title="Link to this heading">¶</a></h2>
+<p>To insert a video into a slide, insert a <a class="reference internal" href="magic-text.html#magic-rectangles"><span class="std std-ref">placeholder rectangle or image</span></a> grouped with a <a class="reference internal" href="magic-text.html#magic-text"><span class="std std-ref">magic text</span></a> box with one
+of the following forms:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">@@@</span>
+<span class="n">video</span> <span class="o">=</span> <span class="s2">&quot;&lt;video URL here&gt;&quot;</span>  <span class="c1"># Short form</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">@@@</span>
+<span class="c1"># Long form</span>
+<span class="p">[</span><span class="n">video</span><span class="p">]</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;&lt;video URL here&gt;&quot;</span>
+<span class="n">start</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># Start offset, seconds (optional)</span>
+<span class="n">loop</span> <span class="o">=</span> <span class="n">false</span>  <span class="c1"># Repeatedly play video (optional)</span>
+<span class="n">mute</span> <span class="o">=</span> <span class="n">false</span>  <span class="c1"># Mute audio (optional)</span>
+</pre></div>
+</div>
+<p>Video URLs may point to online resources or be relative URLs to files stored
+adjacently to the rendered XHTML viewer.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Slidie does not attempt to embed videos within the generated XHTML output
+due to <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs#length_limitations">browser limitations on data URL lengths being too small for many
+videos</a>.
+Care must be taken to ensure that any adjacent video files are stored and
+distributed together with the generated XHTML output.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Some browsers refuse to play video from plain HTTP (non-HTTPS) URLs when
+the viewer is loaded from a <code class="docutils literal notranslate"><span class="pre">file://</span></code> URL.</p>
+</div>
+<p>The optional <code class="docutils literal notranslate"><span class="pre">start</span></code> time controls the point at which the video will play.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">loop</span></code> is true, the video will be restart from the beginning when it
+reaches the end (even if <code class="docutils literal notranslate"><span class="pre">start</span></code> is set to a non-zero value).</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">mute</span></code> is true, audio will not be played back.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Due to browser autoplay restrictions, videos placed on the first slide in
+the show will not play until you first move to another slide and then back
+again. Videos on other slides should play correctly, however.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Slidie currently does not include any mechanism for controling playback:
+media will always automatically start from the specified offset upon
+entering the slide and play to completion (or slide exit, if <code class="docutils literal notranslate"><span class="pre">loop</span></code> is
+set).</p>
+</div>
+</section>
+<section id="automatic-video-placeholder-generation">
+<span id="slidie-video-stills"></span><h2>Automatic video placeholder generation<a class="headerlink" href="#automatic-video-placeholder-generation" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">slidie-video-stills</span></code> command will automatically extract a still frame
+from embedded videos and set it as the placeholder image for the video.</p>
+<p>Usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ slidie-video-stills path/to/slide.svg
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Video</a><ul>
+<li><a class="reference internal" href="#inserting-a-video">Inserting a video</a></li>
+<li><a class="reference internal" href="#automatic-video-placeholder-generation">Automatic video placeholder generation</a></li>
+</ul>
+</li>
+</ul>
+
+  </div><h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation index</a><ul>
+      <li>Previous: <a href="magic-text.html" title="previous chapter">Magic text</a></li>
+      <li>Next: <a href="iframe.html" title="next chapter">Creating <code class="docutils literal notranslate"><span class="pre">&lt;iframe&gt;</span></code> elements</a></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/video.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2024, Jonathan Heathcote.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.3.7.
+  </div>
+  
+  </body>
+</html>

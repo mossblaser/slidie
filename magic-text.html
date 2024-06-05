@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Magic text &#8212; Slidie 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d7e2fa82" />
+    <link rel="stylesheet" type="text/css" href="_static/readable.css?v=e058d051" />
+    <script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Video" href="video.html" />
+    <link rel="prev" title="Speaker notes" href="speaker-notes.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="video.html" title="Video"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="speaker-notes.html" title="Speaker notes"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Slidie 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Magic text</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="magic-text">
+<span id="id1"></span><h1>Magic text<a class="headerlink" href="#magic-text" title="Link to this heading">¶</a></h1>
+<p>To support easy embedding of non-native content within SVGs like <a class="reference internal" href="video.html#video"><span class="std std-ref">videos</span></a>, <a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">iframes</span></a> or <a class="reference internal" href="metadata.html#metadata"><span class="std std-ref">custom metadata</span></a>, Slidie
+provides the ‘magic’ text feature.</p>
+<p>A magic text box is an ordinary SVG text box whose first line is <code class="docutils literal notranslate"><span class="pre">&#64;&#64;&#64;</span></code> (three
+‘at’ signs). The remainder of the text box’s contents is interpreted as a <a class="reference external" href="https://toml.io/en/">TOML</a>
+document and must define <em>exactly one</em> value.</p>
+<p>As an example, both of the following are valid magic text values: both define a
+single top-level value – <code class="docutils literal notranslate"><span class="pre">video</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">@@@</span>
+<span class="n">video</span> <span class="o">=</span> <span class="s2">&quot;http://example.com/example.mp4&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">@@@</span>
+<span class="c1"># A more complex example...</span>
+<span class="p">[</span><span class="n">video</span><span class="p">]</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://example.com/example.mp4&quot;</span>
+<span class="n">start</span> <span class="o">=</span> <span class="mf">12.3</span>
+<span class="n">mute</span> <span class="o">=</span> <span class="n">true</span>
+</pre></div>
+</div>
+<p>Magic text boxes are removed from slides during rendering and do not appear in
+the output.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you want to create a text box in your slide whose first line is <code class="docutils literal notranslate"><span class="pre">&#64;&#64;&#64;</span></code>
+without it being interpreted as magic text, add a trailing space to the
+first line. It will not be visible in the resulting document but will
+prevent Slidie treating it as magic text.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>See the following for supported magic text values:</p>
+<dl class="simple">
+<dt><a class="reference internal" href="video.html#video"><span class="std std-ref">Video</span></a></dt><dd><p>Uses the <code class="docutils literal notranslate"><span class="pre">video</span></code> magic text value.</p>
+</dd>
+<dt><a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">Creating &lt;iframe&gt; elements</span></a></dt><dd><p>Uses the <code class="docutils literal notranslate"><span class="pre">iframe</span></code> magic text value.</p>
+</dd>
+<dt><a class="reference internal" href="metadata.html#metadata"><span class="std std-ref">Metadata</span></a></dt><dd><p>Various magic text values may be used to define document and slide
+metadata, including <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">author</span></code> and <code class="docutils literal notranslate"><span class="pre">date</span></code>.</p>
+</dd>
+</dl>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Unrecognised top-level magic text values are silently ignored. If your
+magic text is not working as intended, look out for typos!</p>
+<p>This is purely an artefact of a lazy implementation in Slidie and may one
+day be addressed…</p>
+</div>
+<section id="magic-rectangles">
+<span id="id2"></span><h2>Magic rectangles<a class="headerlink" href="#magic-rectangles" title="Link to this heading">¶</a></h2>
+<p>In some cases (such as <a class="reference internal" href="video.html#video"><span class="std std-ref">videos</span></a> and <a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">IFrames</span></a>), a
+magic text definition must be associated with a rectangular region on a slide.
+To do this you should group a placeholder SVG rectangle or image object with
+the magic text box.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Only SVG rectangles (<code class="docutils literal notranslate"><span class="pre">&lt;rect&gt;</span></code>) and images (<code class="docutils literal notranslate"><span class="pre">&lt;image&gt;</span></code>) are supported as
+placeholders. For example, a <code class="docutils literal notranslate"><span class="pre">&lt;path&gt;</span></code> defining a rectangle is not
+suitable.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Take care to put the placeholder and magic text alone within their group.
+Slidie will produce an error if other elements are included.</p>
+</div>
+<p>In supported output formats, both the magic text and associated placeholder
+will be removed and replaced with the desired non-native object. In other
+formats, the placeholder will be shown instead (though the magic text will
+still be removed). This allows you to produce slides which render sensibly in
+several output formats.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Magic text</a><ul>
+<li><a class="reference internal" href="#magic-rectangles">Magic rectangles</a></li>
+</ul>
+</li>
+</ul>
+
+  </div><h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation index</a><ul>
+      <li>Previous: <a href="speaker-notes.html" title="previous chapter">Speaker notes</a></li>
+      <li>Next: <a href="video.html" title="next chapter">Video</a></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/magic-text.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2024, Jonathan Heathcote.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.3.7.
+  </div>
+  
+  </body>
+</html>

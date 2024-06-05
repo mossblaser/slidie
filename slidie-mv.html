@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>slidie-mv: Slide renumbering tool &#8212; Slidie 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d7e2fa82" />
+    <link rel="stylesheet" type="text/css" href="_static/readable.css?v=e058d051" />
+    <script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Builds" href="builds.html" />
+    <link rel="prev" title="Slidie file numbering/naming rules" href="file-numbering.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="builds.html" title="Builds"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="file-numbering.html" title="Slidie file numbering/naming rules"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Slidie 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code>: Slide renumbering tool</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="slidie-mv-slide-renumbering-tool">
+<span id="slidie-mv"></span><h1><code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code>: Slide renumbering tool<a class="headerlink" href="#slidie-mv-slide-renumbering-tool" title="Link to this heading">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code> command can be used to reorder slides by renumbering them.</p>
+<section id="reordering-slides">
+<h2>Reordering slides<a class="headerlink" href="#reordering-slides" title="Link to this heading">¶</a></h2>
+<p>The following example illustrates how two slides could be renumbered to move
+them later in a show:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ slidie-mv 100-foo.svg 200-bar.svg --after 300-bar.svg
+</pre></div>
+</div>
+<p>As well as <code class="docutils literal notranslate"><span class="pre">--after</span> <span class="pre">&lt;slide&gt;</span></code> you can also use <code class="docutils literal notranslate"><span class="pre">--before</span> <span class="pre">&lt;slide&gt;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">--start</span></code> or <code class="docutils literal notranslate"><span class="pre">--end</span></code> to specify the destination.</p>
+<p>Whenever possible <code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code> will attempt to rename as few files as
+possible. Only when necessary will slides which aren’t actively being moved be
+renamed.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code> will attempt to infer the numbering pattern in use. That is,
+it will guess the ‘normal’ gap between slide numbers and the number of
+digits to zero-pad to.</p>
+</div>
+</section>
+<section id="creating-a-gap">
+<h2>Creating a gap<a class="headerlink" href="#creating-a-gap" title="Link to this heading">¶</a></h2>
+<p>If you want to create a gab between two adjacently numbered slides for a new
+slide you can use the <code class="docutils literal notranslate"><span class="pre">--insert</span> <span class="pre">&lt;count&gt;</span></code> argument instead of a list of
+existing slides to move.</p>
+<p>For example say we have two slides <code class="docutils literal notranslate"><span class="pre">299-foo.svg</span></code> and <code class="docutils literal notranslate"><span class="pre">300-bar.svg</span></code> and we
+want to insert a new slide between them we could use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ slidie-mv --insert 1 --before 300-bar.svg
+400
+</pre></div>
+</div>
+<p>In the example above, <code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code> will automatically renumber either
+<code class="docutils literal notranslate"><span class="pre">299-foo.svg</span></code> or <code class="docutils literal notranslate"><span class="pre">300-bar.svg</span></code> to make room and print the slide number(s)
+to use for your new slides.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code> will prefer o to move whichever file results in the last
+number of renaming operations, or all else being equal, whichever leads to
+leaving the biggest gaps between the new file numbers.</p>
+</div>
+</section>
+<section id="renumbering-all-slides">
+<h2>Renumbering all slides<a class="headerlink" href="#renumbering-all-slides" title="Link to this heading">¶</a></h2>
+<p>You can renumber all slides to produce a clean numbering scheme using the
+following idiom:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ slidie-mv *.svg --start
+</pre></div>
+</div>
+</section>
+<section id="managing-slides-in-git">
+<h2>Managing slides in Git<a class="headerlink" href="#managing-slides-in-git" title="Link to this heading">¶</a></h2>
+<p>If your slides are being tracked by Git, <code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code> will attempt to use
+<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">mv</span></code> to rename files. You can disable this behaviour using the
+<code class="docutils literal notranslate"><span class="pre">--no-git-mv</span></code> argument.</p>
+</section>
+<section id="argument-reference">
+<h2>Argument reference<a class="headerlink" href="#argument-reference" title="Link to this heading">¶</a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: slidie-mv [-h] [--insert [count]]
+                 (--before slide | --after slide | --start | --end)
+                 [--no-git-mv] [--allow-negative] [--dry-run]
+                 [slide ...]
+
+Reorder (i.e. renumber) slides within a show.
+
+positional arguments:
+  slide                 One or more slides to be moved. These slides will be
+                        reinserted in the same relative order into the
+                        sequence regardless of the order they are specified
+                        here.
+
+options:
+  -h, --help            show this help message and exit
+  --insert [count], -i [count]
+                        Print count new slide numbers in the specified
+                        position, moving existing slides as necessary to make
+                        space. If not specified, count defaults to 1.
+  --before slide        Move the specified slides immediately before this
+                        slide.
+  --after slide         Move the specified slides immediately after this
+                        slide.
+  --start               Move the specified slides to the start of the show.
+  --end                 Move the specified slides to the end of the show.
+  --no-git-mv, -G       By default this tool will attempt to use `git mv` to
+                        rename files, falling back on ordinary file moving if
+                        this fails (e.g. because we&#39;re not in a git repo or
+                        the file is not in the repository). If --no-git/-G is
+                        given, `git mv` will not be used.
+  --allow-negative, -n  If given, slides may be assigned negative numbers.
+                        This option is automatically enabled if any existing
+                        slide which is not being moved has a negative number.
+  --dry-run             If given, outputs the renumberings to be applied but
+                        does not move any files.
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code>: Slide renumbering tool</a><ul>
+<li><a class="reference internal" href="#reordering-slides">Reordering slides</a></li>
+<li><a class="reference internal" href="#creating-a-gap">Creating a gap</a></li>
+<li><a class="reference internal" href="#renumbering-all-slides">Renumbering all slides</a></li>
+<li><a class="reference internal" href="#managing-slides-in-git">Managing slides in Git</a></li>
+<li><a class="reference internal" href="#argument-reference">Argument reference</a></li>
+</ul>
+</li>
+</ul>
+
+  </div><h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation index</a><ul>
+      <li>Previous: <a href="file-numbering.html" title="previous chapter">Slidie file numbering/naming rules</a></li>
+      <li>Next: <a href="builds.html" title="next chapter">Builds</a></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/slidie-mv.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2024, Jonathan Heathcote.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.3.7.
+  </div>
+  
+  </body>
+</html>

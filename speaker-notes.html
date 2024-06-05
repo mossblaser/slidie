@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Speaker notes &#8212; Slidie 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d7e2fa82" />
+    <link rel="stylesheet" type="text/css" href="_static/readable.css?v=e058d051" />
+    <script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Magic text" href="magic-text.html" />
+    <link rel="prev" title="The Slidie XHTML Viewer" href="xhtml-viewer.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="magic-text.html" title="Magic text"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="xhtml-viewer.html" title="The Slidie XHTML Viewer"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Slidie 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Speaker notes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="speaker-notes">
+<span id="id1"></span><h1>Speaker notes<a class="headerlink" href="#speaker-notes" title="Link to this heading">¶</a></h1>
+<p>Speaker notes can be added to a slide by creating a text box whose first line
+contains <code class="docutils literal notranslate"><span class="pre">###</span></code> (three hashes). The remainder of the textbox contains the
+speaker notes in <a class="reference external" href="https://en.wikipedia.org/wiki/Markdown">markdown</a> format. Any special SVG text formatting will be
+ignored.</p>
+<img alt="A screenshot of Inkscape with a set of speaker notes." src="_images/speaker_notes_source_screenshot.png" />
+<p>When rendered, the textbox containing the speaker notes will be made invisible
+and so its physical location within the page is unimportant. At the time of
+writing, <a class="reference internal" href="rendering.html#rendering-formats"><span class="std std-ref">only the XHTML output format supports displaying speaker notes</span></a>. In other formats, the speaker notes are simply removed.</p>
+<img alt="A screenshot of the XHTML viewer showing some speaker notes." src="_images/speaker_notes_viewer_screenshot.png" />
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you want to create a text box in your slide whose first line is <code class="docutils literal notranslate"><span class="pre">###</span></code>
+without it being interpreted as a speaker note, add a trailing space to the
+first line. It will not be visible in the resulting document but will
+prevent Slidie treating it as a speaker note.</p>
+</div>
+<section id="per-build-step-speaker-notes">
+<h2>Per-<a class="reference internal" href="builds.html#builds"><span class="std std-ref">build step</span></a> speaker notes<a class="headerlink" href="#per-build-step-speaker-notes" title="Link to this heading">¶</a></h2>
+<p>If multiple text boxes containing speaker notes are addded to your document,
+the notes are concatenated together in the order they appear in the SVG
+document. This means that the top-most notes on the top-most layers will be
+shown first.</p>
+<p>Speaker note text boxes placed on layers with <a class="reference internal" href="builds.html#builds"><span class="std std-ref">build steps</span></a> are
+treated as only being applicable whilst that layer is visible. In the XHTML
+output format, these notes will be dimmed out (but still visible) when the
+layer is hidden.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Speaker notes</a><ul>
+<li><a class="reference internal" href="#per-build-step-speaker-notes">Per-<span class="xref std std-ref">build step</span> speaker notes</a></li>
+</ul>
+</li>
+</ul>
+
+  </div><h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation index</a><ul>
+      <li>Previous: <a href="xhtml-viewer.html" title="previous chapter">The Slidie XHTML Viewer</a></li>
+      <li>Next: <a href="magic-text.html" title="next chapter">Magic text</a></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/speaker-notes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2024, Jonathan Heathcote.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.3.7.
+  </div>
+  
+  </body>
+</html>

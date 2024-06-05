@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Slidie Guided Tour &#8212; Slidie 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d7e2fa82" />
+    <link rel="stylesheet" type="text/css" href="_static/readable.css?v=e058d051" />
+    <script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Slidie file numbering/naming rules" href="file-numbering.html" />
+    <link rel="prev" title="Slidie" href="index.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="file-numbering.html" title="Slidie file numbering/naming rules"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Slidie"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Slidie 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Slidie Guided Tour</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="slidie-guided-tour">
+<span id="tour"></span><h1>Slidie Guided Tour<a class="headerlink" href="#slidie-guided-tour" title="Link to this heading">¶</a></h1>
+<p>This document provides a very high-level guided tour of many of Slidie’s main
+features, with links to more in-depth documentation.</p>
+<section id="part-0-creating-slides">
+<h2>Part 0: Creating slides<a class="headerlink" href="#part-0-creating-slides" title="Link to this heading">¶</a></h2>
+<p>Lets start by creating some very simple slides. This is as easy as creating
+slide-shaped SVGs using Inkscape.</p>
+<p>A 1920×1080 pixel page size works well for slides and can be set in the
+‘Document Properties’ panel (found in the ‘File’ menu).</p>
+<p>Since slides are usually intended for screen display it makes sense to switch
+the default display units to pixels too.</p>
+<img alt="The document properties panel with 1920×1080 pixel size and pixel units set." src="_images/document_properties.png" />
+<p>Each SVG file’s name must begin with a number which controls the order in which
+the slides will be included in the show. For example, you might name your files
+like:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">100</span> <span class="pre">-</span> <span class="pre">Title.svg</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">-</span> <span class="pre">Overview.svg</span></code></p></li>
+<li><p>…</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1400</span> <span class="pre">-</span> <span class="pre">Conclusions.svg</span></code></p></li>
+</ul>
+</section>
+<section id="part-1-rendering-slides">
+<h2>Part 1: Rendering slides<a class="headerlink" href="#part-1-rendering-slides" title="Link to this heading">¶</a></h2>
+<p>To render your directory full of SVG files into a slide show, use the
+<code class="docutils literal notranslate"><span class="pre">slidie</span></code> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd path/to/slides/
+$ slidie
+</pre></div>
+</div>
+<p>By default, slidie will build the slides in the current directory into a
+standalone XHTML file called <code class="docutils literal notranslate"><span class="pre">out.xhtml</span></code>. This can be opened directly in your
+web browser (no server required). Slidie XHTML files are completely
+self-contained and can be distributed independently of the source SVG files.</p>
+<img alt="The XHTML viewer showing an example presentation." src="_images/xhtml_viewer.png" />
+<p>You can override the output filename using the <code class="docutils literal notranslate"><span class="pre">--output</span></code>/<code class="docutils literal notranslate"><span class="pre">-o</span></code> argument:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ slidie --output my_presentation.xhtml
+</pre></div>
+</div>
+<p>Slidie can also render your slides as a PDF: just specify a <code class="docutils literal notranslate"><span class="pre">.pdf</span></code> filename:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ slidie --output out.pdf
+</pre></div>
+</div>
+<p>In general, the XHTML format supports more features (e.g. videos and presenter
+view) whilst the PDF format is more useful as a distribution or archival
+format.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="rendering.html#rendering-formats"><span class="std std-ref">Supported output formats</span></a></dt><dd><p>For a comparison of all supported output formats.</p>
+</dd>
+<dt><a class="reference internal" href="xhtml-viewer.html#xhtml-viewer"><span class="std std-ref">The Slidie XHTML Viewer</span></a></dt><dd><p>For more details on the functionality of the XHTML viewer application.</p>
+</dd>
+</dl>
+</div>
+</section>
+<section id="part-2-reordering-slides">
+<h2>Part 2: Reordering slides<a class="headerlink" href="#part-2-reordering-slides" title="Link to this heading">¶</a></h2>
+<p>Using BASIC-style numbers for your slides (e.g. incrementing the number by 10
+or 100) makes it easier to reorder slides by renumbering them. For example,
+given the following:</p>
+<ul class="simple">
+<li><p>100 - a.svg</p></li>
+<li><p>200 - b.svg</p></li>
+<li><p>300 - c.svg</p></li>
+</ul>
+<p>You can move the slide ‘C’ in-between ‘A’ and ‘B’ by renumbering it to 150.</p>
+<p>To make this process easier, Slidie includes the <code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code> command. You
+could achieve the same reordering as the example above using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ slidie-mv &quot;300 - c.svg&quot; --before &quot;200 - b.svg&quot;
+</pre></div>
+</div>
+<p>You can alternatively use <code class="docutils literal notranslate"><span class="pre">--after</span> <span class="pre">&lt;slide&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">--start</span></code> or <code class="docutils literal notranslate"><span class="pre">--end</span></code> to
+specify the target location. You can also move several slides in one go.</p>
+<p>If necessary, <code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code> command will automatically rename a minimal number
+of adjacent slides if no gap in the numbering is available.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="file-numbering.html#file-numbering"><span class="std std-ref">Slidie file numbering/naming rules</span></a></dt><dd><p>For more slide numbering suggestions and rules.</p>
+</dd>
+<dt><a class="reference internal" href="slidie-mv.html#slidie-mv"><span class="std std-ref">slidie-mv: Slide renumbering tool</span></a></dt><dd><p>Full command usage reference.</p>
+</dd>
+</dl>
+</div>
+</section>
+<section id="part-3-building-up-slides-step-by-step">
+<h2>Part 3: Building up slides step-by-step<a class="headerlink" href="#part-3-building-up-slides-step-by-step" title="Link to this heading">¶</a></h2>
+<p>Sometimes it is useful to build up the displayed contents of a slide over
+several steps. Slidie allows you to reveal (or hide) layers step-by-step by
+adding special annotations to layer names.</p>
+<p>The simplest type of annotation looks like <code class="docutils literal notranslate"><span class="pre">&lt;1&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;2-4&gt;</span></code> and indicates
+that the layer should be visible only during step 1 or steps 2, 3 and 4
+(respectively). The screenshot below shows <a class="reference download internal" download="" href="_downloads/b8b029244c9068c890114c7e1a0f494e/00200%20-%20Introduction.svg"><code class="xref download docutils literal notranslate"><span class="pre">an</span> <span class="pre">example</span> <span class="pre">SVG</span></code></a> which specifies a
+slide where different layers are displayed at different points in time:</p>
+<img alt="Screenshot of Inkscape with layers containing Slidie build specifications" src="_images/build_steps_screenshot.png" />
+<p>The resulting four steps are shown below.</p>
+<img alt="The resulting slides produced by the previous example." src="_images/build_steps.png" />
+<p>In this example, the layer named ‘Arrows &lt;1-&gt;’ only becomes visible from step
+one (note that the first step is number zero). The ending step is omitted
+meaning the layer will be visible on all remaining steps.</p>
+<p>The two ‘Highlight …’ layers are only shown for a single step (specifying
+step 2 and 3 respectively).</p>
+<p>Layers without a build step annotation will be visible on all steps (or hidden
+if you’ve hidden them in Inkscape).</p>
+<p>The complete syntax for build specifications includes many more features
+including automatic numbering and connecting the visibility of groups of
+layers. See the <a class="reference internal" href="builds.html#builds"><span class="std std-ref">documentation</span></a> for a complete introduction.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="builds.html#builds"><span class="std std-ref">Builds</span></a></dt><dd><p>For a complete introduction to Slidie’s build syntax.</p>
+</dd>
+</dl>
+</div>
+</section>
+<section id="part-4-adding-speaker-notes">
+<h2>Part 4: Adding speaker notes<a class="headerlink" href="#part-4-adding-speaker-notes" title="Link to this heading">¶</a></h2>
+<p>To add speaker notes to a slide, create a text box and type <code class="docutils literal notranslate"><span class="pre">###</span></code> (three
+hashes) followed by a newline. Add your speaker notes to the remaining lines.</p>
+<img alt="A screenshot of Inkscape with a set of speaker notes." src="_images/speaker_notes_source_screenshot.png" />
+<p>When the slides are rendered, the notes will be displayed in the notes area
+(and presenter view) of the XHTML viewer.</p>
+<img alt="A screenshot of the XHTML viewer showing some speaker notes." src="_images/speaker_notes_viewer_screenshot.png" />
+<p>Whilst text formatting applied to the speaker notes in your source file are
+lost, the notes will be formatted as <a class="reference external" href="https://en.wikipedia.org/wiki/Markdown">Markdown</a> in the XHTML viewer.</p>
+<p>Though it is probably most readable to place your speaker notes off the side of
+the page in your SVG, it is not necessary: Slidie removes the text from the
+slide during rendering.</p>
+<p>If you place speaker notes on layers selectively displayed during a <a class="reference internal" href="builds.html#builds"><span class="std std-ref">build
+up</span></a>, those notes will be shown faded-out in the viewer before that
+build step is reached.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="speaker-notes.html#speaker-notes"><span class="std std-ref">Speaker notes</span></a></dt><dd><p>For full details on creating and using speaker notes.</p>
+</dd>
+</dl>
+</div>
+</section>
+<section id="part-5-creating-hyperlinks-between-slides">
+<h2>Part 5: Creating hyperlinks between slides<a class="headerlink" href="#part-5-creating-hyperlinks-between-slides" title="Link to this heading">¶</a></h2>
+<p>Hyperlinks can be created in Inkscape by right clicking an object and clicking
+‘Create anchor (hyperlink)’ and entering a URL in the ‘Href’ box of the ‘Link
+properties’ panel. Links can also be created within a slide show using links
+like <code class="docutils literal notranslate"><span class="pre">#4</span></code> which creates a link to the fourth slide (slides are numbered from
+‘1’).</p>
+<img alt="A screenshot showing setting up a hyperlink in Inkscape" src="_images/hyperlink_screenshot.png" />
+<p>You can also link to a specific <a class="reference internal" href="builds.html#builds"><span class="std std-ref">build steps</span></a> like <code class="docutils literal notranslate"><span class="pre">#4&lt;2&gt;</span></code>
+which links to build step 2 on slide 4. Links to build steps on the current
+slide can omit the slide number (e.g. <code class="docutils literal notranslate"><span class="pre">#&lt;2&gt;</span></code>).</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The XHTML viewer places the current slide number in the URL bar.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="links.html#links"><span class="std std-ref">Creating hyperlinks between slides</span></a></dt><dd><p>For a complete introduction to the inter-slide link syntax. You can
+also learn how to reference slides and steps using names rather than
+rather brittle slide and step numbers.</p>
+</dd>
+</dl>
+</div>
+</section>
+<section id="part-6-adding-a-video-clips-to-slides">
+<h2>Part 6: Adding a video clips to slides<a class="headerlink" href="#part-6-adding-a-video-clips-to-slides" title="Link to this heading">¶</a></h2>
+<p>Slidie supports the inclusion of a number of dynamic elements not natively
+supported by SVG such as <a class="reference internal" href="video.html#video"><span class="std std-ref">videos</span></a> and <a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">iframes</span></a>
+(embedded web browsers). These inclusions make use of a Slidie feature
+(nerve-wrackingly) called <a class="reference internal" href="magic-text.html#magic-text"><span class="std std-ref">‘magic text’</span></a>.</p>
+<p>To insert a video into a slide, first draw a placeholder rectangle or image
+where the video should appear. Next, add a text box containing something like
+the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">@@@</span>
+<span class="n">video</span> <span class="o">=</span> <span class="s2">&quot;path/or/url/to/video.mp4&quot;</span>
+</pre></div>
+</div>
+<p>Finally, combine the placeholder and text in a group (e.g. using Ctrl+G).</p>
+<img alt="A screenshot of a video defined in Inkscape using Slidie's magic text feature." src="_images/video_inkscape_screenshot.png" />
+<p>The <code class="docutils literal notranslate"><span class="pre">&#64;&#64;&#64;</span></code> syntax marks what follows as a <a class="reference internal" href="magic-text.html#magic-text"><span class="std std-ref">‘magic’</span></a> text
+block which Slidie will treat specially. In this case, we’ve indicated that we
+want to substitute the placeholder with a video player. When we render our
+slide we get something like this:</p>
+<img alt="A screenshot of a video playing on a slide." src="_images/video_viewer_screenshot.png" />
+<p>In PDF and PNG outputs (where videos are not supported) Slidie will only show
+the placeholder.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>There are quite a few caveats around Slidie’s video support (seemingly like
+every other slide preparation tool…). Make sure to read the <a class="reference internal" href="video.html#video"><span class="std std-ref">full
+documentation for details</span></a>.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="video.html#video"><span class="std std-ref">Video</span></a></dt><dd><p>For further details of Slidie’s video embedding support.</p>
+</dd>
+<dt><a class="reference internal" href="video.html#slidie-video-stills"><span class="std std-ref">Automatic video placeholder generation</span></a></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">slidie-video-stills</span></code> command can automatically substitute a
+placeholder rectangle with an image placeholder in slides.</p>
+</dd>
+<dt><a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">Creating &lt;iframe&gt; elements</span></a></dt><dd><p>For how to conveniently embed iframes (i.e. web browsers) into slides.
+This is a potentially powerful mechanism for injecting complex
+interactive or live data connected elements into slides.</p>
+</dd>
+<dt><a class="reference internal" href="magic-text.html#magic-text"><span class="std std-ref">Magic text</span></a></dt><dd><p>For details of the magic text syntax and its other uses.</p>
+</dd>
+</dl>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Slidie Guided Tour</a><ul>
+<li><a class="reference internal" href="#part-0-creating-slides">Part 0: Creating slides</a></li>
+<li><a class="reference internal" href="#part-1-rendering-slides">Part 1: Rendering slides</a></li>
+<li><a class="reference internal" href="#part-2-reordering-slides">Part 2: Reordering slides</a></li>
+<li><a class="reference internal" href="#part-3-building-up-slides-step-by-step">Part 3: Building up slides step-by-step</a></li>
+<li><a class="reference internal" href="#part-4-adding-speaker-notes">Part 4: Adding speaker notes</a></li>
+<li><a class="reference internal" href="#part-5-creating-hyperlinks-between-slides">Part 5: Creating hyperlinks between slides</a></li>
+<li><a class="reference internal" href="#part-6-adding-a-video-clips-to-slides">Part 6: Adding a video clips to slides</a></li>
+</ul>
+</li>
+</ul>
+
+  </div><h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation index</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Slidie</a></li>
+      <li>Next: <a href="file-numbering.html" title="next chapter">Slidie file numbering/naming rules</a></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/tour.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2024, Jonathan Heathcote.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.3.7.
+  </div>
+  
+  </body>
+</html>

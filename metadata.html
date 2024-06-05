@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Metadata &#8212; Slidie 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d7e2fa82" />
+    <link rel="stylesheet" type="text/css" href="_static/readable.css?v=e058d051" />
+    <script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Creating &lt;iframe&gt; elements" href="iframe.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="iframe.html" title="Creating &lt;iframe&gt; elements"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Slidie 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Metadata</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="metadata">
+<span id="id1"></span><h1>Metadata<a class="headerlink" href="#metadata" title="Link to this heading">¶</a></h1>
+<p>Various pieces of slide and show metadata can be added to slides via a
+combination of <a class="reference internal" href="magic-text.html#magic-text"><span class="std std-ref">magic text</span></a> annotations and the assignment of
+specific IDs to text boxes within a slide.</p>
+<section id="slide-metadata">
+<h2>Slide metadata<a class="headerlink" href="#slide-metadata" title="Link to this heading">¶</a></h2>
+<p>A title, author and date may be defined for a slide by either giving a text
+element an XML ID of <code class="docutils literal notranslate"><span class="pre">title</span></code>, <code class="docutils literal notranslate"><span class="pre">author</span></code> or <code class="docutils literal notranslate"><span class="pre">date</span></code>. Thus the slide metadata
+can be tied to the actual text on slides.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You can change the XML ID of an element in Inkscape by right clicking on
+it, choosing ‘Object Properties’ and entering a name in the ‘ID’ box and
+clicking the ‘Set’ button (the latter step being easily forgotten!).</p>
+</div>
+<img alt="A text element with an XML ID set to 'title' in Inkscape." src="_images/metadata_text_id_screenshot.png" />
+<p>Alternatively, you can create a <a class="reference internal" href="magic-text.html#magic-text"><span class="std std-ref">magic text box</span></a> defining one
+of <code class="docutils literal notranslate"><span class="pre">title</span></code>, <code class="docutils literal notranslate"><span class="pre">author</span></code> or <code class="docutils literal notranslate"><span class="pre">date</span></code> to define the relevant metadata without
+any text appearing on the slide. This can be useful when the title as written
+on the slide does not match what you’d prefer to appear in the slide show table
+of contents.</p>
+<p>At the moment, metadata assigned to the first slide is used to set <a class="reference internal" href="rendering.html#rendering-pdf"><span class="std std-ref">PDF</span></a> metadata. The title metadata alone on subsequent slides is
+then used to populate PDF table of contents entries.</p>
+<p>The <a class="reference internal" href="rendering.html#rendering-xhtml"><span class="std std-ref">XHTML viewer</span></a> currently only uses the first slide’s
+title metadata to populate the show title in the toolbar.</p>
+</section>
+<section id="slide-ids">
+<span id="id2"></span><h2>Slide IDs<a class="headerlink" href="#slide-ids" title="Link to this heading">¶</a></h2>
+<p>Each slide may be assigned an ID for use in <a class="reference internal" href="links.html#links"><span class="std std-ref">intra-show hyperlinks</span></a>. To assign an ID to a slide, add a <a class="reference internal" href="magic-text.html#magic-text"><span class="std std-ref">magic text</span></a> box
+anywhere on the slide which sets the <code class="docutils literal notranslate"><span class="pre">id</span></code> value like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">@@@</span>
+<span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;my-id-here&quot;</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="links.html#links"><span class="std std-ref">Creating hyperlinks between slides</span></a></dt><dd><p><strong>TL;DR:</strong> To create a hyperlink to a slide with the ID ‘foo’, use the
+URI <code class="docutils literal notranslate"><span class="pre">#foo</span></code>.</p>
+</dd>
+</dl>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Metadata</a><ul>
+<li><a class="reference internal" href="#slide-metadata">Slide metadata</a></li>
+<li><a class="reference internal" href="#slide-ids">Slide IDs</a></li>
+</ul>
+</li>
+</ul>
+
+  </div><h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation index</a><ul>
+      <li>Previous: <a href="iframe.html" title="previous chapter">Creating <code class="docutils literal notranslate"><span class="pre">&lt;iframe&gt;</span></code> elements</a></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/metadata.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2024, Jonathan Heathcote.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.3.7.
+  </div>
+  
+  </body>
+</html>

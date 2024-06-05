@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Builds &#8212; Slidie 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d7e2fa82" />
+    <link rel="stylesheet" type="text/css" href="_static/readable.css?v=e058d051" />
+    <script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Creating hyperlinks between slides" href="links.html" />
+    <link rel="prev" title="slidie-mv: Slide renumbering tool" href="slidie-mv.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="links.html" title="Creating hyperlinks between slides"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="slidie-mv.html" title="slidie-mv: Slide renumbering tool"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Slidie 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Builds</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="builds">
+<span id="id1"></span><h1>Builds<a class="headerlink" href="#builds" title="Link to this heading">¶</a></h1>
+<p>Builds are controlled using special annotations added to Inkscape layer names
+with a <a class="reference external" href="https://en.wikipedia.org/wiki/Beamer_(LaTeX)">Beamer</a>-inspired
+syntax.</p>
+<p>Build <em>specifications</em> are given in angle brackets (<cite>&lt;</cite> and <cite>&gt;</cite>) anywhere
+within the layer name and consist of a comma separated list of <em>step</em> numbers
+during which that layer is visible.</p>
+<p>For example if you have a slide with four layers named <a class="reference download internal" download="" href="_downloads/e429d85bb32ea195f33e0be541ef0456/100_simple_steps.svg"><code class="xref download docutils literal notranslate"><span class="pre">like</span> <span class="pre">so</span></code></a>:</p>
+<ul class="simple">
+<li><p>A</p></li>
+<li><p>B &lt;1&gt;</p></li>
+<li><p>C &lt;2&gt;</p></li>
+<li><p>D &lt;1, 2&gt;.</p></li>
+</ul>
+<img alt="An Inkscape SVG with layers named 'A', 'B &lt;1&gt;', 'C &lt;2&gt;' and 'D &lt;1, 2&gt;'." src="_images/simple_steps_inkscape_screenshot.png" />
+<p>This describes a slide which builds in three steps (numbered 0, 1 and 2):</p>
+<ul class="simple">
+<li><p>In step 0 (the initial state of the slide), only layer A is visible.</p></li>
+<li><p>In step 1 (after the first click), layers A, B and D are visible.</p></li>
+<li><p>In step 2 (after the second click), layers A, C and D are visible.</p></li>
+</ul>
+<img alt="The three slides, side by side." src="_images/simple_steps.png" />
+<section id="ranges">
+<h2>Ranges<a class="headerlink" href="#ranges" title="Link to this heading">¶</a></h2>
+<p>You can also specify ranges of steps, for example, given <a class="reference download internal" download="" href="_downloads/d8df57434952bff81980e7b3432bf392/100_simple_range.svg"><code class="xref download docutils literal notranslate"><span class="pre">the</span>
+<span class="pre">following</span> <span class="pre">layers</span></code></a>:</p>
+<ul class="simple">
+<li><p>A &lt;1&gt;</p></li>
+<li><p>B &lt;2&gt;</p></li>
+<li><p>C &lt;3&gt;</p></li>
+<li><p>D &lt;0-2&gt;</p></li>
+</ul>
+<img alt="An Inkscape SVG with layers named 'A &lt;1&gt;', 'B &lt;2&gt;', 'C &lt;3&gt;' and 'D &lt;0-2&gt;'." src="_images/simple_range_inkscape_screenshot.png" />
+<p>This slide will build in four steps like so:</p>
+<ul class="simple">
+<li><p>In step 0 (the initial state of the slide), only layer D is visible.</p></li>
+<li><p>In step 1 (after the first click), layers A, D are visible.</p></li>
+<li><p>In step 2 (after the second click), layers B and D are visible.</p></li>
+<li><p>In step 3 (after the third click), only layer C is visible.</p></li>
+</ul>
+<img alt="The four slides, side by side." src="_images/simple_range.png" />
+</section>
+<section id="open-ended-ranges">
+<h2>Open-ended ranges<a class="headerlink" href="#open-ended-ranges" title="Link to this heading">¶</a></h2>
+<p>If the start or end of a range is omitted, this defines a range from the first
+step or to last step respectively. For example <code class="docutils literal notranslate"><span class="pre">&lt;2-&gt;</span></code> means from the second
+click onward.</p>
+</section>
+<section id="automatic-step-numbering">
+<h2>Automatic step numbering<a class="headerlink" href="#automatic-step-numbering" title="Link to this heading">¶</a></h2>
+<p>For the common case where consecutive layers are revealed in consecutive steps
+the <code class="docutils literal notranslate"><span class="pre">+</span></code> shorthand means the step after the first step in the previous layer
+with a specification. For example:</p>
+<ul class="simple">
+<li><p>A</p></li>
+<li><p>B &lt;+&gt;</p></li>
+<li><p>C &lt;+&gt;</p></li>
+</ul>
+<img alt="An Inkscape SVG with layers named 'A', 'B &lt;+&gt;' and 'C &lt;+&gt;'." src="_images/simple_auto_numbering_inkscape_screenshot.png" />
+<p>Here, layer A is always visible whilst layers B C appear (then disappear) after
+the first and second clicks respectively.</p>
+<img alt="The three slides, side by side." src="_images/simple_auto_numbering.png" />
+<p>A ‘+’ can be used as part of a range specification. In addition the <code class="docutils literal notranslate"><span class="pre">.</span></code>
+shorthand works like <code class="docutils literal notranslate"><span class="pre">+</span></code> but without incrementing the step number. Used
+together this allows you to something like follows:</p>
+<ul class="simple">
+<li><p>Title</p></li>
+<li><p>First bullet &lt;+-&gt;</p></li>
+<li><p>First bullet highlight &lt;.&gt;</p></li>
+<li><p>Second bullet &lt;+-&gt;</p></li>
+<li><p>Second bullet highlight &lt;.&gt;</p></li>
+<li><p>Third bullet &lt;+-&gt;</p></li>
+<li><p>Third bullet highlight &lt;.&gt;</p></li>
+</ul>
+<img alt="An Inkscape SVG with layers named as above." src="_images/simple_auto_ranges_inkscape_screenshot.png" />
+<p>This slide has four steps with (for example) a bullet being reveled after each
+click. The most recently shown bullet might be highlighted in some way in the
+‘highlight’ layers.</p>
+<img alt="The four slides, side by side." src="_images/simple_auto_ranges.png" />
+</section>
+<section id="tags">
+<span id="builds-tags"></span><h2>Tags<a class="headerlink" href="#tags" title="Link to this heading">¶</a></h2>
+<p>For advanced (or fiddly) usecases, it is possible to add one or more tags to a
+layer by including <code class="docutils literal notranslate"><span class="pre">&#64;tag_name_here</span></code> to their name. These tags may be referenced
+in build specifications to make layers appear in sync with eachother.</p>
+<p>A typical use of this feature is for cases where graphics are split between
+foreground and background layers and need to be built in sync. For example,
+consider the following layers:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Foreground</dt><dd><ul>
+<li><p>Foreground A &lt;+-&gt; &#64;a</p></li>
+<li><p>Foreground B &lt;+-&gt; &#64;b</p></li>
+<li><p>Foreground C &lt;+-&gt; &#64;c</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Background</dt><dd><ul>
+<li><p>Background A &lt;&#64;a&gt;</p></li>
+<li><p>Background B &lt;&#64;b&gt;</p></li>
+<li><p>Background C &lt;&#64;c&gt;</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>This slide builds in four steps with foreground layers A, B and C being
+revealed after each click. The corresponding background layers are revealed in
+sync with their foreground counterparts.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="links.html#links-tags"><span class="std std-ref">Linking to build steps</span></a></dt><dd><p>Tag names may also be referenced in inter-slide hyperlinks. For
+example, <code class="docutils literal notranslate"><span class="pre">#10&#64;foo</span></code> to link to the first build step on slide 10 with
+the tag ‘foo’.</p>
+</dd>
+</dl>
+</div>
+<section id="tag-suffixes">
+<h3>Tag suffixes<a class="headerlink" href="#tag-suffixes" title="Link to this heading">¶</a></h3>
+<p>By default, when you use a tag in a build specification, <em>all</em> of the steps of
+layers with that tag are, in effect, copied into your specification.</p>
+<p>By adding a <code class="docutils literal notranslate"><span class="pre">.start</span></code>, <code class="docutils literal notranslate"><span class="pre">.end</span></code>, <code class="docutils literal notranslate"><span class="pre">.before</span></code>, or <code class="docutils literal notranslate"><span class="pre">.after</span></code> suffix, you can instead
+reference the first or last steps layers with that tag are visible. For
+example, given the following layers:</p>
+<ul class="simple">
+<li><p>Foo &lt;1, 2, 3&gt; &#64;foo</p></li>
+<li><p>A &lt;&#64;foo.before&gt;</p></li>
+<li><p>B &lt;&#64;foo.start&gt;</p></li>
+<li><p>C &lt;&#64;foo.end&gt;</p></li>
+<li><p>D &lt;&#64;foo.after&gt;</p></li>
+</ul>
+<img alt="An Inkscape SVG with layers named as above." src="_images/simple_tag_suffixes_inkscape_screenshot.png" />
+<p>This defines a slide with five build steps:</p>
+<ul class="simple">
+<li><p>In step 0, just layer A is visible</p></li>
+<li><p>In step 1, layers Foo and B are visible</p></li>
+<li><p>In step 2, just layer Foo is visible</p></li>
+<li><p>In step 3, layers Foo and C are visible</p></li>
+<li><p>In step 4, just layer D is visible</p></li>
+</ul>
+<img alt="The five slides, side by side." src="_images/simple_tag_suffixes.png" />
+<div class="admonition note" id="negative-step-numbers">
+<p class="admonition-title">Note</p>
+<p>The astute reader may have noticed that <code class="docutils literal notranslate"><span class="pre">&#64;*.before</span></code> syntax could lead to
+referencing steps numbered less than zero. Slidie will handle this scenario
+(steps will start from -1, or -2, or whatever is necessary, on that slide)
+but you still can’t explicitly write negative step numbers.</p>
+</div>
+</section>
+<section id="tags-in-ranges">
+<h3>Tags in ranges<a class="headerlink" href="#tags-in-ranges" title="Link to this heading">¶</a></h3>
+<p>When a tag is used in a range specification without a suffix, the <code class="docutils literal notranslate"><span class="pre">.start</span></code> and
+<code class="docutils literal notranslate"><span class="pre">.end</span></code> suffixes are implied for the start end end of the range. That is,
+<code class="docutils literal notranslate"><span class="pre">&lt;&#64;foo-&#64;bar&gt;</span></code> is treated as <code class="docutils literal notranslate"><span class="pre">&lt;&#64;foo.start-&#64;bar.end&gt;</span></code>.</p>
+</section>
+<section id="sharing-tags">
+<h3>Sharing tags<a class="headerlink" href="#sharing-tags" title="Link to this heading">¶</a></h3>
+<p>Many layers may be labelled with the same tag. In this case, referencing that
+tag refers to the union of all steps those layers are visible. For example,
+given the layers:</p>
+<ul class="simple">
+<li><p>A &lt;1&gt; &#64;foo</p></li>
+<li><p>B &lt;2&gt; &#64;foo</p></li>
+<li><p>C &lt;&#64;foo&gt;</p></li>
+</ul>
+<p>Layer ‘C’ will be visible at the same time as both layers ‘A’ and ‘B’.</p>
+</section>
+<section id="limitations-of-tags">
+<h3>Limitations of tags<a class="headerlink" href="#limitations-of-tags" title="Link to this heading">¶</a></h3>
+<p>There are two major limitations to the use of tags in build specifications:</p>
+<p>Firstly, circular dependencies between layers via tags are not permitted and
+will result in an error.</p>
+<p>Secondly, automatic step numbering (i.e. <code class="docutils literal notranslate"><span class="pre">+</span></code> and <code class="docutils literal notranslate"><span class="pre">.</span></code>) will ignore any tag
+references when computing the number to use. For example given the layers:</p>
+<ul class="simple">
+<li><p>A &lt;1&gt; &#64;foo</p></li>
+<li><p>B &lt;&#64;foo, 2&gt;</p></li>
+<li><p>C &lt;.&gt;</p></li>
+</ul>
+<p>Here the <code class="docutils literal notranslate"><span class="pre">.</span></code> in layer C resolves to 2 (not 1) because 2 is the first non-tag
+step in the layer B’s build specification.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Builds</a><ul>
+<li><a class="reference internal" href="#ranges">Ranges</a></li>
+<li><a class="reference internal" href="#open-ended-ranges">Open-ended ranges</a></li>
+<li><a class="reference internal" href="#automatic-step-numbering">Automatic step numbering</a></li>
+<li><a class="reference internal" href="#tags">Tags</a><ul>
+<li><a class="reference internal" href="#tag-suffixes">Tag suffixes</a></li>
+<li><a class="reference internal" href="#tags-in-ranges">Tags in ranges</a></li>
+<li><a class="reference internal" href="#sharing-tags">Sharing tags</a></li>
+<li><a class="reference internal" href="#limitations-of-tags">Limitations of tags</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div><h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation index</a><ul>
+      <li>Previous: <a href="slidie-mv.html" title="previous chapter"><code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code>: Slide renumbering tool</a></li>
+      <li>Next: <a href="links.html" title="next chapter">Creating hyperlinks between slides</a></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/builds.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2024, Jonathan Heathcote.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.3.7.
+  </div>
+  
+  </body>
+</html>

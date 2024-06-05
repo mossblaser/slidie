@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Slidie &#8212; Slidie 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d7e2fa82" />
+    <link rel="stylesheet" type="text/css" href="_static/readable.css?v=e058d051" />
+    <script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Slidie Guided Tour" href="tour.html" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head><body>
+  
+  
+  <div class="indexwrapper">
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tour.html" title="Slidie Guided Tour"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Slidie 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Slidie</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="slidie">
+<h1>Slidie<a class="headerlink" href="#slidie" title="Link to this heading">¶</a></h1>
+<p><em>Slidie is a slide preparation system which makes illustrations easy and bullet
+points hard.</em></p>
+<p>Slidie converts a directory full of Inkscape SVGs into a slide show to
+accompany a presentation.</p>
+<section id="guided-tour">
+<h2>Guided tour<a class="headerlink" href="#guided-tour" title="Link to this heading">¶</a></h2>
+<p>To get a brief overview of how to get started with Slidie, see the
+<a class="reference internal" href="tour.html#tour"><span class="std std-ref">Slidie guided tour</span></a>:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tour.html">Slidie Guided Tour</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tour.html#part-0-creating-slides">Part 0: Creating slides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tour.html#part-1-rendering-slides">Part 1: Rendering slides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tour.html#part-2-reordering-slides">Part 2: Reordering slides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tour.html#part-3-building-up-slides-step-by-step">Part 3: Building up slides step-by-step</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tour.html#part-4-adding-speaker-notes">Part 4: Adding speaker notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tour.html#part-5-creating-hyperlinks-between-slides">Part 5: Creating hyperlinks between slides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tour.html#part-6-adding-a-video-clips-to-slides">Part 6: Adding a video clips to slides</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="reference-manual">
+<h2>Reference manual<a class="headerlink" href="#reference-manual" title="Link to this heading">¶</a></h2>
+<p>The following documentation describes each of Slidie’s features in detail.</p>
+<section id="file-numbering">
+<h3>File numbering<a class="headerlink" href="#file-numbering" title="Link to this heading">¶</a></h3>
+<p>Slidie orders SVG files in a directory <a class="reference internal" href="file-numbering.html#file-numbering"><span class="std std-ref">based on numbers at the start of their
+filename</span></a>. Slidie also provides the <a class="reference internal" href="slidie-mv.html#slidie-mv"><span class="std std-ref">slidie-mv</span></a>
+command for conveniently renumbering SVG files to reorganise slides in a show.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="file-numbering.html">Slidie file numbering/naming rules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="file-numbering.html#practical-tips">Practical tips</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="slidie-mv.html"><code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code>: Slide renumbering tool</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="slidie-mv.html#reordering-slides">Reordering slides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="slidie-mv.html#creating-a-gap">Creating a gap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="slidie-mv.html#renumbering-all-slides">Renumbering all slides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="slidie-mv.html#managing-slides-in-git">Managing slides in Git</a></li>
+<li class="toctree-l2"><a class="reference internal" href="slidie-mv.html#argument-reference">Argument reference</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="slide-builds">
+<h3>Slide builds<a class="headerlink" href="#slide-builds" title="Link to this heading">¶</a></h3>
+<p>Slides can be built up step-by-step by showing (or hiding) groups Inkscape
+layers. Slidie provides <a class="reference internal" href="builds.html#builds"><span class="std std-ref">syntax for defining builds</span></a> using
+special annotations in layer names.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="builds.html">Builds</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="builds.html#ranges">Ranges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="builds.html#open-ended-ranges">Open-ended ranges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="builds.html#automatic-step-numbering">Automatic step numbering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="builds.html#tags">Tags</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="links">
+<h3>Links<a class="headerlink" href="#links" title="Link to this heading">¶</a></h3>
+<p>Slidie supports <a class="reference internal" href="links.html#links"><span class="std std-ref">hyperlinks between slides</span></a> using anchor-style
+(<code class="docutils literal notranslate"><span class="pre">#...</span></code>) URIs.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="links.html">Creating hyperlinks between slides</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="links.html#linking-to-slides">Linking to slides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="links.html#linking-to-build-steps">Linking to build steps</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="output-formats">
+<h3>Output formats<a class="headerlink" href="#output-formats" title="Link to this heading">¶</a></h3>
+<p>Slidie supports rendering slide shows as <a class="reference internal" href="rendering.html#rendering-xhtml"><span class="std std-ref">XHTML</span></a>,
+<a class="reference internal" href="rendering.html#rendering-pdf"><span class="std std-ref">PDF</span></a> and <a class="reference internal" href="rendering.html#rendering-png"><span class="std std-ref">PNG</span></a> formats, albeit with
+slightly different sets of supported features.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rendering.html"><code class="docutils literal notranslate"><span class="pre">slidie</span></code> command</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rendering.html#supported-output-formats">Supported output formats</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="xhtml-viewer.html">The Slidie XHTML Viewer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="xhtml-viewer.html#user-interface">User interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xhtml-viewer.html#presenter-view">Presenter view</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xhtml-viewer.html#browser-quirks">Browser quirks</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="speaker-notes">
+<h3>Speaker notes<a class="headerlink" href="#speaker-notes" title="Link to this heading">¶</a></h3>
+<p>Speaker notes can be embedded within a slide using <code class="docutils literal notranslate"><span class="pre">&lt;text&gt;</span></code> elements whose
+contents begin with <code class="docutils literal notranslate"><span class="pre">###</span></code>. These notes may be written in markdown and can
+also be associated with specific build steps.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="speaker-notes.html">Speaker notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="speaker-notes.html#per-build-step-speaker-notes">Per-<span class="xref std std-ref">build step</span> speaker notes</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="magic-text">
+<h3>Magic text<a class="headerlink" href="#magic-text" title="Link to this heading">¶</a></h3>
+<p>Slidie provides a convenient mechanism for embedding non-SVG-native content
+such as <a class="reference internal" href="video.html#video"><span class="std std-ref">videos</span></a> and <a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">iframes</span></a>, as well as certain
+<a class="reference internal" href="metadata.html#metadata"><span class="std std-ref">metadata</span></a>, based on ‘magic’ text boxes. Magic text boxes are
+ordinary text boxes whose contents begin with <code class="docutils literal notranslate"><span class="pre">&#64;&#64;&#64;</span></code> and contain <a class="reference external" href="https://toml.io/en/">TOML</a> data.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="magic-text.html">Magic text</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="magic-text.html#magic-rectangles">Magic rectangles</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="video.html">Video</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="video.html#inserting-a-video">Inserting a video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="video.html#automatic-video-placeholder-generation">Automatic video placeholder generation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="iframe.html">Creating <code class="docutils literal notranslate"><span class="pre">&lt;iframe&gt;</span></code> elements</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="iframe.html#inserting-an-iframe">Inserting an iframe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iframe.html#appending-url-query-parameters">Appending URL query parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iframe.html#scaling">Scaling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iframe.html#opening-hyperlinks-in-an-iframe">Opening hyperlinks in an iframe</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="metadata.html#slide-metadata">Slide metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metadata.html#slide-ids">Slide IDs</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="#">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Slidie</a><ul>
+<li><a class="reference internal" href="#guided-tour">Guided tour</a></li>
+<li><a class="reference internal" href="#reference-manual">Reference manual</a><ul>
+<li><a class="reference internal" href="#file-numbering">File numbering</a></li>
+<li><a class="reference internal" href="#slide-builds">Slide builds</a></li>
+<li><a class="reference internal" href="#links">Links</a></li>
+<li><a class="reference internal" href="#output-formats">Output formats</a></li>
+<li><a class="reference internal" href="#speaker-notes">Speaker notes</a></li>
+<li><a class="reference internal" href="#magic-text">Magic text</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div><h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation index</a><ul>
+      <li>Next: <a href="tour.html" title="next chapter">Slidie Guided Tour</a></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2024, Jonathan Heathcote.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.3.7.
+  </div>
+  
+  </div>
+  
+  </body>
+</html>
