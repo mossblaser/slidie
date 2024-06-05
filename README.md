@@ -13,16 +13,25 @@ into a slide show to accompany a presentation.
 Noteworthy features include:
 
 * Slides are just ordinary (numbered) Inkscape SVG files
-* No plugins etc. are required
+* No Inkscape plugins etc. are required
 * Reveal complex diagrams step-by-step by adding
-  [Beamer](https://en.wikipedia.org/wiki/Beamer_(LaTeX))-inspired annotations
+  [Beamer](https://en.wikipedia.org/wiki/Beamer_(LaTeX))-like annotations
   to Inkscape layer names.
-* Export to multiple output formats (PDF, XHTML, loads of PNG files)
-* Rich linking between slides
+* Export to multiple output formats (PDF, single-file browser-based viewer and
+  PNG files)
+* Hyperlinking between slides
 * Speaker notes
 * Presenter view
-* Video and iframes
-* Embedded subset fonts
+* Embedded videos and iframes
+* Embedded fonts
+
+
+Documentation
+-------------
+
+* [A guided tour of Slidie's main features](https://mossblaser.github.io/slidie/tour.html)
+
+* [Slidie reference manual](https://mossblaser.github.io/slidie/)
 
 
 Motivation
@@ -47,91 +56,6 @@ in Inkscape layer names, Slidie makes it possible to have a complex diagram
 build-up step-by-step from a single Inkscape SVG file.
 
 Everything else is just gravy.
-
-
-Documentation
--------------
-
-**TODO: This is a work in progress: much of the explanatory documentation exists
-in extensive docstrings in the sources.**
-
-
-Quick-start
------------
-
-A Slidie presentation is just a bunch of numbered SVGs in a directory.
-
-Create some slides, one per SVG, and save them into a directory with names
-beginning with a number. Make sure to set your page size to a suitable aspect
-ratio. [For example](./docs/source/_static/examples/getting_started):
-
-    examples/getting_started/
-     |- 00100 - Title.svg
-     |- 00200 - Introduction.svg
-     |- 00300 - ???.svg
-     |- 00400 - Profit.svg
-
-*Tip: Use BASIC-style line numbering for your file numbers, this makes it
-easier to reorganise them later -- Slidie also provides the `slidie-mv` utility
-to assist. You don't have to do this, though: Slidie will still order your
-files correctly.*
-
-You can then build the slide show into a single PDF or standalone web page
-using:
-
-    $ slidie examples/getting_started/ -o examples/getting_started.pdf
-    $ slidie examples/getting_started/ -o examples/getting_started.xhtml
-
-See [`getting_started.pdf`](./docs/source/_static/examples/getting_started.pdf) and
-[`getting_started.xhtml`](./docs/source/_static/examples/getting_started.xhtml).
-
-*Tip: The standalone web page files must have the `.xhtml` extension and not
-just `.html`.*
-
-The standalone XHTML page can be opened without a local web server and provides
-a complete tool for running a presentation including a presenter view. More
-dynamic features such as embedded videos only available in the XHTML output.
-
-If you want to make a slide reveal certain layers to build up step-by-step, you
-can add build step annotations in angle brackets to the layer name in Inkscape
-like so:
-
-![Specially labelled layers](./docs/source/_static/build_steps_screenshot.png)
-
-Slidie will render this SVG into four separate slides (build steps are numbered
-from zero!):
-
-![Diagram building up](./docs/source/_static/build_steps.png)
-
-*Tip: The build syntax is far more powerful (and ergonomic) than this quick
-example lets on. See the rest of the documentation for more!*
-
-To add speaker notes to a slide, write your notes in Markdown in a text element
-into your SVG starting with the magic string `###` on its own line. This
-element will be stripped from the output and the speaker notes displayed in the
-web viewer and presenter view.
-
-![Speaker notes in Inkscape](./docs/source/_static/speaker_notes_source_screenshot.png)
-
-The speaker notes are displayed in the viewer as markdown:
-
-![Speaker notes in XHTML viewer](./docs/source/_static/speaker_notes_viewer_screenshot.png)
-
-To add a video, draw a rectangle where you want the video and add a text
-element with the following:
-
-    @@@
-    video = "path/to/video.mp4"
-
-Group the rectangle and element together and when the presentation is displayed
-they will be replaced with a video player:
-
-![A video playing with the XHTML viewer](./docs/source/_static/video_viewer_screenshot.png)
-
-*Tip: Magic text elements starting with `@@@` can do a few other neat things
-which are covered in the documentation.*
-
-For a lot more detail, see the manual.
 
 
 Preemptive FAQ
@@ -175,3 +99,8 @@ past](http://jhnet.co.uk/misc/handWavyPCIe.pdf), I've reluctantly concluded it
 usually just too slow to author for slides in most situations.
 
 
+### What about non-Inkscape SVG authoring tools
+
+They're cool too, but I just don't support them (yet). You can still use these
+to create slides, but slidie's step-by-step build-up system currently depends
+on Inkscape's layers mechanism and so this feature will not be usable.
