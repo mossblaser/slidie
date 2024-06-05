@@ -26,6 +26,8 @@ the output format produced. Supported extensions are ``.xhtml``, ``.pdf`` and
 ``.png``. See the sections below for details of the various formats.
 
 
+.. _rendering-formats:
+
 Supported output formats
 ------------------------
 
