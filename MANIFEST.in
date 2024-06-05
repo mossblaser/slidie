@@ -1,3 +1,4 @@
 include slidie/render_xhtml/*.xhtml
-include slidie/render_xhtml/*.js
 include slidie/render_xhtml/*.css
+include slidie/render_xhtml/viewer/*.js
+include slidie/render_xhtml/viewer/*.js.map
