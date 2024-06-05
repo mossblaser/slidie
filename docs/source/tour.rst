@@ -4,24 +4,24 @@ Slidie Guided Tour
 ==================
 
 This document provides a very high-level guided tour of many of Slidie's main
-features, with links to more in-depth documentation as required.
+features, with links to more in-depth documentation.
 
 
-Part 0: Create some slides
---------------------------
+Part 0: Creating slides
+-----------------------
 
 Lets start by creating some very simple slides. This is as easy as creating
 slide-shaped SVGs using Inkscape.
 
-A 1920x1080 pixel page size works well for slides and can be set in the
-'Document Properties' panel (found in the 'File' mennu).
+A 1920×1080 pixel page size works well for slides and can be set in the
+'Document Properties' panel (found in the 'File' menu).
 
-Since slides are usually intended for screen display I like to switch the
-display units to pixels too.
+Since slides are usually intended for screen display it makes sense to switch
+the default display units to pixels too.
 
 .. image:: _static/document_properties.png
     :alt:
-        The document properties panel with 1920x1080 pixel size and pixel units
+        The document properties panel with 1920×1080 pixel size and pixel units
         set.
 
 Each SVG file's name must begin with a number which controls the order in which
@@ -33,23 +33,20 @@ like:
 * ...
 * ``1400 - Conclusions.svg``
 
-.. tip::
 
-    Using BASIC-style numbering makes reordering slides easier.
+Part 1: Rendering slides
+------------------------
 
-Part 1: Render your slides
---------------------------
-
-To render your slides into a standalone XHTML viewer, PDF, or directory full of
-PNG images, use the ``slidie`` command::
+To render your directory full of SVG files into a slide show, use the
+``slidie`` command::
 
     $ cd path/to/slides/
     $ slidie
 
 By default, slidie will build the slides in the current directory into a
-standalone XHTML file called ``out.xhtml`` which can be opened directly in your
-web browser (no server required). Slidie XHTML files are completely self
-contained and can be distributed independently of the source SVG files.
+standalone XHTML file called ``out.xhtml``. This can be opened directly in your
+web browser (no server required). Slidie XHTML files are completely
+self-contained and can be distributed independently of the source SVG files.
 
 .. image:: _static/xhtml_viewer.png
     :alt: The XHTML viewer showing an example presentation.
@@ -68,25 +65,25 @@ format.
 
 .. seealso::
     
-    :ref:`xhtml-viewer`
-        For more details on how to use the XHTML viewer application.
+    :ref:`rendering-formats`
+        For a comparison of all supported output formats.
     
-    :ref:`rendering`
-        For details of all supported output formats.
+    :ref:`xhtml-viewer`
+        For more details on the functionality of the XHTML viewer application.
 
 
 Part 2: Reordering slides
 -------------------------
 
-Using BASIC-style numbers for your slides (i.e. incrementing by 100) makes it
-easier to change the relative ordering of slides. For example, given the
-following:
+Using BASIC-style numbers for your slides (e.g. incrementing the number by 10
+or 100) makes it easier to reorder slides by renumbering them. For example,
+given the following:
 
 * 100 - a.svg
 * 200 - b.svg
 * 300 - c.svg
 
-You can move the slide 'C' between 'A' and 'B' by renumbering it to 150.
+You can move the slide 'C' in-between 'A' and 'B' by renumbering it to 150.
 
 To make this process easier, Slidie includes the ``slidie-mv`` command. You
 could achieve the same reordering as the example above using::
@@ -96,18 +93,21 @@ could achieve the same reordering as the example above using::
 You can alternatively use ``--after <slide>``, ``--start`` or ``--end`` to
 specify the target location. You can also move several slides in one go.
 
-If no gap in numbering exists, the ``slidie-mv`` command will attempt to rename
-a minimum of other slides to make the slides fit.
+If necessary, ``slidie-mv`` command will automatically rename a minimal number
+of adjacent slides if no gap in the numbering is available.
 
 
 .. seealso::
 
+    :ref:`file-numbering`
+        For more slide numbering suggestions and rules.
+    
     :ref:`slidie-mv`
         Full command usage reference.
 
 
-Part 3: Build up a slide step-by-step
--------------------------------------
+Part 3: Building up slides step-by-step
+---------------------------------------
 
 Sometimes it is useful to build up the displayed contents of a slide over
 several steps. Slidie allows you to reveal (or hide) layers step-by-step by
@@ -152,8 +152,8 @@ layers. See the :ref:`documentation <builds>` for a complete introduction.
 
 
 
-Part 4: Add speaker notes
--------------------------
+Part 4: Adding speaker notes
+----------------------------
 
 To add speaker notes to a slide, create a text box and type ``###`` (three
 hashes) followed by a newline. Add your speaker notes to the remaining lines.
@@ -178,125 +178,96 @@ Though it is probably most readable to place your speaker notes off the side of
 the page in your SVG, it is not necessary: Slidie removes the text from the
 slide during rendering.
 
-If you place speaker notes on layers selectively displayed during a build up,
-those notes will be shown faded-out in the viewer before that build step is
-reached.
+If you place speaker notes on layers selectively displayed during a :ref:`build
+up <builds>`, those notes will be shown faded-out in the viewer before that
+build step is reached.
 
-.. note::
+.. seealso::
 
-    Speaker notes are, unfortunately, currently only available in the XHTML
-    viewer and are inaccessible in other output formats.
+    :ref:`speaker-notes`
+        For full details on creating and using speaker notes.
 
 
-Part 5: Create clickable links between slides
----------------------------------------------
+Part 5: Creating hyperlinks between slides
+------------------------------------------
 
-You might not have realised but Inkscape allows you to create hyperlinks in
-your SVGs by right clicking an object and clicking 'Create anchor
-(hyperlink)'.
-
-You can create links to external resources by entering an ordinary URL in the
-'Href' box of the 'Link properties' panel.
-
-.. tip::
-
-    When linking to external resources, set the target to ``_blank`` to make
-    the link open in a new window (rather than navigating away from the XHTML
-    viewer!).
-
-To create a link to another slide, make a link like ``#NNN``. For example, to
-create a link to the fourth slide use ``#4`` (slides are numbered from '1').
+Hyperlinks can be created in Inkscape by right clicking an object and clicking
+'Create anchor (hyperlink)' and entering a URL in the 'Href' box of the 'Link
+properties' panel. Links can also be created within a slide show using links
+like ``#4`` which creates a link to the fourth slide (slides are numbered from
+'1').
 
 .. image:: _static/hyperlink_screenshot.png
     :alt:
         A screenshot showing setting up a hyperlink in Inkscape
 
-You can also link to a specific build step on a slide using syntax
-``#NNN<MMM>`` which links to slide ``NNN``, step ``MMM``. To link to a
-particular build step on the *current* slide, just use ``#<MMM>``.
+You can also link to a specific :ref:`build steps <builds>` like ``#4<2>``
+which links to build step 2 on slide 4. Links to build steps on the current
+slide can omit the slide number (e.g. ``#<2>``).
+
+.. tip::
+
+    The XHTML viewer places the current slide number in the URL bar.
 
 .. seealso::
 
     :ref:`links`
         For a complete introduction to the inter-slide link syntax. You can
-        also learn how to reference slides and steps using user-defined names
-        to avoid relying on brittle slide and step numbers.
-
-
-.. tip::
-
-    The XHTML viewer places the current slide number in the URL bar and you can
-    test link definitions by typing them there, or in the slide number box at
-    the top left.
+        also learn how to reference slides and steps using names rather than
+        rather brittle slide and step numbers.
 
 
 
-Part 6: Add a video clip (and Slidie's magic text feature)
-----------------------------------------------------------
+Part 6: Adding a video clips to slides
+--------------------------------------
 
 Slidie supports the inclusion of a number of dynamic elements not natively
-supported by SVG such as videos and iframes (embedded web browsers). These
-inclusions make use of a Slidie feature (nerve-wrackingly) called 'magic text'.
+supported by SVG such as :ref:`videos <video>` and :ref:`iframes <iframe>`
+(embedded web browsers). These inclusions make use of a Slidie feature
+(nerve-wrackingly) called :ref:`'magic text' <magic-text>`.
 
-In this example, lets insert a video into a slide, draw a rectangle where the
-video should appear and then, on top, add a text box containing something like
+To insert a video into a slide, first draw a placeholder rectangle or image
+where the video should appear. Next, add a text box containing something like
 the following::
 
     @@@
     video = "path/or/url/to/video.mp4"
 
-Finally, combine the rectangle and text in a group.
+Finally, combine the placeholder and text in a group (e.g. using Ctrl+G).
 
 .. image:: _static/video_inkscape_screenshot.png
     :alt:
         A screenshot of a video defined in Inkscape using Slidie's magic text
         feature.
 
-The ``@@@`` syntax marks what follows as a 'magic' text block which Slidie will
-treat specially. In this case, we've indicated that we want to substitute the
-grouped rectangle with a video player. If we render our slide we get something
-like this:
+The ``@@@`` syntax marks what follows as a :ref:`'magic' <magic-text>` text
+block which Slidie will treat specially. In this case, we've indicated that we
+want to substitute the placeholder with a video player. When we render our
+slide we get something like this:
 
 .. image:: _static/video_viewer_screenshot.png
     :alt:
         A screenshot of a video playing on a slide.
 
-In PDF and PNG outputs Slidie will only show the placeholder rectangle. (This
-is true of the XHTML viewer's slide thumbnails too!) To make it more obvious
-what's going on, you can replace the rectangle with an image to use as a
-placeholder. The ``slidie-video-stills`` command is provided which can do this
-automatically::
+In PDF and PNG outputs (where videos are not supported) Slidie will only show
+the placeholder.
 
-    $ slidie-video-stills path/to/slide.svg
 
 .. warning::
-    
-    Unlike other media, Slidie does *not* embed video data into the XHTML
-    output format. For local video files, you must take care to distribute the
-    video files and viewer together.
-    
-    This situation is not ideal but is currently neccessary because of the
-    limited size of `data URLs
-    <https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs>`_
-    supported by major browsers.
 
-.. note::
-    
-    Videos are only supported in Slidie's XHTML output format. When exported to
-    other formats, the placeholder rectangle or image will be shown instead.
-    
-    Whilst PDF does *technically* support embedding videos, viewer support is
-    typically crude, janky or most often missing entirely. Further, producing a
-    standards-conforming PDF with an embedded video supported by the few
-    capable PDF viewers involves both Flash media player binaries and blobs of
-    Javascript calling undocumented APIs. Its really bad. In short, the author
-    decided that implementing this feature would be in poor taste, not to
-    mention of limited practical value.
+    There are quite a few caveats around Slidie's video support (seemingly like
+    every other slide preparation tool...). Make sure to read the :ref:`full
+    documentation for details <video>`.
+
 
 .. seealso::
 
     :ref:`video`
         For further details of Slidie's video embedding support.
+
+    :ref:`slidie-video-stills`
+        The ``slidie-video-stills`` command can automatically substitute a
+        placeholder rectangle with an image placeholder in slides.
 
     :ref:`iframe`
         For how to conveniently embed iframes (i.e. web browsers) into slides.

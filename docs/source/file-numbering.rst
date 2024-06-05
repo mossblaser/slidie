@@ -21,6 +21,7 @@ number. Slide numbers may be negative (start with ``-``). They may also have
 explicit leading ``+``. Leading zeros are ignored.
 
 
+.. _file-numbering-tips:
 
 Practical tips
 --------------
