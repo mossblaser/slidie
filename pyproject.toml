@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "slidie"
 dependencies = ["pikepdf"]
 dynamic = ["version"]
+license = {file = "LICENCE"}
 
 [tool.setuptools.dynamic]
 version = {attr = "slidie.__version__"}
