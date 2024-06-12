@@ -46,16 +46,16 @@
             
   <section id="video">
 <span id="id1"></span><h1>Video<a class="headerlink" href="#video" title="Link to this heading">¶</a></h1>
-<p>Basic support for adding videos to slides is included in slidie via the
+<p>Basic support for adding videos to slides is included in Slidie via the
 <code class="docutils literal notranslate"><span class="pre">video</span></code> <a class="reference internal" href="magic-text.html#magic-text"><span class="std std-ref">magic text</span></a> value.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Video support in slidie is relatively limited and comes with far more
+<p>Video support in Slidie is relatively limited and comes with far more
 caveats than other features.</p>
 <p>The author would feel worse about this if not for the fact that every other
 presentation tool seems to fumble video handling in their own unique ways.</p>
 </div>
-<p>Embedded videos are only supported in the <a class="reference internal" href="rendering.html#rendering-xhtml"><span class="std std-ref">XHTML viewer</span></a>. A user-defined placeholder will be output for other
+<p>Embedded videos are only supported in the <a class="reference internal" href="rendering.html#rendering-xhtml"><span class="std std-ref">XHTML viewer</span></a>. The user-defined placeholder will be shown in other
 output formats.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -63,9 +63,9 @@ output formats.</p>
 usable in practice. For example, viewer support is extremely limited and
 often very unreliable. Implementing video embeddings which happen to be
 compatible with the already-small pool of capable viewers is also
-horrendous and involves terms like “Flash” and “undocumented Javascript
-API”. In short, I’m afraid the author eventually concluded that they did
-not want to go there, despite serious efforts to do so.</p>
+horrendous and involves things like Flash(!) and undocumented Javascript
+APIs. In short, I’m afraid the author eventually concluded that they did
+not want to go there, despite serious good-faith efforts to do so.</p>
 </div>
 <img alt="A screenshot of a video defined in Inkscape using Slidie's magic text feature." src="_images/video_inkscape_screenshot.png" />
 <img alt="A screenshot of a video playing on a slide." src="_images/video_viewer_screenshot.png" />
@@ -91,10 +91,10 @@ adjacently to the rendered XHTML viewer.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Slidie does not attempt to embed videos within the generated XHTML output
-due to <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs#length_limitations">browser limitations on data URL lengths being too small for many
-videos</a>.
-Care must be taken to ensure that any adjacent video files are stored and
-distributed together with the generated XHTML output.</p>
+due to <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs#length_limitations">browser limitations on data URL lengths</a>.
+Care must be taken to ensure that local video files are stored and
+distributed together with the generated XHTML output in the correct
+relative location.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -104,7 +104,7 @@ the viewer is loaded from a <code class="docutils literal notranslate"><span cla
 <p>The optional <code class="docutils literal notranslate"><span class="pre">start</span></code> time controls the point at which the video will play.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">loop</span></code> is true, the video will be restart from the beginning when it
 reaches the end (even if <code class="docutils literal notranslate"><span class="pre">start</span></code> is set to a non-zero value).</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">mute</span></code> is true, audio will not be played back.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">mute</span></code> is true, audio will be muted.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Due to browser autoplay restrictions, videos placed on the first slide in
@@ -116,17 +116,21 @@ again. Videos on other slides should play correctly, however.</p>
 <p>Slidie currently does not include any mechanism for controling playback:
 media will always automatically start from the specified offset upon
 entering the slide and play to completion (or slide exit, if <code class="docutils literal notranslate"><span class="pre">loop</span></code> is
-set).</p>
+set). This may be addressed in a future release. In the meantime, some
+browsers allow you to right-click and choose ‘show controls’.</p>
 </div>
 </section>
 <section id="automatic-video-placeholder-generation">
 <span id="slidie-video-stills"></span><h2>Automatic video placeholder generation<a class="headerlink" href="#automatic-video-placeholder-generation" title="Link to this heading">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">slidie-video-stills</span></code> command will automatically extract a still frame
-from embedded videos and set it as the placeholder image for the video.</p>
+from embedded videos and insert it as the placeholder image for the video.</p>
 <p>Usage:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ slidie-video-stills path/to/slide.svg
 </pre></div>
 </div>
+<p>Using <code class="docutils literal notranslate"><span class="pre">slidie-video-stills</span></code>, you can quicly lay out videos your slides using
+simple rectangle placeholders and later replace them automatically with stills
+for the benefit of thumbnails and non-XHTML output formats.</p>
 </section>
 </section>
 

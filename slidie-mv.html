@@ -46,14 +46,16 @@
             
   <section id="slidie-mv-slide-renumbering-tool">
 <span id="slidie-mv"></span><h1><code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code>: Slide renumbering tool<a class="headerlink" href="#slidie-mv-slide-renumbering-tool" title="Link to this heading">¶</a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code> command can be used to reorder slides by renumbering them.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code> command can be used to reorder slides by <a class="reference internal" href="file-numbering.html#file-numbering"><span class="std std-ref">renumbering</span></a> them.</p>
 <section id="reordering-slides">
 <h2>Reordering slides<a class="headerlink" href="#reordering-slides" title="Link to this heading">¶</a></h2>
 <p>The following example illustrates how two slides could be renumbered to move
 them later in a show:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ slidie-mv 100-foo.svg 200-bar.svg --after 300-bar.svg
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ slidie-mv 100-foo.svg 200-bar.svg --after 300-baz.svg
 </pre></div>
 </div>
+<p>The result would be that the slides <code class="docutils literal notranslate"><span class="pre">100-foo.svg</span></code> and <code class="docutils literal notranslate"><span class="pre">100-bar.svg</span></code> would
+be given new numerical prefixes like <code class="docutils literal notranslate"><span class="pre">400-foo.svg</span></code> and <code class="docutils literal notranslate"><span class="pre">500-bar.svg</span></code>.</p>
 <p>As well as <code class="docutils literal notranslate"><span class="pre">--after</span> <span class="pre">&lt;slide&gt;</span></code> you can also use <code class="docutils literal notranslate"><span class="pre">--before</span> <span class="pre">&lt;slide&gt;</span></code>,
 <code class="docutils literal notranslate"><span class="pre">--start</span></code> or <code class="docutils literal notranslate"><span class="pre">--end</span></code> to specify the destination.</p>
 <p>Whenever possible <code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code> will attempt to rename as few files as
@@ -66,26 +68,27 @@ it will guess the ‘normal’ gap between slide numbers and the number of
 digits to zero-pad to.</p>
 </div>
 </section>
-<section id="creating-a-gap">
-<h2>Creating a gap<a class="headerlink" href="#creating-a-gap" title="Link to this heading">¶</a></h2>
-<p>If you want to create a gab between two adjacently numbered slides for a new
-slide you can use the <code class="docutils literal notranslate"><span class="pre">--insert</span> <span class="pre">&lt;count&gt;</span></code> argument instead of a list of
-existing slides to move.</p>
-<p>For example say we have two slides <code class="docutils literal notranslate"><span class="pre">299-foo.svg</span></code> and <code class="docutils literal notranslate"><span class="pre">300-bar.svg</span></code> and we
-want to insert a new slide between them we could use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ slidie-mv --insert 1 --before 300-bar.svg
+<section id="inserting-new-slides">
+<h2>Inserting new slides<a class="headerlink" href="#inserting-new-slides" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code> can also suggest new slide numbers to use to insert new slides
+into your presentation using <code class="docutils literal notranslate"><span class="pre">--insert</span> <span class="pre">&lt;count&gt;</span></code>, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ slidie-mv --insert 1 --after 300-foo.svg
 400
 </pre></div>
 </div>
-<p>In the example above, <code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code> will automatically renumber either
-<code class="docutils literal notranslate"><span class="pre">299-foo.svg</span></code> or <code class="docutils literal notranslate"><span class="pre">300-bar.svg</span></code> to make room and print the slide number(s)
-to use for your new slides.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code> will prefer o to move whichever file results in the last
-number of renaming operations, or all else being equal, whichever leads to
-leaving the biggest gaps between the new file numbers.</p>
-</div>
+<p>In the example above, <code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code> suggested we asign our new slide the number
+400.</p>
+</section>
+<section id="creating-gaps">
+<h2>Creating gaps<a class="headerlink" href="#creating-gaps" title="Link to this heading">¶</a></h2>
+<p>For example say we have two slides <code class="docutils literal notranslate"><span class="pre">300-foo.svg</span></code> and <code class="docutils literal notranslate"><span class="pre">301-bar.svg</span></code> and we
+want to move a slide in between them, Slidie will have to rename not just the
+moved slide but also either <code class="docutils literal notranslate"><span class="pre">300-foo.svg</span></code> or <code class="docutils literal notranslate"><span class="pre">301-bar.svg</span></code> (and potentially
+any further immediate adjacent slides).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code> command will determine which files to rename, prioritising
+keeping the number of files renamed to a minimum (to keep version control
+history cleaner) and maximise the spacing of the resulting numbers (to maximise
+the chances of gaps existing in the future).</p>
 </section>
 <section id="renumbering-all-slides">
 <h2>Renumbering all slides<a class="headerlink" href="#renumbering-all-slides" title="Link to this heading">¶</a></h2>
@@ -155,7 +158,8 @@ options:
     <ul>
 <li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code>: Slide renumbering tool</a><ul>
 <li><a class="reference internal" href="#reordering-slides">Reordering slides</a></li>
-<li><a class="reference internal" href="#creating-a-gap">Creating a gap</a></li>
+<li><a class="reference internal" href="#inserting-new-slides">Inserting new slides</a></li>
+<li><a class="reference internal" href="#creating-gaps">Creating gaps</a></li>
 <li><a class="reference internal" href="#renumbering-all-slides">Renumbering all slides</a></li>
 <li><a class="reference internal" href="#managing-slides-in-git">Managing slides in Git</a></li>
 <li><a class="reference internal" href="#argument-reference">Argument reference</a></li>

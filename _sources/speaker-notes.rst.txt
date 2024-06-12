@@ -5,8 +5,7 @@ Speaker notes
 
 Speaker notes can be added to a slide by creating a text box whose first line
 contains ``###`` (three hashes). The remainder of the textbox contains the
-speaker notes in markdown_ format. Any special SVG text formatting will be
-ignored.
+speaker notes in markdown_ format. SVG text formatting is ignored.
 
 .. _markdown: https://en.wikipedia.org/wiki/Markdown
 
@@ -14,10 +13,11 @@ ignored.
     :alt:
         A screenshot of Inkscape with a set of speaker notes.
 
-When rendered, the textbox containing the speaker notes will be made invisible
-and so its physical location within the page is unimportant. At the time of
-writing, :ref:`only the XHTML output format supports displaying speaker notes
-<rendering-formats>`. In other formats, the speaker notes are simply removed.
+When rendered, the text box containing the speaker notes will be made invisible
+and so its doesn't *need* to be placed off the edge of the page -- though this
+is often convenient. At the time of writing, :ref:`only the XHTML output format
+supports displaying speaker notes <rendering-formats>`. In other formats, the
+speaker notes are simply removed.
 
 .. image:: _static/speaker_notes_viewer_screenshot.png
     :alt:
@@ -40,6 +40,5 @@ document. This means that the top-most notes on the top-most layers will be
 shown first.
 
 Speaker note text boxes placed on layers with :ref:`build steps <builds>` are
-treated as only being applicable whilst that layer is visible. In the XHTML
-output format, these notes will be dimmed out (but still visible) when the
-layer is hidden.
+treated as only being relevant whilst that layer is visible: these notes are
+shown dimmed out when the layer they're on is not visible.

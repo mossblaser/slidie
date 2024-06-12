@@ -43,7 +43,7 @@ To render your directory full of SVG files into a slide show, use the
     $ cd path/to/slides/
     $ slidie
 
-By default, slidie will build the slides in the current directory into a
+By default, Slidie will build the slides in the current directory into a
 standalone XHTML file called ``out.xhtml``. This can be opened directly in your
 web browser (no server required). Slidie XHTML files are completely
 self-contained and can be distributed independently of the source SVG files.

@@ -14,7 +14,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="The Slidie XHTML Viewer" href="xhtml-viewer.html" />
-    <link rel="prev" title="Creating hyperlinks between slides" href="links.html" />
+    <link rel="prev" title="Slidie Guided Tour" href="tour.html" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
@@ -32,7 +32,7 @@
           <a href="xhtml-viewer.html" title="The Slidie XHTML Viewer"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="links.html" title="Creating hyperlinks between slides"
+          <a href="tour.html" title="Slidie Guided Tour"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Slidie 0.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><code class="docutils literal notranslate"><span class="pre">slidie</span></code> command</a></li> 
@@ -52,7 +52,7 @@ files.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ slidie [SOURCE ...] [--output OUTPUT]
 </pre></div>
 </div>
-<p>If the source is omitted, slidie will look for slide SVGs in the current
+<p>If the source is omitted, Slidie will look for slide SVGs in the current
 directory. Otherwise, the source can be a directory name (containing
 <a class="reference internal" href="file-numbering.html#file-numbering"><span class="std std-ref">numbered</span></a> SVG files) or an explicit list of SVG files
 (which need not be numbered and will be combined in the order given).</p>
@@ -131,7 +131,7 @@ text as well as support for more dynamic content (e.g. videos).</p>
 <td><p>–</p></td>
 <td><p>–</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">IFrames</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">iframes</span></a></p></td>
 <td><p>✔ <a class="footnote-reference brackets" href="#f3" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a></p></td>
 <td><p>–</p></td>
 <td><p>–</p></td>
@@ -152,7 +152,7 @@ implemented in the future.</p>
 <aside class="footnote brackets" id="f3" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></span>
 <span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
-<p>Videos and IFrames are not supported on Webkit based browsers (e.g.
+<p>Videos and iframes are not supported in Webkit based browsers (e.g.
 Safari) due to rendering bugs in that browser engine at the time of
 writing. This might one day fix itself.</p>
 </aside>
@@ -165,21 +165,21 @@ by modern browsers with no need for a web server or internet connection.</p>
 <img alt="The XHTML viewer application open in a browser." src="_images/xhtml_viewer.png" />
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Slidie generates XHTML, not HTML, since it directly incorporates full
+<p>Slidie generates XHTML, not HTML. The XHTML directly includes full
 (XML-based) SVG files and depends on XML processing features not available
 in regular HTML documents.</p>
 </div>
 <p>Whilst the XHTML viewer application can be hosted on a web server, it is
 designed to function correctly when loaded directly from a <code class="docutils literal notranslate"><span class="pre">file://</span></code> URL.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Some browsers place extra restrictions on <a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">IFrames</span></a> when
-running from a <code class="docutils literal notranslate"><span class="pre">file://</span></code> URL. This can cause embedded IFrames to silently
-ignore keyboard and mouse input. In this situation, using a simple web
-server (e.g. <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">http.server</span></code>) might be necessary.</p>
-</div>
 <p>The generated file is entirely self-contained, including all slide graphics,
 fonts and the viewer application and should be openable on other systems.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>An exception is if your SVGs reference external files (rather than
+embedding them), the generated XHTML viewer will also reference, rather
+than embedding those files. In this case you’ll need to take care to keep
+the viewer and these files together.</p>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Unfortunately there is not a straightforward mechanism to do automatic font
@@ -209,7 +209,7 @@ features:</p>
 stored once in the PDF file).</p></li>
 <li><p>Font embedding.</p></li>
 </ul>
-<img alt="A slidie PDF in a PDF viewer showing a rich table of contents and custom page numbering." src="_images/getting_started_pdf_screenshot.png" />
+<img alt="A Slidie PDF in a PDF viewer showing a rich table of contents and custom page numbering." src="_images/getting_started_pdf_screenshot.png" />
 </section>
 <section id="png">
 <span id="rendering-png"></span><h3>PNG<a class="headerlink" href="#png" title="Link to this heading">¶</a></h3>
@@ -219,7 +219,7 @@ an individual PNG file.</p>
 <p>The resolution of the generated PNGs may be overriden from the default of 96
 DPI using the <code class="docutils literal notranslate"><span class="pre">--png-dpi</span></code> argument.</p>
 <p>By default, PNGs will be rendered with fully-opaque backgrounds. This may be
-overridden using the <cite>–png-background-opacity`</cite> argument.</p>
+overridden using the <code class="docutils literal notranslate"><span class="pre">--png-background-opacity</span></code> argument.</p>
 <p>The generated PNGs are assigned ascending numbers (starting from 1).</p>
 <p>By default a <code class="docutils literal notranslate"><span class="pre">NNN_</span></code> prefix is added to the supplied filename where <code class="docutils literal notranslate"><span class="pre">NNN</span></code> is
 the three-digit zero-padded number assigned to that file. Alternatively, if the
@@ -258,7 +258,7 @@ filename contains a valid <a class="reference external" href="https://docs.pytho
   </div><h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation index</a><ul>
-      <li>Previous: <a href="links.html" title="previous chapter">Creating hyperlinks between slides</a></li>
+      <li>Previous: <a href="tour.html" title="previous chapter">Slidie Guided Tour</a></li>
       <li>Next: <a href="xhtml-viewer.html" title="next chapter">The Slidie XHTML Viewer</a></li>
   </ul></li>
 </ul>

@@ -52,7 +52,8 @@ provides the ‘magic’ text feature.</p>
 ‘at’ signs). The remainder of the text box’s contents is interpreted as a <a class="reference external" href="https://toml.io/en/">TOML</a>
 document and must define <em>exactly one</em> value.</p>
 <p>As an example, both of the following are valid magic text values: both define a
-single top-level value – <code class="docutils literal notranslate"><span class="pre">video</span></code>.</p>
+single top-level value – <code class="docutils literal notranslate"><span class="pre">video</span></code> – though in the latter case that value
+contains a complex datastructure with multiple sub-values.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">@@@</span>
 <span class="n">video</span> <span class="o">=</span> <span class="s2">&quot;http://example.com/example.mp4&quot;</span>
 </pre></div>
@@ -66,7 +67,7 @@ single top-level value – <code class="docutils literal notranslate"><span clas
 </pre></div>
 </div>
 <p>Magic text boxes are removed from slides during rendering and do not appear in
-the output.</p>
+the output. As a result they can be placed wherever is convenient on a slide.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>If you want to create a text box in your slide whose first line is <code class="docutils literal notranslate"><span class="pre">&#64;&#64;&#64;</span></code>
@@ -76,7 +77,7 @@ prevent Slidie treating it as magic text.</p>
 </div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p>See the following for supported magic text values:</p>
+<p>See the following supported magic-text-based functions:</p>
 <dl class="simple">
 <dt><a class="reference internal" href="video.html#video"><span class="std std-ref">Video</span></a></dt><dd><p>Uses the <code class="docutils literal notranslate"><span class="pre">video</span></code> magic text value.</p>
 </dd>
@@ -96,7 +97,7 @@ day be addressed…</p>
 </div>
 <section id="magic-rectangles">
 <span id="id2"></span><h2>Magic rectangles<a class="headerlink" href="#magic-rectangles" title="Link to this heading">¶</a></h2>
-<p>In some cases (such as <a class="reference internal" href="video.html#video"><span class="std std-ref">videos</span></a> and <a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">IFrames</span></a>), a
+<p>In some cases (such as <a class="reference internal" href="video.html#video"><span class="std std-ref">videos</span></a> and <a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">iframes</span></a>), a
 magic text definition must be associated with a rectangular region on a slide.
 To do this you should group a placeholder SVG rectangle or image object with
 the magic text box.</p>

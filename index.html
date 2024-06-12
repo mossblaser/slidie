@@ -70,6 +70,26 @@ accompany a presentation.</p>
 <section id="reference-manual">
 <h2>Reference manual<a class="headerlink" href="#reference-manual" title="Link to this heading">¶</a></h2>
 <p>The following documentation describes each of Slidie’s features in detail.</p>
+<section id="output-formats">
+<h3>Output formats<a class="headerlink" href="#output-formats" title="Link to this heading">¶</a></h3>
+<p>Slidie supports rendering slide shows as <a class="reference internal" href="rendering.html#rendering-xhtml"><span class="std std-ref">XHTML</span></a>,
+<a class="reference internal" href="rendering.html#rendering-pdf"><span class="std std-ref">PDF</span></a> and <a class="reference internal" href="rendering.html#rendering-png"><span class="std std-ref">PNG</span></a> formats, albeit with
+slightly different sets of supported features beyond the core functionality.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rendering.html"><code class="docutils literal notranslate"><span class="pre">slidie</span></code> command</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rendering.html#supported-output-formats">Supported output formats</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="xhtml-viewer.html">The Slidie XHTML Viewer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="xhtml-viewer.html#user-interface">User interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xhtml-viewer.html#presenter-view">Presenter view</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xhtml-viewer.html#browser-quirks">Browser quirks</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
 <section id="file-numbering">
 <h3>File numbering<a class="headerlink" href="#file-numbering" title="Link to this heading">¶</a></h3>
 <p>Slidie orders SVG files in a directory <a class="reference internal" href="file-numbering.html#file-numbering"><span class="std std-ref">based on numbers at the start of their
@@ -83,7 +103,8 @@ command for conveniently renumbering SVG files to reorganise slides in a show.</
 </li>
 <li class="toctree-l1"><a class="reference internal" href="slidie-mv.html"><code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code>: Slide renumbering tool</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="slidie-mv.html#reordering-slides">Reordering slides</a></li>
-<li class="toctree-l2"><a class="reference internal" href="slidie-mv.html#creating-a-gap">Creating a gap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="slidie-mv.html#inserting-new-slides">Inserting new slides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="slidie-mv.html#creating-gaps">Creating gaps</a></li>
 <li class="toctree-l2"><a class="reference internal" href="slidie-mv.html#renumbering-all-slides">Renumbering all slides</a></li>
 <li class="toctree-l2"><a class="reference internal" href="slidie-mv.html#managing-slides-in-git">Managing slides in Git</a></li>
 <li class="toctree-l2"><a class="reference internal" href="slidie-mv.html#argument-reference">Argument reference</a></li>
@@ -118,26 +139,6 @@ special annotations in layer names.</p>
 <li class="toctree-l1"><a class="reference internal" href="links.html">Creating hyperlinks between slides</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="links.html#linking-to-slides">Linking to slides</a></li>
 <li class="toctree-l2"><a class="reference internal" href="links.html#linking-to-build-steps">Linking to build steps</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
-<section id="output-formats">
-<h3>Output formats<a class="headerlink" href="#output-formats" title="Link to this heading">¶</a></h3>
-<p>Slidie supports rendering slide shows as <a class="reference internal" href="rendering.html#rendering-xhtml"><span class="std std-ref">XHTML</span></a>,
-<a class="reference internal" href="rendering.html#rendering-pdf"><span class="std std-ref">PDF</span></a> and <a class="reference internal" href="rendering.html#rendering-png"><span class="std std-ref">PNG</span></a> formats, albeit with
-slightly different sets of supported features.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="rendering.html"><code class="docutils literal notranslate"><span class="pre">slidie</span></code> command</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="rendering.html#supported-output-formats">Supported output formats</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="xhtml-viewer.html">The Slidie XHTML Viewer</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="xhtml-viewer.html#user-interface">User interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xhtml-viewer.html#presenter-view">Presenter view</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xhtml-viewer.html#browser-quirks">Browser quirks</a></li>
 </ul>
 </li>
 </ul>
@@ -205,10 +206,10 @@ ordinary text boxes whose contents begin with <code class="docutils literal notr
 <li><a class="reference internal" href="#">Slidie</a><ul>
 <li><a class="reference internal" href="#guided-tour">Guided tour</a></li>
 <li><a class="reference internal" href="#reference-manual">Reference manual</a><ul>
+<li><a class="reference internal" href="#output-formats">Output formats</a></li>
 <li><a class="reference internal" href="#file-numbering">File numbering</a></li>
 <li><a class="reference internal" href="#slide-builds">Slide builds</a></li>
 <li><a class="reference internal" href="#links">Links</a></li>
-<li><a class="reference internal" href="#output-formats">Output formats</a></li>
 <li><a class="reference internal" href="#speaker-notes">Speaker notes</a></li>
 <li><a class="reference internal" href="#magic-text">Magic text</a></li>
 </ul>

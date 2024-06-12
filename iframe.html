@@ -48,13 +48,21 @@
 <span id="iframe"></span><h1>Creating <code class="docutils literal notranslate"><span class="pre">&lt;iframe&gt;</span></code> elements<a class="headerlink" href="#creating-iframe-elements" title="Link to this heading">¶</a></h1>
 <p>Slidie supports the inclusion of <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe">inline frames (iframes)</a> in slides
 when viewed in a web browser using the <a class="reference internal" href="rendering.html#rendering-xhtml"><span class="std std-ref">XHTML output format</span></a>. This relatively powerful feature enables you to embed
-arbitrary web content into your presentations. At its simplest, this can
-provide a simple browser instance within your presentation for demonstrating
-some website or application. It could also be used as the basis for developing
-custom live and/or interactive widgets for use in demonstrations: you have the
-full web platform at your disposal!</p>
+arbitrary web content into your presentations.</p>
 <img alt="A screenshot of an iframe defined in Inkscape using Slidie's magic text feature." src="_images/simple_iframe_inkscape_screenshot.png" />
 <img alt="A screenshot of an iframe displayed on a slide." src="_images/simple_iframe.png" />
+<p>At its simplest, an iframe can act as a basic web browser within your slide for
+demonstrating some website or application. It could also be used as the basis
+for developing custom live and/or interactive widgets for use in
+demonstrations: you have the full web platform at your disposal!</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference external" href="https://github.com/mossblaser/slidie-ttyd">slidie-ttyd</a></dt><dd><p>An interactive terminal widget you can insert into your slides using
+iframes.</p>
+</dd>
+</dl>
+</div>
 <section id="inserting-an-iframe">
 <h2>Inserting an iframe<a class="headerlink" href="#inserting-an-iframe" title="Link to this heading">¶</a></h2>
 <p>To insert an iframe into a slide, insert a <a class="reference internal" href="magic-text.html#magic-rectangles"><span class="std std-ref">placeholder rectangle or image</span></a> grouped with a <a class="reference internal" href="magic-text.html#magic-text"><span class="std std-ref">magic text</span></a> box with one
@@ -75,88 +83,104 @@ of the following forms:</p>
 <p>The purpose of the optional parameters is explained in subsequent sections.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If an iframe grabs, or is given, focus, slidie becomes unable to
-intercept keyboard shortcuts to advance through slides.</p>
+<p>If an iframe grabs, or is given, focus, Slidie becomes unable to
+intercept keyboard shortcuts to advance through slides. Beware of creating
+full-screen iframes!</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Some browsers will treat an ‘Escape’ key pressed within an iframe as a
+command to leave full-screen mode when entered by the ‘Full screen’ button
+in the XHTML viewer.</p>
+<p>If you want to be able to type an ‘Escape’ within an iframe, try using the ‘Hide
+UI’ button and the browser’s own full-screen function (e.g. by pressing
+F11). In this mode, browsers won’t usually intercept the ‘Escape’ key.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Some websites use various means to prevent their loading within iframes and
-so can’t be used.</p>
+<p>Some websites deliberately prevent themselves being loaded within iframes.
+Unfortunately there is no workaround for this.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Browsers often enforce fairly strict (and complicated) security rules
 around iframes. Most notably, Firefox will, in certain situations, prevent
 the user from interacting with iframes in pages loaded from <code class="docutils literal notranslate"><span class="pre">file://</span></code>
-URLs. For this reason, if you’re doing anything complex with iframes, it
-might be necessary to serve the XHTML viewer from a web server (e.g.
-<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">http.server</span></code>.</p>
+URLs. For this reason, if you’re doing anything complex or interactive with
+iframes, it might be necessary to serve the XHTML viewer from a web server
+(e.g.  <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">http.server</span></code>).</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>All iframes on all slides are be loaded as soon as the viewer is opened and
 remain loaded regardless of their visibility. Beware of the potential
-resources consumed and audio playback.</p>
-<p>A future version of slidie might add a <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">postMessage()</a>
-based API to inform iframes whether they are visible or not.</p>
+resources consumed and potential for background audio playback.</p>
+<p>A future version of Slidie might add a <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">postMessage()</a>
+based API to inform iframes whether they are visible or not. It might also
+allow them to be loaded and unloaded depending on slide visibility.</p>
 </div>
 </section>
 <section id="appending-url-query-parameters">
 <h2>Appending URL query parameters<a class="headerlink" href="#appending-url-query-parameters" title="Link to this heading">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">query</span></code> parameter of the long-form magic text value may be used to append
-extra query parameters to the provided URL. This may be convenient if you’re
-developing some widget for inclusion in your slides which is controlled by
-query parameters since slidie will handle the URL encoding of values for you.</p>
-<p>The query parameter may be specified in any of the two following forms:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Adds: foo=bar&amp;baz=qux&amp;baz=quo</span>
-<span class="n">query</span><span class="o">.</span><span class="n">foo</span> <span class="o">=</span> <span class="s2">&quot;bar&quot;</span>
-<span class="n">query</span><span class="o">.</span><span class="n">baz</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;qux&quot;</span><span class="p">,</span> <span class="s2">&quot;quo&quot;</span><span class="p">]</span>  <span class="c1"># Repeated query parameters</span>
+extra query parameters to the provided URL. This may be convenient for
+controling custom widgets within iframes. Slidie handles details URL encoding
+for you making it easy to pass in arbitrary data.</p>
+<p>Query parameters may be specified in one of the two following forms:</p>
+<dl>
+<dt><em>Concise form:</em></dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Adds: foo=one&amp;baz=two&amp;baz=three</span>
+<span class="n">query</span><span class="o">.</span><span class="n">foo</span> <span class="o">=</span> <span class="s2">&quot;one&quot;</span>
+<span class="n">query</span><span class="o">.</span><span class="n">bar</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;two&quot;</span><span class="p">,</span> <span class="s2">&quot;three&quot;</span><span class="p">]</span>  <span class="c1"># Repeated query parameters in a list</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Adds baz=qux&amp;foo=bar&amp;baz=quo</span>
+</dd>
+<dt><em>Verbose form (allowing arbitrary paramter ordering):</em></dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Adds foo=one&amp;bar=two&amp;foo=three</span>
 <span class="n">query</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;baz&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;qux&quot;</span><span class="p">},</span>
-    <span class="p">{</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span><span class="p">},</span>
-    <span class="p">{</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;baz&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;quo&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;one&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;two&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;three&quot;</span><span class="p">},</span>
 <span class="p">]</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 <p>The latter form is more verbose but makes it possible to control the relative
 order and interleaving of repeated query parameters.</p>
 </section>
 <section id="scaling">
 <h2>Scaling<a class="headerlink" href="#scaling" title="Link to this heading">¶</a></h2>
-<p>By default, the contents of the iframe will be scaled such that when the slide
-is displayed at its ‘native’ size, the iframe contents will also be rendered at
+<p>By default, the contents of iframes will be scaled such that when the slide is
+displayed at its ‘native’ size, the iframe contents will also be rendered at
 their native size. Likewise, if the slide is shown smaller (or larger) on
 screen, the iframe’s contents will be scaled accordingly.</p>
 <p>For example, in the example screenshot above, the slide has a native size of
-1920x1080 and so the example.com page appears very small in the scaled-down
-view of the slide.</p>
-<p>The optional <code class="docutils literal notranslate"><span class="pre">scale</span></code> parameter may be used to force the iframe contents to be
-rendered at a larger or smaller than usual scale. For example, setting
-<code class="docutils literal notranslate"><span class="pre">scale</span></code> to 2 will cause the iframe contents to be rendered at twice the
-native size. This may be helpful for making text more ledgible when slides are
-being shown on a projector or shared display.</p>
+1920x1080 and so the example.com page appears very small in the small
+viewer window shown above.</p>
+<p>The optional <code class="docutils literal notranslate"><span class="pre">scale</span></code> parameter may be used to apply a scaling factor the
+iframe contents. For example, setting <code class="docutils literal notranslate"><span class="pre">scale</span></code> to 2 will cause the iframe
+contents to be rendered at twice the native size. This can be helpful for
+making text more ledgible when slides are being shown on a projector or shared
+display.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>SVG transforms (and filter effects) applied to your placeholder rectangle
 will be applied to the resulting iframe as displayed in your browser. This
 means that you can create distorted browser windows which still function
-correctly – including accepting input, albeit with unusual shapes.</p>
+correctly, including accepting input.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Slidie goes to great lengths to achieve the scaling regime it does since
-the default scaling behaviour is almost never what you want, especially for
-Inkscape-authored SVGs whose document scaling factors are often arbitrary.
-You can, however, use the ‘native’ scaling by setting <code class="docutils literal notranslate"><span class="pre">scale</span></code> to 0.</p>
+<p>The scaling rules used for iframes by Slidie differ from the native SVG
+behaviour because the latter is almost never what you really want. This is
+particularly true for Inkscape-authored SVGs whose internal document
+scaling factors are often arbitrary. If you <em>really</em> want the native
+scaling behaviour, however, set <code class="docutils literal notranslate"><span class="pre">scale</span></code> to 0.</p>
 </div>
 </section>
 <section id="opening-hyperlinks-in-an-iframe">
 <h2>Opening hyperlinks in an iframe<a class="headerlink" href="#opening-hyperlinks-in-an-iframe" title="Link to this heading">¶</a></h2>
-<p>It is possible to add hyperlinks to your slides which open within an embedded
-iframe on that slide when clicked.</p>
+<p>It is possible to insert hyperlinks into your slides which open their targets
+within an embedded iframe rather than a new window.</p>
 <p>First, give the target iframe a name using the optional <code class="docutils literal notranslate"><span class="pre">name</span></code> parameter.
 This assigns a <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#name">HTML name attribute</a> to
 the iframe.</p>

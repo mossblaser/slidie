@@ -13,7 +13,7 @@
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="slidie command" href="rendering.html" />
+    <link rel="next" title="Speaker notes" href="speaker-notes.html" />
     <link rel="prev" title="Builds" href="builds.html" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -29,7 +29,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="rendering.html" title="slidie command"
+          <a href="speaker-notes.html" title="Speaker notes"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="builds.html" title="Builds"
@@ -58,22 +58,23 @@ URL to open the viewer at the specified slide.</p>
 and picking ‘Create anchor (hyperlink)’. Enter the destination URI in the
 ‘Href’ box.</p>
 <p>For links to external resources, you may wish to set the ‘Target’ to
-<code class="docutils literal notranslate"><span class="pre">_blank</span></code> to ensure the link opens in a new window when using Slidie’s
-browser-based XHTML viewer. For inter-slide links, leave this box empty.</p>
+<code class="docutils literal notranslate"><span class="pre">_blank</span></code> to ensure the link opens in a new window. For inter-slide links,
+leave this box empty.</p>
 <img alt="A screenshot showing setting up a hyperlink in Inkscape" src="_images/hyperlink_screenshot.png" />
 </div>
 <section id="linking-to-slides">
 <span id="links-slides"></span><h2>Linking to slides<a class="headerlink" href="#linking-to-slides" title="Link to this heading">¶</a></h2>
 <p>You can link to the Nth slide by creating a link to <code class="docutils literal notranslate"><span class="pre">#N</span></code>. For example, to
-link to slide 4, use <code class="docutils literal notranslate"><span class="pre">#4</span></code>. Slide indices count from ‘1’ and are not related
-to the numbers used <a class="reference internal" href="file-numbering.html#file-numbering"><span class="std std-ref">in filenames</span></a>.</p>
+link to slide 4, use <code class="docutils literal notranslate"><span class="pre">#4</span></code>. Slide indices count sequentially from ‘1’ and are
+not related to the numbers used <a class="reference internal" href="file-numbering.html#file-numbering"><span class="std std-ref">in filenames</span></a>.
+<a class="reference internal" href="builds.html#builds"><span class="std std-ref">Build steps</span></a> within a slide are not counted as separate slides.</p>
 <p>You can also link to slides <a class="reference internal" href="metadata.html#slide-ids"><span class="std std-ref">by ID</span></a>. For example, to link to a
 slide with the ID ‘foo’, use <code class="docutils literal notranslate"><span class="pre">#foo</span></code>.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl>
-<dt><a class="reference internal" href="metadata.html#slide-ids"><span class="std std-ref">Slide IDs</span></a></dt><dd><p><strong>TL;DR:</strong> To give a slide an ID, create a text box with the following contents
-anywhere in the slide:</p>
+<dt><a class="reference internal" href="metadata.html#slide-ids"><span class="std std-ref">Slide IDs</span></a></dt><dd><p><strong>TL;DR:</strong> To give a slide an ID, create a text box containing the
+following anywhere in the slide:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">@@@</span>
 <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;slide-id-here&quot;</span>
 </pre></div>
@@ -135,7 +136,7 @@ slide, use <code class="docutils literal notranslate"><span class="pre">#&lt;2&g
 <ul>
   <li><a href="index.html">Documentation index</a><ul>
       <li>Previous: <a href="builds.html" title="previous chapter">Builds</a></li>
-      <li>Next: <a href="rendering.html" title="next chapter"><code class="docutils literal notranslate"><span class="pre">slidie</span></code> command</a></li>
+      <li>Next: <a href="speaker-notes.html" title="next chapter">Speaker notes</a></li>
   </ul></li>
 </ul>
   <div role="note" aria-label="source link">

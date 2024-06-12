@@ -42,35 +42,41 @@
             
   <section id="metadata">
 <span id="id1"></span><h1>Metadata<a class="headerlink" href="#metadata" title="Link to this heading">¶</a></h1>
-<p>Various pieces of slide and show metadata can be added to slides via a
-combination of <a class="reference internal" href="magic-text.html#magic-text"><span class="std std-ref">magic text</span></a> annotations and the assignment of
-specific IDs to text boxes within a slide.</p>
+<p>Various pieces of slide and show metadata can be added to slides via either
+<a class="reference internal" href="magic-text.html#magic-text"><span class="std std-ref">magic text</span></a> annotations or naming relevant text boxes within
+a slide.</p>
 <section id="slide-metadata">
 <h2>Slide metadata<a class="headerlink" href="#slide-metadata" title="Link to this heading">¶</a></h2>
-<p>A title, author and date may be defined for a slide by either giving a text
-element an XML ID of <code class="docutils literal notranslate"><span class="pre">title</span></code>, <code class="docutils literal notranslate"><span class="pre">author</span></code> or <code class="docutils literal notranslate"><span class="pre">date</span></code>. Thus the slide metadata
-can be tied to the actual text on slides.</p>
+<p>A title, author and date may be defined for a slide by giving a text element an
+XML ID of <code class="docutils literal notranslate"><span class="pre">title</span></code>, <code class="docutils literal notranslate"><span class="pre">author</span></code> or <code class="docutils literal notranslate"><span class="pre">date</span></code>. This mechanism ensures that slide
+metadata is consistent with the actual text on slides.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>You can change the XML ID of an element in Inkscape by right clicking on
 it, choosing ‘Object Properties’ and entering a name in the ‘ID’ box and
-clicking the ‘Set’ button (the latter step being easily forgotten!).</p>
+clicking the ‘Set’ button (the last step being easily forgotten!).</p>
 </div>
 <img alt="A text element with an XML ID set to 'title' in Inkscape." src="_images/metadata_text_id_screenshot.png" />
 <p>Alternatively, you can create a <a class="reference internal" href="magic-text.html#magic-text"><span class="std std-ref">magic text box</span></a> defining one
 of <code class="docutils literal notranslate"><span class="pre">title</span></code>, <code class="docutils literal notranslate"><span class="pre">author</span></code> or <code class="docutils literal notranslate"><span class="pre">date</span></code> to define the relevant metadata without
-any text appearing on the slide. This can be useful when the title as written
-on the slide does not match what you’d prefer to appear in the slide show table
-of contents.</p>
-<p>At the moment, metadata assigned to the first slide is used to set <a class="reference internal" href="rendering.html#rendering-pdf"><span class="std std-ref">PDF</span></a> metadata. The title metadata alone on subsequent slides is
-then used to populate PDF table of contents entries.</p>
-<p>The <a class="reference internal" href="rendering.html#rendering-xhtml"><span class="std std-ref">XHTML viewer</span></a> currently only uses the first slide’s
-title metadata to populate the show title in the toolbar.</p>
+any text appearing on the slide. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">@@@</span>
+<span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;My slide&#39;s title&quot;</span>
+</pre></div>
+</div>
+<p>This can be useful when the title as written on the slide does not match what
+you’d prefer to appear in the slide show table of contents.</p>
+<p>Metadata assigned to the first slide is treated as the document-level metadata.
+For example, <a class="reference internal" href="rendering.html#rendering-pdf"><span class="std std-ref">PDF</span></a> document-level metadata and the title
+of the <a class="reference internal" href="xhtml-viewer.html#xhtml-viewer"><span class="std std-ref">XHTML viewer</span></a>.</p>
+<p>At the moment, slide metadata beyond the first slide is largely unused. An
+exception is that PDF tables of contents are populated using slide ‘title’
+data.</p>
 </section>
 <section id="slide-ids">
 <span id="id2"></span><h2>Slide IDs<a class="headerlink" href="#slide-ids" title="Link to this heading">¶</a></h2>
-<p>Each slide may be assigned an ID for use in <a class="reference internal" href="links.html#links"><span class="std std-ref">intra-show hyperlinks</span></a>. To assign an ID to a slide, add a <a class="reference internal" href="magic-text.html#magic-text"><span class="std std-ref">magic text</span></a> box
-anywhere on the slide which sets the <code class="docutils literal notranslate"><span class="pre">id</span></code> value like so:</p>
+<p>Each slide may also be assigned a slide ID for use in <a class="reference internal" href="links.html#links"><span class="std std-ref">intra-show
+hyperlinks</span></a>. To assign a slide ID to a slide, add a <a class="reference internal" href="magic-text.html#magic-text"><span class="std std-ref">magic text</span></a> box anywhere on the slide which sets the <code class="docutils literal notranslate"><span class="pre">id</span></code> value like so:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">@@@</span>
 <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;my-id-here&quot;</span>
 </pre></div>

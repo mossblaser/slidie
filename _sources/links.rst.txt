@@ -18,8 +18,8 @@ URL to open the viewer at the specified slide.
     'Href' box.
     
     For links to external resources, you may wish to set the 'Target' to
-    ``_blank`` to ensure the link opens in a new window when using Slidie's
-    browser-based XHTML viewer. For inter-slide links, leave this box empty.
+    ``_blank`` to ensure the link opens in a new window. For inter-slide links,
+    leave this box empty.
     
     .. image:: _static/hyperlink_screenshot.png
         :alt:
@@ -32,8 +32,9 @@ Linking to slides
 -----------------
 
 You can link to the Nth slide by creating a link to ``#N``. For example, to
-link to slide 4, use ``#4``. Slide indices count from '1' and are not related
-to the numbers used :ref:`in filenames <file-numbering>`.
+link to slide 4, use ``#4``. Slide indices count sequentially from '1' and are
+not related to the numbers used :ref:`in filenames <file-numbering>`.
+:ref:`Build steps <builds>` within a slide are not counted as separate slides.
 
 You can also link to slides :ref:`by ID <slide-ids>`. For example, to link to a
 slide with the ID 'foo', use ``#foo``.
@@ -41,8 +42,8 @@ slide with the ID 'foo', use ``#foo``.
 .. seealso::
 
     :ref:`slide-ids`
-        **TL;DR:** To give a slide an ID, create a text box with the following contents
-        anywhere in the slide::
+        **TL;DR:** To give a slide an ID, create a text box containing the
+        following anywhere in the slide::
         
             @@@
             id = "slide-id-here"

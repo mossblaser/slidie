@@ -13,7 +13,7 @@
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Speaker notes" href="speaker-notes.html" />
+    <link rel="next" title="Slidie file numbering/naming rules" href="file-numbering.html" />
     <link rel="prev" title="slidie command" href="rendering.html" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -29,7 +29,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="speaker-notes.html" title="Speaker notes"
+          <a href="file-numbering.html" title="Slidie file numbering/naming rules"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="rendering.html" title="slidie command"
@@ -46,7 +46,7 @@
             
   <section id="the-slidie-xhtml-viewer">
 <span id="xhtml-viewer"></span><h1>The Slidie XHTML Viewer<a class="headerlink" href="#the-slidie-xhtml-viewer" title="Link to this heading">¶</a></h1>
-<p>The slidie XHTML viewer application is embedded into the <a class="reference internal" href="rendering.html#rendering-xhtml"><span class="std std-ref">XHTML output
+<p>The Slidie XHTML viewer application is embedded into the <a class="reference internal" href="rendering.html#rendering-xhtml"><span class="std std-ref">XHTML output
 format</span></a> files. The viewer provides a simple read-only view of a
 set of slides, along with a few presenter-oriented utilities.</p>
 <section id="user-interface">
@@ -55,22 +55,21 @@ set of slides, along with a few presenter-oriented utilities.</p>
 <img alt="Annotated XHTML viewer screenshot." src="_images/xhtml_viewer_annotated.png" />
 <ol class="arabic simple">
 <li><p><strong>The current slide and step numbers.</strong> These are displayed (and can
-be entered) using the same <a class="reference internal" href="links.html#links"><span class="std std-ref">syntax used for hyperlinks</span></a>. The
-current position in the presentation is also reflected in the browser URL
-bar.</p></li>
+be entered) using the same <a class="reference internal" href="links.html#links"><span class="std std-ref">syntax used for hyperlinks</span></a>,
+without the leading <code class="docutils literal notranslate"><span class="pre">#</span></code>. The current position in the presentation is also
+reflected in the browser URL bar.</p></li>
 <li><p><strong>The presentation title.</strong> This is taken from the first slide’s
 <a class="reference internal" href="metadata.html#metadata"><span class="std std-ref">metadata</span></a>.</p></li>
 <li><p><strong>Fullscreen button.</strong> This will enter full-screen mode, hiding everything
-but the slides. Press escape to exit.</p></li>
+but the slides. Press Escape to exit.</p></li>
 <li><p><strong>Hide UI button.</strong> This hides all of the viewer application’s user
 interface but does not enter full screen mode. This may be useful when
 presenting via a video conferencing system. Press escape to restore the
 user interface.</p></li>
-<li><p><strong>Presenter view button.</strong> Open <a class="reference internal" href="#presenter-view"><span class="std std-ref">presenter view</span></a> in a
-new window.</p></li>
+<li><p><strong>Presenter view button.</strong> Open the <a class="reference internal" href="#presenter-view"><span class="std std-ref">presenter view</span></a>
+in a new window.</p></li>
 <li><p><strong>Help button.</strong> Enumerates all keyboard shortcuts supported by the viewer.</p></li>
-<li><p><strong>Slide thumbnail browser.</strong> Tip: Hover over the slide number to show the
-source file name of a slide.</p></li>
+<li><p><strong>Slide thumbnail browser.</strong></p></li>
 <li><p><strong>Speaker notes.</strong> Rendered as Markdown. <a class="reference internal" href="speaker-notes.html#speaker-notes"><span class="std std-ref">Speaker notes</span></a> not related to the current <a class="reference internal" href="builds.html#builds"><span class="std std-ref">build step</span></a> are
 shown dimly.</p></li>
 </ol>
@@ -78,6 +77,11 @@ shown dimly.</p></li>
 arrow keys. Other keyboard shortcuts are provided to skip more rapidly (e.g.
 past <a class="reference internal" href="builds.html#builds"><span class="std std-ref">build steps</span></a> or to the beginning and end). See the built-in
 help menu for the complete list.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Hover over the slide number in the thumbnail browser to show the source
+SVG file of that slide.</p>
+</div>
 </section>
 <section id="presenter-view">
 <span id="id1"></span><h2>Presenter view<a class="headerlink" href="#presenter-view" title="Link to this heading">¶</a></h2>
@@ -87,7 +91,7 @@ view has the following major components:</p>
 <img alt="Annotated XHTML presenter view screenshot." src="_images/xhtml_presenter_view_annotated.png" />
 <ol class="arabic simple">
 <li><p><strong>Current slide.</strong></p></li>
-<li><p><strong>Next slide.</strong></p></li>
+<li><p><strong>Next slide or build step.</strong></p></li>
 <li><p><strong>Speaker notes.</strong></p></li>
 <li><p><strong>Current time.</strong></p></li>
 <li><p><strong>Stopwatch.</strong></p></li>
@@ -101,7 +105,7 @@ is placed in full-screen mode.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>The slide previews unfortunately do not show a live view of any dynamic
-slide elements (e.g.  ;ref:<cite>videos &lt;video&gt;</cite> or <a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">IFrames</span></a>).</p>
+slide elements (e.g.  <a class="reference internal" href="video.html#video"><span class="std std-ref">videos</span></a> or <a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">iframes</span></a>).</p>
 </div>
 </section>
 <section id="browser-quirks">
@@ -109,12 +113,12 @@ slide elements (e.g.  ;ref:<cite>videos &lt;video&gt;</cite> or <a class="refere
 <p>The XHTML viewer application supports all major browser engines and browsers.
 There are, however, a some known limitations in certain browsers:</p>
 <dl class="simple">
-<dt>Webkit (e.g. Safari)</dt><dd><p><a class="reference internal" href="video.html#video"><span class="std std-ref">Videos</span></a> and <a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">IFrames</span></a> are not supported at the
+<dt>Webkit (e.g. Safari)</dt><dd><p><a class="reference internal" href="video.html#video"><span class="std std-ref">Videos</span></a> and <a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">iframes</span></a> are not supported at the
 time of writing due to a rendering bug in this browser engine. These
 elements will currently render in a glitchy and unusable fashion.</p>
 </dd>
 <dt>Firefox</dt><dd><p>Firefox’s security rules prevent keyboard and mouse input from
-reaching <a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">IFrames</span></a> under certain circumstances when the
+reaching <a class="reference internal" href="iframe.html#iframe"><span class="std std-ref">iframes</span></a> under certain circumstances when the
 viewer is opened directly from a file. Accessing the slides via a web
 server (e.g. <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">http.server</span></code>) is a possible workaround.</p>
 </dd>
@@ -144,7 +148,7 @@ server (e.g. <code class="docutils literal notranslate"><span class="pre">python
 <ul>
   <li><a href="index.html">Documentation index</a><ul>
       <li>Previous: <a href="rendering.html" title="previous chapter"><code class="docutils literal notranslate"><span class="pre">slidie</span></code> command</a></li>
-      <li>Next: <a href="speaker-notes.html" title="next chapter">Speaker notes</a></li>
+      <li>Next: <a href="file-numbering.html" title="next chapter">Slidie file numbering/naming rules</a></li>
   </ul></li>
 </ul>
   <div role="note" aria-label="source link">

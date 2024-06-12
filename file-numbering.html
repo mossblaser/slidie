@@ -14,7 +14,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="slidie-mv: Slide renumbering tool" href="slidie-mv.html" />
-    <link rel="prev" title="Slidie Guided Tour" href="tour.html" />
+    <link rel="prev" title="The Slidie XHTML Viewer" href="xhtml-viewer.html" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
@@ -32,7 +32,7 @@
           <a href="slidie-mv.html" title="slidie-mv: Slide renumbering tool"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="tour.html" title="Slidie Guided Tour"
+          <a href="xhtml-viewer.html" title="The Slidie XHTML Viewer"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Slidie 0.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Slidie file numbering/naming rules</a></li> 
@@ -50,17 +50,18 @@
 their filenames. For example:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>100_first_slide.svg</p></li>
-<li><p>200_second_slide.svg</p></li>
-<li><p>300_third_slide.svg</p></li>
+<li><p>00100_first_slide.svg</p></li>
+<li><p>00200_second_slide.svg</p></li>
+<li><p>00300_third_slide.svg</p></li>
 </ul>
 </div></blockquote>
-<p>Slides <em>must</em> have an integer prefix and end with <code class="docutils literal notranslate"><span class="pre">.svg</span></code>.</p>
-<p>Slides are sorted in numerical rather than lexicographic order.</p>
+<p>Slide filenames <em>must</em> have an integer prefix and end with <code class="docutils literal notranslate"><span class="pre">.svg</span></code>.</p>
+<p>Slides are displayed in numerical rather than lexicographic order.</p>
 <p>No two slides may start with the same number (even if formatted differently).</p>
-<p>Slidie treats all leading digits (and optional <code class="docutils literal notranslate"><span class="pre">-</span></code> or <code class="docutils literal notranslate"><span class="pre">+</span></code>) as the file’s
-number. Slide numbers may be negative (start with <code class="docutils literal notranslate"><span class="pre">-</span></code>). They may also have
-explicit leading <code class="docutils literal notranslate"><span class="pre">+</span></code>. Leading zeros are ignored.</p>
+<p>Slidie treats all digits at the start of its filename as the slide number,
+ending with the first non-digit. Slide numbers may be negative (start with
+<code class="docutils literal notranslate"><span class="pre">-</span></code>). They may also have explicit leading <code class="docutils literal notranslate"><span class="pre">+</span></code>. Leading zeros are ignored.
+Everything after the slide number is ignored.</p>
 <section id="practical-tips">
 <span id="file-numbering-tips"></span><h2>Practical tips<a class="headerlink" href="#practical-tips" title="Link to this heading">¶</a></h2>
 <section id="naming">
@@ -75,7 +76,7 @@ equally valid.</p>
 <section id="basic-style-numbering">
 <h3>BASIC-style numbering<a class="headerlink" href="#basic-style-numbering" title="Link to this heading">¶</a></h3>
 <p>Using BASIC-line-number-style numbering makes it easier to reorganise slides at
-a later point in time. Slidie also provides a utility (<a class="reference internal" href="slidie-mv.html#slidie-mv"><span class="std std-ref">slidie-mv</span></a>) for doing this. For example, given the following:</p>
+a later point in time. For example, given the following:</p>
 <ul class="simple">
 <li><p>100 - a.svg</p></li>
 <li><p>200 - b.svg</p></li>
@@ -86,6 +87,9 @@ a later point in time. Slidie also provides a utility (<a class="reference inter
 less likely you’ll have to rename extra files when reorganising your slides
 whilst smaller gaps lead to smaller numbers. You could try 100 (as in the
 example above) as a starting point if unsure.</p>
+<p>Slidie provides the <a class="reference internal" href="slidie-mv.html#slidie-mv"><span class="std std-ref">slidie-mv</span></a> utility for conveniently
+reordering slides based on this scheme (whilst handling the awkward case where
+you run out of numbers).</p>
 </section>
 <section id="zero-padding">
 <h3>Zero padding<a class="headerlink" href="#zero-padding" title="Link to this heading">¶</a></h3>
@@ -122,7 +126,7 @@ have fewer than ten slides!</p>
   </div><h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation index</a><ul>
-      <li>Previous: <a href="tour.html" title="previous chapter">Slidie Guided Tour</a></li>
+      <li>Previous: <a href="xhtml-viewer.html" title="previous chapter">The Slidie XHTML Viewer</a></li>
       <li>Next: <a href="slidie-mv.html" title="next chapter"><code class="docutils literal notranslate"><span class="pre">slidie-mv</span></code>: Slide renumbering tool</a></li>
   </ul></li>
 </ul>

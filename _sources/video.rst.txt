@@ -3,19 +3,19 @@
 Video
 =====
 
-Basic support for adding videos to slides is included in slidie via the
+Basic support for adding videos to slides is included in Slidie via the
 ``video`` :ref:`magic text <magic-text>` value.
 
 .. warning::
 
-    Video support in slidie is relatively limited and comes with far more
+    Video support in Slidie is relatively limited and comes with far more
     caveats than other features.
     
     The author would feel worse about this if not for the fact that every other
     presentation tool seems to fumble video handling in their own unique ways.
 
 Embedded videos are only supported in the :ref:`XHTML viewer
-<rendering-xhtml>`. A user-defined placeholder will be output for other
+<rendering-xhtml>`. The user-defined placeholder will be shown in other
 output formats.
 
 .. note::
@@ -24,9 +24,9 @@ output formats.
     usable in practice. For example, viewer support is extremely limited and
     often very unreliable. Implementing video embeddings which happen to be
     compatible with the already-small pool of capable viewers is also
-    horrendous and involves terms like "Flash" and "undocumented Javascript
-    API". In short, I'm afraid the author eventually concluded that they did
-    not want to go there, despite serious efforts to do so.
+    horrendous and involves things like Flash(!) and undocumented Javascript
+    APIs. In short, I'm afraid the author eventually concluded that they did
+    not want to go there, despite serious good-faith efforts to do so.
 
 .. image:: _static/video_inkscape_screenshot.png
     :alt:
@@ -66,11 +66,11 @@ adjacently to the rendered XHTML viewer.
 .. warning::
 
     Slidie does not attempt to embed videos within the generated XHTML output
-    due to `browser limitations on data URL lengths being too small for many
-    videos
+    due to `browser limitations on data URL lengths
     <https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs#length_limitations>`_.
-    Care must be taken to ensure that any adjacent video files are stored and
-    distributed together with the generated XHTML output.
+    Care must be taken to ensure that local video files are stored and
+    distributed together with the generated XHTML output in the correct
+    relative location.
 
 .. warning::
 
@@ -82,7 +82,7 @@ The optional ``start`` time controls the point at which the video will play.
 If ``loop`` is true, the video will be restart from the beginning when it
 reaches the end (even if ``start`` is set to a non-zero value).
 
-If ``mute`` is true, audio will not be played back.
+If ``mute`` is true, audio will be muted.
 
 .. warning::
 
@@ -95,7 +95,8 @@ If ``mute`` is true, audio will not be played back.
     Slidie currently does not include any mechanism for controling playback:
     media will always automatically start from the specified offset upon
     entering the slide and play to completion (or slide exit, if ``loop`` is
-    set).
+    set). This may be addressed in a future release. In the meantime, some
+    browsers allow you to right-click and choose 'show controls'.
 
 
 
@@ -106,8 +107,12 @@ Automatic video placeholder generation
 --------------------------------------
 
 The ``slidie-video-stills`` command will automatically extract a still frame
-from embedded videos and set it as the placeholder image for the video.
+from embedded videos and insert it as the placeholder image for the video.
 
 Usage::
 
     $ slidie-video-stills path/to/slide.svg
+
+Using ``slidie-video-stills``, you can quicly lay out videos your slides using
+simple rectangle placeholders and later replace them automatically with stills
+for the benefit of thumbnails and non-XHTML output formats.

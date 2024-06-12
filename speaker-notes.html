@@ -14,7 +14,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Magic text" href="magic-text.html" />
-    <link rel="prev" title="The Slidie XHTML Viewer" href="xhtml-viewer.html" />
+    <link rel="prev" title="Creating hyperlinks between slides" href="links.html" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
@@ -32,7 +32,7 @@
           <a href="magic-text.html" title="Magic text"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="xhtml-viewer.html" title="The Slidie XHTML Viewer"
+          <a href="links.html" title="Creating hyperlinks between slides"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Slidie 0.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Speaker notes</a></li> 
@@ -48,12 +48,13 @@
 <span id="id1"></span><h1>Speaker notes<a class="headerlink" href="#speaker-notes" title="Link to this heading">¶</a></h1>
 <p>Speaker notes can be added to a slide by creating a text box whose first line
 contains <code class="docutils literal notranslate"><span class="pre">###</span></code> (three hashes). The remainder of the textbox contains the
-speaker notes in <a class="reference external" href="https://en.wikipedia.org/wiki/Markdown">markdown</a> format. Any special SVG text formatting will be
-ignored.</p>
+speaker notes in <a class="reference external" href="https://en.wikipedia.org/wiki/Markdown">markdown</a> format. SVG text formatting is ignored.</p>
 <img alt="A screenshot of Inkscape with a set of speaker notes." src="_images/speaker_notes_source_screenshot.png" />
-<p>When rendered, the textbox containing the speaker notes will be made invisible
-and so its physical location within the page is unimportant. At the time of
-writing, <a class="reference internal" href="rendering.html#rendering-formats"><span class="std std-ref">only the XHTML output format supports displaying speaker notes</span></a>. In other formats, the speaker notes are simply removed.</p>
+<p>When rendered, the text box containing the speaker notes will be made invisible
+and so its doesn’t <em>need</em> to be placed off the edge of the page – though this
+is often convenient. At the time of writing, <a class="reference internal" href="rendering.html#rendering-formats"><span class="std std-ref">only the XHTML output format
+supports displaying speaker notes</span></a>. In other formats, the
+speaker notes are simply removed.</p>
 <img alt="A screenshot of the XHTML viewer showing some speaker notes." src="_images/speaker_notes_viewer_screenshot.png" />
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -69,9 +70,8 @@ the notes are concatenated together in the order they appear in the SVG
 document. This means that the top-most notes on the top-most layers will be
 shown first.</p>
 <p>Speaker note text boxes placed on layers with <a class="reference internal" href="builds.html#builds"><span class="std std-ref">build steps</span></a> are
-treated as only being applicable whilst that layer is visible. In the XHTML
-output format, these notes will be dimmed out (but still visible) when the
-layer is hidden.</p>
+treated as only being relevant whilst that layer is visible: these notes are
+shown dimmed out when the layer they’re on is not visible.</p>
 </section>
 </section>
 
@@ -94,7 +94,7 @@ layer is hidden.</p>
   </div><h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation index</a><ul>
-      <li>Previous: <a href="xhtml-viewer.html" title="previous chapter">The Slidie XHTML Viewer</a></li>
+      <li>Previous: <a href="links.html" title="previous chapter">Creating hyperlinks between slides</a></li>
       <li>Next: <a href="magic-text.html" title="next chapter">Magic text</a></li>
   </ul></li>
 </ul>
