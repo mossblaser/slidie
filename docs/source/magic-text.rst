@@ -12,7 +12,8 @@ A magic text box is an ordinary SVG text box whose first line is ``@@@`` (three
 document and must define *exactly one* value.
 
 As an example, both of the following are valid magic text values: both define a
-single top-level value -- ``video``.
+single top-level value -- ``video`` -- though in the latter case that value
+contains a complex datastructure with multiple sub-values.
 
 .. _TOML: https://toml.io/en/
 
@@ -31,7 +32,7 @@ single top-level value -- ``video``.
     mute = true
 
 Magic text boxes are removed from slides during rendering and do not appear in
-the output.
+the output. As a result they can be placed wherever is convenient on a slide.
 
 .. tip::
 
@@ -42,7 +43,7 @@ the output.
 
 .. seealso::
 
-    See the following for supported magic text values:
+    See the following supported magic-text-based functions:
 
     :ref:`video`
         Uses the ``video`` magic text value.
@@ -68,7 +69,7 @@ the output.
 Magic rectangles
 ----------------
 
-In some cases (such as :ref:`videos <video>` and :ref:`IFrames <iframe>`), a
+In some cases (such as :ref:`videos <video>` and :ref:`iframes <iframe>`), a
 magic text definition must be associated with a rectangular region on a slide.
 To do this you should group a placeholder SVG rectangle or image object with
 the magic text box.

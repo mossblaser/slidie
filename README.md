@@ -102,5 +102,5 @@ usually just too slow to author for slides in most situations.
 ### What about non-Inkscape SVG authoring tools
 
 They're cool too, but I just don't support them (yet). You can still use these
-to create slides, but slidie's step-by-step build-up system currently depends
+to create slides, but Slidie's step-by-step build-up system currently depends
 on Inkscape's layers mechanism and so this feature will not be usable.

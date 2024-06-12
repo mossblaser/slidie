@@ -6,19 +6,20 @@ Slidie file numbering/naming rules
 The order in which slides are included is determined by numerical prefixes in
 their filenames. For example:
 
-    * 100_first_slide.svg
-    * 200_second_slide.svg
-    * 300_third_slide.svg
+    * 00100_first_slide.svg
+    * 00200_second_slide.svg
+    * 00300_third_slide.svg
 
-Slides *must* have an integer prefix and end with ``.svg``.
+Slide filenames *must* have an integer prefix and end with ``.svg``.
 
-Slides are sorted in numerical rather than lexicographic order.
+Slides are displayed in numerical rather than lexicographic order.
 
 No two slides may start with the same number (even if formatted differently).
 
-Slidie treats all leading digits (and optional ``-`` or ``+``) as the file's
-number. Slide numbers may be negative (start with ``-``). They may also have
-explicit leading ``+``. Leading zeros are ignored.
+Slidie treats all digits at the start of its filename as the slide number,
+ending with the first non-digit. Slide numbers may be negative (start with
+``-``). They may also have explicit leading ``+``. Leading zeros are ignored.
+Everything after the slide number is ignored.
 
 
 .. _file-numbering-tips:
@@ -42,8 +43,7 @@ BASIC-style numbering
 `````````````````````
 
 Using BASIC-line-number-style numbering makes it easier to reorganise slides at
-a later point in time. Slidie also provides a utility (:ref:`slidie-mv
-<slidie-mv>`) for doing this. For example, given the following:
+a later point in time. For example, given the following:
 
 * 100 - a.svg
 * 200 - b.svg
@@ -55,6 +55,10 @@ The gap you leave between numbers is a matter of taste. Larger gaps make it
 less likely you'll have to rename extra files when reorganising your slides
 whilst smaller gaps lead to smaller numbers. You could try 100 (as in the
 example above) as a starting point if unsure.
+
+Slidie provides the :ref:`slidie-mv <slidie-mv>` utility for conveniently
+reordering slides based on this scheme (whilst handling the awkward case where
+you run out of numbers).
 
 Zero padding
 ````````````

@@ -10,7 +10,7 @@ Usage is as follows::
 
     $ slidie [SOURCE ...] [--output OUTPUT]
 
-If the source is omitted, slidie will look for slide SVGs in the current
+If the source is omitted, Slidie will look for slide SVGs in the current
 directory. Otherwise, the source can be a directory name (containing
 :ref:`numbered <file-numbering>` SVG files) or an explicit list of SVG files
 (which need not be numbered and will be combined in the order given).
@@ -67,7 +67,7 @@ Slidie supports several output formats suitable for different purposes:
 +----------------------------------------+------------+------------+------------+
 | :ref:`Video <video>`                   | ✔ [#f3]_   | --         | --         |
 +----------------------------------------+------------+------------+------------+
-| :ref:`IFrames <iframe>`                | ✔ [#f3]_   | --         | --         |
+| :ref:`iframes <iframe>`                | ✔ [#f3]_   | --         | --         |
 +----------------------------------------+------------+------------+------------+
 
 .. [#f1] Whilst browsers now have very good SVG support, there are still some
@@ -76,7 +76,7 @@ Slidie supports several output formats suitable for different purposes:
 .. [#f2] Support for incorporating speaker notes into PDF comments may be
          implemented in the future.
 
-.. [#f3] Videos and IFrames are not supported on Webkit based browsers (e.g.
+.. [#f3] Videos and iframes are not supported in Webkit based browsers (e.g.
          Safari) due to rendering bugs in that browser engine at the time of
          writing. This might one day fix itself.
 
@@ -95,22 +95,22 @@ by modern browsers with no need for a web server or internet connection.
 
 .. note::
 
-    Slidie generates XHTML, not HTML, since it directly incorporates full
+    Slidie generates XHTML, not HTML. The XHTML directly includes full
     (XML-based) SVG files and depends on XML processing features not available
     in regular HTML documents. 
 
 Whilst the XHTML viewer application can be hosted on a web server, it is
 designed to function correctly when loaded directly from a ``file://`` URL.
 
-.. warning::
-
-    Some browsers place extra restrictions on :ref:`IFrames <iframe>` when
-    running from a ``file://`` URL. This can cause embedded IFrames to silently
-    ignore keyboard and mouse input. In this situation, using a simple web
-    server (e.g. ``python -m http.server``) might be necessary.
-
 The generated file is entirely self-contained, including all slide graphics,
 fonts and the viewer application and should be openable on other systems.
+
+.. warning::
+
+    An exception is if your SVGs reference external files (rather than
+    embedding them), the generated XHTML viewer will also reference, rather
+    than embedding those files. In this case you'll need to take care to keep
+    the viewer and these files together.
 
 .. note::
 
@@ -143,7 +143,7 @@ features:
 * Font embedding.
 
 .. image:: _static/examples/getting_started_pdf_screenshot.png
-    :alt: A slidie PDF in a PDF viewer showing a rich table of contents and
+    :alt: A Slidie PDF in a PDF viewer showing a rich table of contents and
           custom page numbering.
 
 
@@ -162,7 +162,7 @@ The resolution of the generated PNGs may be overriden from the default of 96
 DPI using the ``--png-dpi`` argument.
 
 By default, PNGs will be rendered with fully-opaque backgrounds. This may be
-overridden using the `--png-background-opacity`` argument.
+overridden using the ``--png-background-opacity`` argument.
 
 The generated PNGs are assigned ascending numbers (starting from 1).
 

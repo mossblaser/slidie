@@ -26,6 +26,20 @@ Reference manual
 The following documentation describes each of Slidie's features in detail.
 
 
+Output formats
+``````````````
+
+Slidie supports rendering slide shows as :ref:`XHTML <rendering-xhtml>`,
+:ref:`PDF <rendering-pdf>` and :ref:`PNG <rendering-png>` formats, albeit with
+slightly different sets of supported features beyond the core functionality.
+
+.. toctree::
+    :maxdepth: 2
+    
+    rendering.rst
+    xhtml-viewer.rst
+
+
 File numbering
 ``````````````
 
@@ -64,20 +78,6 @@ Slidie supports :ref:`hyperlinks between slides <links>` using anchor-style
     :maxdepth: 2
     
     links.rst
-
-
-Output formats
-``````````````
-
-Slidie supports rendering slide shows as :ref:`XHTML <rendering-xhtml>`,
-:ref:`PDF <rendering-pdf>` and :ref:`PNG <rendering-png>` formats, albeit with
-slightly different sets of supported features.
-
-.. toctree::
-    :maxdepth: 2
-    
-    rendering.rst
-    xhtml-viewer.rst
 
 
 Speaker notes

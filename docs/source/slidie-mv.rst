@@ -3,7 +3,8 @@
 ``slidie-mv``: Slide renumbering tool
 =====================================
 
-The ``slidie-mv`` command can be used to reorder slides by renumbering them.
+The ``slidie-mv`` command can be used to reorder slides by :ref:`renumbering
+<file-numbering>` them.
 
 
 Reordering slides
@@ -12,7 +13,10 @@ Reordering slides
 The following example illustrates how two slides could be renumbered to move
 them later in a show::
 
-    $ slidie-mv 100-foo.svg 200-bar.svg --after 300-bar.svg
+    $ slidie-mv 100-foo.svg 200-bar.svg --after 300-baz.svg
+
+The result would be that the slides ``100-foo.svg`` and ``100-bar.svg`` would
+be given new numerical prefixes like ``400-foo.svg`` and ``500-bar.svg``.
 
 As well as ``--after <slide>`` you can also use ``--before <slide>``,
 ``--start`` or ``--end`` to specify the destination.
@@ -29,28 +33,31 @@ renamed.
     digits to zero-pad to.
 
 
-Creating a gap
---------------
+Inserting new slides
+--------------------
 
-If you want to create a gab between two adjacently numbered slides for a new
-slide you can use the ``--insert <count>`` argument instead of a list of
-existing slides to move.
+``slidie-mv`` can also suggest new slide numbers to use to insert new slides
+into your presentation using ``--insert <count>``, for example::
 
-For example say we have two slides ``299-foo.svg`` and ``300-bar.svg`` and we
-want to insert a new slide between them we could use::
-
-    $ slidie-mv --insert 1 --before 300-bar.svg
+    $ slidie-mv --insert 1 --after 300-foo.svg
     400
 
-In the example above, ``slidie-mv`` will automatically renumber either
-``299-foo.svg`` or ``300-bar.svg`` to make room and print the slide number(s)
-to use for your new slides.
+In the example above, ``slidie-mv`` suggested we asign our new slide the number
+400.
 
-.. note::
 
-    ``slidie-mv`` will prefer o to move whichever file results in the last
-    number of renaming operations, or all else being equal, whichever leads to
-    leaving the biggest gaps between the new file numbers.
+Creating gaps
+-------------
+
+For example say we have two slides ``300-foo.svg`` and ``301-bar.svg`` and we
+want to move a slide in between them, Slidie will have to rename not just the
+moved slide but also either ``300-foo.svg`` or ``301-bar.svg`` (and potentially
+any further immediate adjacent slides).
+
+The ``slidie-mv`` command will determine which files to rename, prioritising
+keeping the number of files renamed to a minimum (to keep version control
+history cleaner) and maximise the spacing of the resulting numbers (to maximise
+the chances of gaps existing in the future).
 
 
 Renumbering all slides
