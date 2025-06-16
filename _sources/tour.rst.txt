@@ -10,7 +10,7 @@ features, with links to more in-depth documentation.
 Installation
 ------------
 
-You can install Slidie from `PyPI<ttps://pypi.org/project/slidie/#data>`_ into
+You can install Slidie from `PyPI <https://pypi.org/project/slidie/>`_ into
 a `Python virtual environment <https://docs.python.org/3/library/venv.html>`_
 like so::
 
