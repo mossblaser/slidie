@@ -7,6 +7,18 @@ This document provides a very high-level guided tour of many of Slidie's main
 features, with links to more in-depth documentation.
 
 
+Installation
+------------
+
+You can install Slidie from [PyPI](https://pypi.org/project/slidie/#data) into
+a [Python virtual environment](https://docs.python.org/3/library/venv.html)
+like so::
+
+    $ python3 -m venv venv
+    $ source ./venv/bin/activate
+    $ pip install slidie
+
+
 Part 0: Creating slides
 -----------------------
 
