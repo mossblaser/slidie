@@ -7,6 +7,7 @@ from typing import TextIO, Self, Iterator
 from types import TracebackType
 
 import os
+import re
 from subprocess import Popen, PIPE, STDOUT
 from pathlib import Path
 from xml.etree import ElementTree as ET
@@ -82,8 +83,8 @@ class Inkscape:
         Run a command and return any output it produces, up to but excluding
         the next prompt.
 
-        If strip_warnings is true, all lines starting with "WARNING:" will be
-        removed from the output.
+        If strip_warnings is true, all lines starting with "WARNING:" or ``**
+        (...): Warning **:`` will be removed from the output.
 
         If strip_gtk_warnings is true, all lines containing "Gtk-WARNING" will
         be stripped from the output.
@@ -143,7 +144,14 @@ class Inkscape:
         # Filter out any Inkscape warnings
         if strip_warnings:
             out = "\n".join(
-                line for line in out.splitlines() if not line.startswith("WARNING:")
+                line for line in out.splitlines() if not re.match(
+                    (
+                      r"^WARNING:"
+                      r"|"
+                      r"^\*\* \([^\)]+\): WARNING \*\*:"
+                    ),
+                    line,
+                )
             )
 
         return out
