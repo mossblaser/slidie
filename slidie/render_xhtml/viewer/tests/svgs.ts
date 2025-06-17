@@ -50,7 +50,7 @@ export async function getProcessedSvg(name: string): Promise<SVGSVGElement> {
       ),
       resolve(inputFile),
       resolve(outputFile),
-    ]);
+    ], {"stdio": "inherit"});
     await new Promise((resolve) => proc.on("close", resolve));
     const jsdom = new JSDOM(await readFile(outputFile), {
       contentType: "image/svg+xml",
