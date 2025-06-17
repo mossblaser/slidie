@@ -128,31 +128,30 @@ class Inkscape:
         # Snip off the echo-back of the command
         out = out.partition("\n")[2]
 
+        # XXX: Filter GTK warnings (ideally these could be suppressed another
+        # way..)
+        if strip_gtk_warnings:
+            out = re.sub(
+                r"^.* Gtk-Warning .*$\n*",
+                "",
+                out,
+                flags=re.MULTILINE,
+            )
+
+        # Filter out any Inkscape warnings
+        if strip_warnings:
+            out = re.sub(
+                r"^(WARNING:|\*\* \([^\)]+\): WARNING \*\*:).*$\n*",
+                "",
+                out,
+                flags=re.MULTILINE,
+            )
+
         # Snip off the prompt (if present)
         if out == "> " or out.endswith("\n> "):
             out = out[:-3]
             if out.endswith("\r"):  # Windows...
                 out = out[:-1]
-
-        # XXX: Filter GTK warnings (ideally these could be suppressed another
-        # way..)
-        if strip_gtk_warnings:
-            out = "\n".join(
-                line for line in out.splitlines() if "Gtk-WARNING" not in line
-            )
-
-        # Filter out any Inkscape warnings
-        if strip_warnings:
-            out = "\n".join(
-                line for line in out.splitlines() if not re.match(
-                    (
-                      r"^WARNING:"
-                      r"|"
-                      r"^\*\* \([^\)]+\): WARNING \*\*:"
-                    ),
-                    line,
-                )
-            )
 
         return out
 
