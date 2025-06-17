@@ -93,7 +93,9 @@ def viewer(request: Any, driver: WebDriver, viewer_path: Path) -> WebDriver:
 
 
 def viewer_screenshot(viewer: WebDriver) -> NDArray:
-    return np.array(Image.open(io.BytesIO(viewer.get_screenshot_as_png())))
+    return np.array(
+        Image.open(io.BytesIO(viewer.get_screenshot_as_png())).convert("RGBA")
+    )
 
 
 def viewer_fullscreen(viewer: WebDriver) -> None:
