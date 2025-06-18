@@ -4,6 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "slidie"
+description = "An Inkscape-centered slide preparation tool"
+readme = "README.md"
 dependencies = ["pikepdf"]
 dynamic = ["version"]
 license = {file = "LICENCE"}
